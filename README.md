@@ -42,4 +42,5 @@
 
 ## Zadania
 
-1. [Zadanie 1 - Model danych (1 pkt)](./zad1/)
+1. [Zadanie 1 - Model danych](./zad1/)
+2. [Zadanie 2 - Workload](./zad2/)
