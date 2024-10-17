@@ -1,15 +1,45 @@
-# Zaawansowane systemy baz danych
+# Zaawansowane systemy baz danych (ZSDB)
 
-Baza danych - Więzienie
+<table align="center">
+  <thead>
+    <tr>
+      <th colspan="2">Grupa B5 - Więzienie</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="2">
 
-Skład zespołu:
-- Tomasz Chojnacki (260365)
-- Kamila Iwańska (253027)
-- Jakub Zehner (260285)
+![@tchojnacki](https://github.com/tchojnacki.png?size=64)
+      </td>
+      <td>**Tomasz Chojnacki** (260365)</td>
+    </tr>
+    <tr>
+      <td>[@tchojnacki](https://github.com/tchojnacki)</td>
+    </tr>
+    <tr>
+      <td rowspan="2">
 
-## Etap 1
+![@kamila-iwanska](https://github.com/kamila-iwanska.png?size=64)
+      </td>
+      <td>**Kamila Iwańska** (253027)</td>
+    </tr>
+    <tr>
+      <td>[@kamila-iwanska](https://github.com/kamila-iwanska)</td>
+    </tr>
+    <tr>
+      <td rowspan="2">
 
-Baza służy do zarządzania więziennym systemem informatycznym, umożliwi ona osobom administrującym więzieniem gromadzenie oraz przetwarzanie wszelkich danych niezbędnych w procesie sprawnej organizacji zakładu, strażników, więźniów oraz odbywanych kar. Przeznaczeniem projektowanej bazy danych jest umożliwienie gromadzenia, wyszukiwania, sortowania i czytelnego prezentowania danych dotyczących osób skazanych na karę pozbawienia wolności wraz z ich wyrokami, naganami i celą więzienną. Dodatkowo zapisywane będą informacje odnośnie strażników oraz spis bloków więziennych wraz z celami które się w nich znajdują i miejscami w celach. Spowoduje to przyspieszenie procesu zarządzania zakładem karnym oraz ułatwi prezentowanie danych dotyczących funkcjonowania.
+![@jakubzehner](https://github.com/jakubzehner.png?size=64)
+      </td>
+      <td>**Jakub Zehner** (260285)</td>
+    </tr>
+    <tr>
+      <td>[@jakubzehner](https://github.com/jakubzehner)</td>
+    </tr>
+  </tbody>
+</table>
 
-![schemat](erd.drawio.png)
+## Zadania
 
+1. [Zadanie 1 - Model danych (1 pkt)](./zad1/)
