@@ -70,6 +70,15 @@ Wyszukanie wydarzeń związanych z więźniami w danym bloku `block_id`, które 
 | `reprimand_count` |
 | `is_in_solitary`  |
 
+### Zapytanie 4 (dodatkowe)
+
+Zwrócenie raportu dotyczącego minimalnej, maksymalnej i średniej dla wzrostu, wagi, liczby wyroków, liczby reprymend, liczby przekwaterowań, czasu spędzonego w więzieniu dla więźniów w danym bloku `block_id`. Można filtrować wyniki według płci więźniów (`sex`).
+
+| Parametry  |
+| ---------- |
+| `block_id` |
+| `sex`      |
+
 ### Zmiana danych 1
 
 Zwolnienie wszystkich strażników ze stażem mniejszym niż `experience_months` miesięcy, którzy nie mają zaplanowanych patroli w przyszłości oraz patrolowali blok `block_id` w określonym przedziale czasowym (`start_time` - `end_time`).
@@ -101,3 +110,14 @@ Przeniesienie więźniów, którzy w przedziale czasowym (`start_time` - `end_ti
 | `start_time` |
 | `end_time`   |
 | `event_type` |
+
+### Zamiana danych 4 (dodatkowa)
+
+Wystawienie reprymendy o treści `reason` przez strażnika `guard_id` wszystkim więźniom niebędącym w izolatce i znajdującym się w bloku `block_id` w momencie `event_time`.
+
+| Parametry    |
+| ------------ |
+| `block_id`   |
+| `event_time` |
+| `guard_id`   |
+| `reason`     |
