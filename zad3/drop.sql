@@ -1,80 +1,82 @@
-BEGIN
-   EXECUTE IMMEDIATE 'DROP TABLE ' || reprimand;
-EXCEPTION
-   WHEN OTHERS THEN
-      IF SQLCODE != -942 THEN
-         RAISE;
-      END IF;
-END;
+begin
+   begin
+      execute immediate 'drop table reprimand';
+   exception
+      when others then
+         if sqlcode != -942 then
+            raise;
+         end if;
+   end;
 
-BEGIN
-   EXECUTE IMMEDIATE 'DROP TABLE ' || patrol;
-EXCEPTION
-   WHEN OTHERS THEN
-      IF SQLCODE != -942 THEN
-         RAISE;
-      END IF;
-END;
+   begin
+      execute immediate 'drop table patrol';
+   exception
+      when others then
+         if sqlcode != -942 then
+            raise;
+         end if;
+   end;
 
-BEGIN
-   EXECUTE IMMEDIATE 'DROP TABLE ' || sentence;
-EXCEPTION
-   WHEN OTHERS THEN
-      IF SQLCODE != -942 THEN
-         RAISE;
-      END IF;
-END;
+   begin
+      execute immediate 'drop table sentence';
+   exception
+      when others then
+         if sqlcode != -942 then
+            raise;
+         end if;
+   end;
 
-BEGIN
-   EXECUTE IMMEDIATE 'DROP TABLE ' || accommodation;
-EXCEPTION
-   WHEN OTHERS THEN
-      IF SQLCODE != -942 THEN
-         RAISE;
-      END IF;
-END;
+   begin
+      execute immediate 'drop table accommodation';
+   exception
+      when others then
+         if sqlcode != -942 then
+            raise;
+         end if;
+   end;
 
-BEGIN
-   EXECUTE IMMEDIATE 'DROP TABLE ' || cell;
-EXCEPTION
-   WHEN OTHERS THEN
-      IF SQLCODE != -942 THEN
-         RAISE;
-      END IF;
-END;
+   begin
+      execute immediate 'drop table cell';
+   exception
+      when others then
+         if sqlcode != -942 then
+            raise;
+         end if;
+   end;
 
-BEGIN
-   EXECUTE IMMEDIATE 'DROP TABLE ' || patrol_slot;
-EXCEPTION
-   WHEN OTHERS THEN
-      IF SQLCODE != -942 THEN
-         RAISE;
-      END IF;
-END;
+   begin
+      execute immediate 'drop table patrol_slot';
+   exception
+      when others then
+         if sqlcode != -942 then
+            raise;
+         end if;
+   end;
 
-BEGIN
-   EXECUTE IMMEDIATE 'DROP TABLE ' || guard;
-EXCEPTION
-   WHEN OTHERS THEN
-      IF SQLCODE != -942 THEN
-         RAISE;
-      END IF;
-END;
+   begin
+      execute immediate 'drop table guard';
+   exception
+      when others then
+         if sqlcode != -942 then
+            raise;
+         end if;
+   end;
 
-BEGIN
-   EXECUTE IMMEDIATE 'DROP TABLE ' || prison_block;
-EXCEPTION
-   WHEN OTHERS THEN
-      IF SQLCODE != -942 THEN
-         RAISE;
-      END IF;
-END;
+   begin
+      execute immediate 'drop table prison_block';
+   exception
+      when others then
+         if sqlcode != -942 then
+            raise;
+         end if;
+   end;
 
-BEGIN
-   EXECUTE IMMEDIATE 'DROP TABLE ' || prisoner;
-EXCEPTION
-   WHEN OTHERS THEN
-      IF SQLCODE != -942 THEN
-         RAISE;
-      END IF;
-END;
+   begin
+      execute immediate 'drop table prisoner';
+   exception
+      when others then
+         if sqlcode != -942 then
+            raise;
+         end if;
+   end;
+end;
