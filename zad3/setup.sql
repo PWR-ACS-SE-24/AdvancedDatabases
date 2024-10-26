@@ -72,7 +72,9 @@ create table cell (
    check ( cell_number >= 1 ),
    check ( place_count >= 1 ),
    check ( is_solitary in ( 0,
-                            1 ) )
+                            1 ) ),
+   check ( is_solitary = 0
+       or place_count = 1 )
 );
 
 create table accommodation (
