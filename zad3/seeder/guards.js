@@ -21,7 +21,7 @@ const GUARD_SALARY_EXPERIENCE_MULTIPLIER = 0.1;
  * @returns {Promise<number>}
  */
 async function ensureGuard(con, patrolSlotId, start, end) {
-  let result = await con.execute(
+  const result = await con.execute(
     `select g.id from guard g
     inner join patrol p on g.id = p.fk_guard
     where p.fk_patrol_slot <> :psid
@@ -63,7 +63,7 @@ async function generateGuard(con, start, end) {
     GUARD_BASE_SALARY *
     (1 + experienceYears * GUARD_SALARY_EXPERIENCE_MULTIPLIER) *
     Math.pow(INFLATION_MULTIPLIER, inflationYears);
-  result = await con.execute(
+  const result = await con.execute(
     `insert into guard(first_name, last_name, employment_date, dismissal_date, has_disability_class, monthly_salary_pln)
     values (:first, :last, :employment, :dismissal, :disability, :salary)
     returning id into :id`,
