@@ -20,6 +20,11 @@ async function truncate(con) {
   await con.commit();
 }
 
+async function count_rows(con, table) {
+  const result = await con.execute(`select count(*) as cnt from ${table}`);
+  console.log("Created", result.rows[0][0], "rows in", table);
+}
+
 (async () => {
   const con = await oracledb.getConnection({
     user: USER,
@@ -29,6 +34,8 @@ async function truncate(con) {
 
   await truncate(con);
   await createBlocks(con);
+  await count_rows(con, "prison_block");
+  await count_rows(con, "cell");
 
   await con.close();
 })();
