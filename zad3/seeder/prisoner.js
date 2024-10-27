@@ -94,6 +94,7 @@ export async function createPrisoners(con) {
   }
   bar.stop();
 
+  console.log("\tInserting prisoners...");
   await con.executeMany(
     `insert into prisoner(pesel, first_name, last_name, birthday, sex, height_m, weight_kg)
     values (:pesel, :first, :last, :birthday, :sex, :height, :weight)`,
