@@ -6,11 +6,11 @@ Zespół B5 (baza danych dla więzienia): <br/> <b>Tomasz Chojnacki (260365), Ka
 
 ## Zadanie 3 - Baza danych
 
-### DBMS
+### System zarządzania bazą danych
 Do realizacji zadania wybrano Oracle 21c Express Edition. Utworzono konto z danymi logowania `system` / `password` oraz połączono się z domyślną bazą danych. Dokonano połączenia z serwisem `XEPDB1` na porcie `1521`.
 
 ### Schemat bazy danych
-Utworzono tabele zgodnie z diagramem przygotowanym w etapie 1. Dokonano małych zmian w nazewnictwie, wymuszonych przez wykorzystanie słów kluczowych Oracle SQL:
+Utworzono tabele zgodnie z diagramem przygotowanym w etapie 1. Zmieniono typ `boolean` na `number(1)`, ponieważ ten pierwszy nie jest wspierany w naszej wersji SZBD. Dokonano małych zmian w nazewnictwie, wymuszonych przez wykorzystanie słów kluczowych Oracle SQL:
 - tabela `block` zamieniona na `prison_block`
 - pole `number` w tabeli `prison_block` zamienione na `block_number`
 - pole `number` w tabeli `cell` zamienione na `cell_number`
