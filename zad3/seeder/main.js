@@ -1,5 +1,6 @@
 import oracledb from "oracledb";
 import { createBlocks } from "./blocks.js";
+import { createGuards } from "./guards.js";
 
 const USER = "system";
 const PASSWORD = "password";
@@ -20,7 +21,11 @@ async function truncate(con) {
   await con.commit();
 }
 
-async function count_rows(con, table) {
+/**
+ * @param {oracledb.Connection} con
+ * @param {string} table
+ */
+async function countRows(con, table) {
   const result = await con.execute(`select count(*) as cnt from ${table}`);
   console.log("Created", result.rows[0][0], "rows in", table);
 }
@@ -34,8 +39,12 @@ async function count_rows(con, table) {
 
   await truncate(con);
   await createBlocks(con);
-  await count_rows(con, "prison_block");
-  await count_rows(con, "cell");
+  await countRows(con, "prison_block");
+  await countRows(con, "cell");
+  await createGuards(con);
+  await countRows(con, "patrol_slot");
+  await countRows(con, "guard");
+  await countRows(con, "patrol");
 
   await con.close();
 })();

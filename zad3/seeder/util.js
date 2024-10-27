@@ -23,3 +23,17 @@ export function poisson(lambda, min, max) {
     }
   }
 }
+
+/**
+ * @param {number} mean
+ * @param {number} sd
+ * @returns {number}
+ */
+export function normal(mean, sd, min, max) {
+  while (true) {
+    const value = PD.rnorm(1, mean, sd)[0];
+    if (value >= min && value <= max) {
+      return value;
+    }
+  }
+}

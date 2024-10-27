@@ -9,7 +9,7 @@ const NORMAL_BLOCK_COUNT = 80;
  * @param {oracledb.Connection} con
  * @param {string} nr
  * @param {number} showers
- * @param {string | undefined} notes
+ * @param {string | null} notes
  * @returns {Promise<number>}
  */
 async function insertBlock(con, nr, showers, notes) {
@@ -30,7 +30,7 @@ async function insertBlock(con, nr, showers, notes) {
  * @param {number} nr
  * @param {number} places
  * @param {0 | 1} solitary
- * @param {string | undefined} notes
+ * @param {string | null} notes
  */
 async function insertCell(con, block, nr, places, solitary, notes) {
   await con.execute(

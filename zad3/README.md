@@ -196,7 +196,7 @@ create table reprimand (
 - `guard.last_name` - rzeczywiste nazwisko
 - `guard.employment_date` - data z przeszłości (od 2000 roku)
 - `guard.dismissal_date` - jeżeli istnieje jest późniejsza niż data zatrudnienia, średni czas pracy to 10 lat zgodnie z rozkładem normalnym
-- `guard.has_disability_class` - około 5% strażników ma niepełnosprawność (lekką), nie mogą oni pełnić służby w godzinach nocnych
+- `guard.has_disability_class` - około 5% strażników ma niepełnosprawność (lekką)
 - `guard.monthly_salary_pln` - wynagrodzenie strażnika uwzględnia inflację (5% rok do roku) oraz jest zależna od stażu pracy
 - `patrol_slot.start_time`, `patrol_slot.end_time` - warty zaczynają się co godzinę (24 dziennie), prowadzimy ewidencję od 2000 roku
 - `sentence.crime` - listą rzeczywistych przestępstw oddzielonych przecinkiem o liczności co najmniej 1, zgodnej z rozkładem Poissona dla `λ = 3` 
