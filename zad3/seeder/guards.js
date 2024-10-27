@@ -1,5 +1,6 @@
 import oracledb from "oracledb";
 import { fakerPL } from "@faker-js/faker";
+import progress from "cli-progress";
 import { normal, rand } from "./util.js";
 
 const START_TIMESTAMP = new Date("2000-01-01T00:00:00Z");
@@ -17,6 +18,7 @@ const GUARD_SALARY_EXPERIENCE_MULTIPLIER = 0.1;
  * @param {number} patrolSlotId
  * @param {Date} start
  * @param {Date} end
+ * @returns {Promise<number>}
  */
 async function ensureGuard(con, patrolSlotId, start, end) {
   let result = await con.execute(
@@ -28,10 +30,19 @@ async function ensureGuard(con, patrolSlotId, start, end) {
     { psid: patrolSlotId, s: start, e: end }
   );
   const guardId = result.rows[0]?.[0];
-  if (guardId) {
+  if (typeof guardId === "number") {
     return guardId;
   }
+  return generateGuard(con, start, end);
+}
 
+/**
+ * @param {oracledb.Connection} con
+ * @param {Date} start
+ * @param {Date} end
+ * @returns {number}
+ */
+async function generateGuard(con, start, end) {
   const gender = Math.random() < 0.1 ? "female" : "male";
   const employment = new Date(
     Math.max(start.getTime() - rand(0, YEAR_IN_MS), START_TIMESTAMP)
@@ -69,14 +80,17 @@ async function ensureGuard(con, patrolSlotId, start, end) {
   return result.outBinds.id[0];
 }
 
-/**
- *
- * @param {oracledb.Connection} con
- */
+/** @param {oracledb.Connection} con */
 export async function createGuards(con) {
+  const bar = new progress.SingleBar({});
+
   console.log("STAGE #2: Creating guards...");
 
   console.log("\tCreating patrol slots...");
+  bar.start(
+    (END_TIMESTAMP.getTime() - START_TIMESTAMP.getTime()) / PATROL_DURATION_MS,
+    0
+  );
   for (
     let ts = START_TIMESTAMP.getTime();
     ts < END_TIMESTAMP.getTime();
@@ -89,9 +103,11 @@ export async function createGuards(con) {
         e: new Date(ts + PATROL_DURATION_MS - 1),
       }
     );
+    bar.increment();
   }
+  bar.stop();
 
-  console.log("\tCreating patrols...");
+  console.log("\tCreating patrols with guards...");
   const patrolSlots = (
     await con.execute("select id, start_time, end_time from patrol_slot")
   ).rows;
@@ -100,23 +116,36 @@ export async function createGuards(con) {
       "select min(pb.id), count(c.id) as cnt from prison_block pb inner join cell c on pb.id = c.fk_block group by pb.id"
     )
   ).rows;
+  bar.start(patrolSlots.length * blocks.length, 0);
   for (const [patrolSlotId, start, end] of patrolSlots) {
     for (const [blockId, cellCount] of blocks) {
       const patrolCount = Math.floor(cellCount / CELLS_PER_GUARD) + 1;
       for (let i = 0; i < patrolCount; i++) {
         const guardId = await ensureGuard(con, patrolSlotId, start, end);
+        const isNight = start.getHours() <= 6 || start.getHours() >= 20;
+        let dog = Math.random() < (isNight ? 0.5 : 0.25) ? 1 : 0;
+        const result = await con.execute(
+          "select has_disability_class from guard where id = :id",
+          { id: guardId }
+        );
+        if (result.rows[0][0] === 1) {
+          dog = 1;
+        }
+
         await con.execute(
           "insert into patrol(fk_guard, fk_block, fk_patrol_slot, is_with_dog) values (:guard, :block, :slot, :dog)",
           {
             guard: guardId,
             block: blockId,
             slot: patrolSlotId,
-            dog: Math.random() < 0.05 ? 1 : 0,
+            dog,
           }
         );
       }
+      bar.increment();
     }
   }
+  bar.stop();
 
   await con.commit();
 }
