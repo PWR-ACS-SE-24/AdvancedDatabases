@@ -14,35 +14,11 @@ const GUARD_BASE_SALARY = 5000;
 const GUARD_SALARY_EXPERIENCE_MULTIPLIER = 0.1;
 
 /**
- * @param {oracledb.Connection} con
- * @param {number} patrolSlotId
  * @param {Date} start
  * @param {Date} end
- * @returns {Promise<number>}
+ * @returns {{ first: string, last: string, employment: Date, dismissal: Date | null, disability: 0 | 1, salary: number }}
  */
-async function ensureGuard(con, patrolSlotId, start, end) {
-  const result = await con.execute(
-    `select g.id from guard g
-    inner join patrol p on g.id = p.fk_guard
-    where p.fk_patrol_slot <> :psid
-      and g.employment_date <= :s
-      and (g.dismissal_date is null or g.dismissal_date >= :e)`,
-    { psid: patrolSlotId, s: start, e: end }
-  );
-  const guardId = result.rows[0]?.[0];
-  if (typeof guardId === "number") {
-    return guardId;
-  }
-  return generateGuard(con, start, end);
-}
-
-/**
- * @param {oracledb.Connection} con
- * @param {Date} start
- * @param {Date} end
- * @returns {number}
- */
-async function generateGuard(con, start, end) {
+function generateGuard(start, end) {
   const sex = Math.random() < 0.1 ? "female" : "male";
   const employment = new Date(
     Math.max(start.getTime() - rand(0, YEAR_IN_MS), START_TIMESTAMP)
@@ -60,24 +36,20 @@ async function generateGuard(con, start, end) {
     (worksUntilMs - START_TIMESTAMP.getTime()) / YEAR_IN_MS;
   const experienceYears = (worksUntilMs - employment.getTime()) / YEAR_IN_MS;
   const salary =
-    GUARD_BASE_SALARY *
-    (1 + experienceYears * GUARD_SALARY_EXPERIENCE_MULTIPLIER) *
-    Math.pow(INFLATION_MULTIPLIER, inflationYears);
-  const result = await con.execute(
-    `insert into guard(first_name, last_name, employment_date, dismissal_date, has_disability_class, monthly_salary_pln)
-    values (:first, :last, :employment, :dismissal, :disability, :salary)
-    returning id into :id`,
-    {
-      first: fakerPL.person.firstName(sex),
-      last: fakerPL.person.lastName(sex),
-      employment,
-      dismissal,
-      disability,
-      salary,
-      id: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT },
-    }
-  );
-  return result.outBinds.id[0];
+    Math.round(
+      GUARD_BASE_SALARY *
+        (1 + experienceYears * GUARD_SALARY_EXPERIENCE_MULTIPLIER) *
+        Math.pow(INFLATION_MULTIPLIER, inflationYears) *
+        100
+    ) / 100;
+  return {
+    first: fakerPL.person.firstName(sex),
+    last: fakerPL.person.lastName(sex),
+    employment,
+    dismissal,
+    disability,
+    salary,
+  };
 }
 
 /** @param {oracledb.Connection} con */
@@ -113,33 +85,88 @@ export async function createGuards(con) {
       "select min(pb.id), count(c.id) as cnt from prison_block pb inner join cell c on pb.id = c.fk_block group by pb.id"
     )
   ).rows;
-  bar.start(patrolSlots.length * blocks.length, 0);
+  const guardsForOneSlot = blocks
+    .map(([_, cellCount]) => Math.floor(cellCount / CELLS_PER_GUARD) + 1)
+    .reduce((a, b) => a + b, 0);
+  bar.start(patrolSlots.length, 0);
   for (const [patrolSlotId, start, end] of patrolSlots) {
+    const availableGuards = (
+      await con.execute(
+        `
+      SELECT g.id, g.has_disability_class FROM guard g
+      LEFT JOIN patrol p ON p.fk_guard = g.id AND p.fk_patrol_slot = :psid
+      WHERE p.fk_guard IS NULL and g.employment_date <= :s
+          and (g.dismissal_date is null or g.dismissal_date >= :e)
+      `,
+        { psid: patrolSlotId, s: start, e: end }
+      )
+    ).rows.map((row) => ({ id: row[0], disability: row[1] }));
+
+    const missingGuards = guardsForOneSlot - availableGuards.length;
+    if (missingGuards > 0) {
+      const newGuards = [];
+      for (let i = 0; i < missingGuards; i++) {
+        newGuards.push(generateGuard(start, end));
+      }
+      const createdGuards = (
+        await con.executeMany(
+          `insert into guard(first_name, last_name, employment_date, dismissal_date, has_disability_class, monthly_salary_pln)
+          values (:first, :last, :employment, :dismissal, :disability, :salary)
+          returning id into :id`,
+          newGuards,
+          {
+            autoCommit: true,
+            bindDefs: {
+              first: { type: oracledb.STRING, maxSize: 255 },
+              last: { type: oracledb.STRING, maxSize: 255 },
+              employment: { type: oracledb.DATE },
+              dismissal: { type: oracledb.DATE },
+              disability: { type: oracledb.NUMBER },
+              salary: { type: oracledb.NUMBER },
+              id: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT },
+            },
+          }
+        )
+      ).outBinds.map((row, i) => ({
+        id: row.id[0],
+        disability: newGuards[i].disability,
+      }));
+      availableGuards.push(...createdGuards);
+    }
+
+    const patrols = [];
+    const isNight = start.getHours() <= 6 || start.getHours() >= 20;
     for (const [blockId, cellCount] of blocks) {
       const patrolCount = Math.floor(cellCount / CELLS_PER_GUARD) + 1;
       for (let i = 0; i < patrolCount; i++) {
-        const guardId = await ensureGuard(con, patrolSlotId, start, end);
-        const isNight = start.getHours() <= 6 || start.getHours() >= 20;
         let dog = Math.random() < (isNight ? 0.5 : 0.25) ? 1 : 0;
-        const result = await con.execute(
-          "select has_disability_class from guard where id = :id",
-          { id: guardId }
-        );
-        if (result.rows[0][0] === 1) {
-          dog = 1;
+        let guard = availableGuards.pop();
+        if (guard.disability) {
+          dog = 1; // przewodnik
         }
-        await con.execute(
-          "insert into patrol(fk_guard, fk_block, fk_patrol_slot, is_with_dog) values (:guard, :block, :slot, :dog)",
-          {
-            guard: guardId,
-            block: blockId,
-            slot: patrolSlotId,
-            dog,
-          }
-        );
+        patrols.push({
+          guard: guard.id,
+          block: blockId,
+          slot: patrolSlotId,
+          dog,
+        });
       }
-      bar.increment();
     }
+    await con.executeMany(
+      `insert into patrol(fk_guard, fk_block, fk_patrol_slot, is_with_dog) values (:guard, :block, :slot, :dog)`,
+      patrols,
+      {
+        autoCommit: true,
+        bindDefs: {
+          guard: { type: oracledb.NUMBER },
+          block: { type: oracledb.NUMBER },
+          slot: { type: oracledb.NUMBER },
+          dog: { type: oracledb.NUMBER },
+        },
+      }
+    );
+
+    bar.increment();
   }
   bar.stop();
 
