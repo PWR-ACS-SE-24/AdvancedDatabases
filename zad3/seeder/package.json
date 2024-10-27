@@ -1,0 +1,8 @@
+{
+  "name": "seeder",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "oracledb": "^6.6.0"
+  }
+}
