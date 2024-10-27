@@ -41,7 +41,7 @@ create table prisoner (
 ```SQL
 create table prison_block (
    id               integer generated always as identity,
-   block_number     varchar(2) unique not null,
+   block_number     varchar(4) unique not null,
    shower_count     integer not null,
    additional_notes varchar(2000),
    primary key ( id ),

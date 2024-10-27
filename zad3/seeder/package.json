@@ -2,7 +2,11 @@
   "name": "seeder",
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "start": "node main.js"
+  },
   "dependencies": {
-    "oracledb": "^6.6.0"
+    "oracledb": "^6.6.0",
+    "probability-distributions": "^0.9.1"
   }
 }
