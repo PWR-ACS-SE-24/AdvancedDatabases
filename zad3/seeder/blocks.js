@@ -9,10 +9,10 @@ const NORMAL_BLOCK_COUNT = 80;
  * @param {oracledb.Connection} con
  */
 export async function createBlocks(con) {
-  for (let nr = 0; nr < EMPTY_BLOCK_COUNT; nr++) {
+  for (let i = 0; i < EMPTY_BLOCK_COUNT; i++) {
     await con.execute(
       "insert into prison_block(block_number, shower_count, additional_notes) values (:nr, 23, 'ab')",
-      { nr }
+      { nr: `E${i}` }
     );
   }
 }
