@@ -1,6 +1,7 @@
 import oracledb from "oracledb";
 import { createBlocks } from "./blocks.js";
 import { createGuards } from "./guards.js";
+import { createPrisoners } from "./prisoner.js";
 
 const USER = "system";
 const PASSWORD = "password";
@@ -45,6 +46,7 @@ async function countRows(con, table) {
   await countRows(con, "patrol_slot");
   await countRows(con, "guard");
   await countRows(con, "patrol");
+  // await createPrisoners(con);
 
   await con.close();
 })();

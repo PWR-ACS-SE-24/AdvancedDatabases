@@ -31,16 +31,35 @@ async function insertBlock(con, nr, showers, notes) {
 /**
  * @param {oracledb.Connection} con
  * @param {number} block
- * @param {number} nr
- * @param {number} places
- * @param {0 | 1} solitary
- * @param {string | null} notes
+ * @param {number} count
+ * @param {(i: number) => ({ nr: number, places: number, solitary: 0 | 1, notes: string | null })} generator
  */
-async function insertCell(con, block, nr, places, solitary, notes) {
-  await con.execute(
+async function insertCells(con, block, count, generator) {
+  const cells = Array.from({ length: count }, (_, i) => ({
+    block,
+    ...generator(i + 1),
+  }));
+
+  await con.executeMany(
     `insert into cell(fk_block, cell_number, place_count, is_solitary, additional_notes)
     values (:block, :nr, :places, :solitary, :notes)`,
-    { block, nr, places, solitary, notes }
+    cells,
+    {
+      autoCommit: true,
+      bindDefs: {
+        block: { type: oracledb.NUMBER },
+        nr: { type: oracledb.NUMBER },
+        places: { type: oracledb.NUMBER },
+        solitary: { type: oracledb.NUMBER },
+        notes: {
+          type: oracledb.STRING,
+          maxSize: cells.reduce(
+            (max, { notes }) => Math.max(max, notes?.length ?? 0),
+            0
+          ),
+        },
+      },
+    }
   );
 }
 
@@ -70,9 +89,12 @@ export async function createBlocks(con) {
       "Blok zawierający izolatki."
     );
 
-    for (let j = 1; j <= cellCount; j++) {
-      await insertCell(con, blockId, j, 1, 1, "Izolatka.");
-    }
+    await insertCells(con, blockId, cellCount, (j) => ({
+      nr: j,
+      places: 1,
+      solitary: 1,
+      notes: "Izolatka.",
+    }));
 
     bar.increment();
   }
@@ -90,9 +112,12 @@ export async function createBlocks(con) {
       "Blok z celami dla więźniów."
     );
 
-    for (let j = 1; j <= cellCount; j++) {
-      await insertCell(con, blockId, j, poisson(5, 1, 10), 0, "Cela normalna.");
-    }
+    await insertCells(con, blockId, cellCount, (j) => ({
+      nr: j,
+      places: poisson(5, 1, 10),
+      solitary: 0,
+      notes: "Cela normalna.",
+    }));
 
     bar.increment();
   }

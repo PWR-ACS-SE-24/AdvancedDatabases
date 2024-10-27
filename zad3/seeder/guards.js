@@ -43,7 +43,7 @@ async function ensureGuard(con, patrolSlotId, start, end) {
  * @returns {number}
  */
 async function generateGuard(con, start, end) {
-  const gender = Math.random() < 0.1 ? "female" : "male";
+  const sex = Math.random() < 0.1 ? "female" : "male";
   const employment = new Date(
     Math.max(start.getTime() - rand(0, YEAR_IN_MS), START_TIMESTAMP)
   );
@@ -68,8 +68,8 @@ async function generateGuard(con, start, end) {
     values (:first, :last, :employment, :dismissal, :disability, :salary)
     returning id into :id`,
     {
-      first: fakerPL.person.firstName(gender),
-      last: fakerPL.person.lastName(gender),
+      first: fakerPL.person.firstName(sex),
+      last: fakerPL.person.lastName(sex),
       employment,
       dismissal,
       disability,
@@ -82,30 +82,27 @@ async function generateGuard(con, start, end) {
 
 /** @param {oracledb.Connection} con */
 export async function createGuards(con) {
-  const bar = new progress.SingleBar({});
-
   console.log("STAGE #2: Creating guards...");
 
   console.log("\tCreating patrol slots...");
-  bar.start(
-    (END_TIMESTAMP.getTime() - START_TIMESTAMP.getTime()) / PATROL_DURATION_MS,
-    0
-  );
+  const slots = [];
   for (
     let ts = START_TIMESTAMP.getTime();
     ts < END_TIMESTAMP.getTime();
     ts += PATROL_DURATION_MS
   ) {
-    await con.execute(
-      "insert into patrol_slot(start_time, end_time) values (:s, :e)",
-      {
-        s: new Date(ts),
-        e: new Date(ts + PATROL_DURATION_MS - 1),
-      }
-    );
-    bar.increment();
+    slots.push({ s: new Date(ts), e: new Date(ts + PATROL_DURATION_MS - 1) });
   }
-  bar.stop();
+  await con.executeMany(
+    "insert into patrol_slot(start_time, end_time) values (:s, :e)",
+    slots,
+    {
+      autoCommit: true,
+      bindDefs: { s: { type: oracledb.DATE }, e: { type: oracledb.DATE } },
+    }
+  );
+
+  const bar = new progress.SingleBar({});
 
   console.log("\tCreating patrols with guards...");
   const patrolSlots = (
@@ -131,7 +128,6 @@ export async function createGuards(con) {
         if (result.rows[0][0] === 1) {
           dog = 1;
         }
-
         await con.execute(
           "insert into patrol(fk_guard, fk_block, fk_patrol_slot, is_with_dog) values (:guard, :block, :slot, :dog)",
           {
