@@ -17,7 +17,7 @@ Utworzono tabele zgodnie z diagramem przygotowanym w etapie 1. Zmieniono typ `bo
 
 ```SQL
 create table prisoner (
-   id         integer not null,
+   id         integer generated always as identity,
    pesel      char(11) unique not null,
    first_name varchar(255) not null,
    last_name  varchar(255) not null,
@@ -40,7 +40,7 @@ create table prisoner (
 
 ```SQL
 create table prison_block (
-   id               integer not null,
+   id               integer generated always as identity,
    block_number     varchar(2) unique not null,
    shower_count     integer not null,
    additional_notes varchar(2000),
@@ -52,7 +52,7 @@ create table prison_block (
 
 ```SQL
 create table guard (
-   id                   integer not null,
+   id                   integer generated always as identity,
    first_name           varchar(255) not null,
    last_name            varchar(255) not null,
    employment_date      date not null,
@@ -72,7 +72,7 @@ create table guard (
 
 ```SQL
 create table patrol_slot (
-   id         integer not null,
+   id         integer generated always as identity,
    start_time timestamp not null,
    end_time   timestamp not null,
    primary key ( id ),
@@ -82,7 +82,7 @@ create table patrol_slot (
 
 ```SQL
 create table cell (
-   id               integer not null,
+   id               integer generated always as identity,
    fk_block         integer not null,
    cell_number      integer not null,
    place_count      integer not null,
@@ -102,7 +102,7 @@ create table cell (
 
 ```SQL
 create table accommodation (
-   id          integer not null,
+   id          integer generated always as identity,
    fk_cell     integer not null,
    fk_prisoner integer not null,
    start_date  date not null,
@@ -119,7 +119,7 @@ create table accommodation (
 
 ```SQL
 create table sentence (
-   id               integer not null,
+   id               integer generated always as identity,
    fk_prisoner      integer not null,
    crime            varchar(1000) not null,
    start_date       date not null,
@@ -137,7 +137,7 @@ create table sentence (
 
 ```SQL
 create table patrol (
-   id             integer not null,
+   id             integer generated always as identity,
    fk_guard       integer not null,
    fk_block       integer not null,
    fk_patrol_slot integer not null,
@@ -156,7 +156,7 @@ create table patrol (
 
 ```SQL
 create table reprimand (
-   id          integer not null,
+   id          integer generated always as identity,
    fk_guard    integer not null,
    fk_prisoner integer not null,
    reason      varchar(2000) not null,
