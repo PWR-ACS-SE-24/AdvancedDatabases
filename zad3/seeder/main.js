@@ -46,7 +46,8 @@ async function countRows(con, table) {
   await countRows(con, "patrol_slot");
   await countRows(con, "guard");
   await countRows(con, "patrol");
-  // await createPrisoners(con);
+  await createPrisoners(con);
+  await countRows(con, "prisoner");
 
   await con.close();
 })();

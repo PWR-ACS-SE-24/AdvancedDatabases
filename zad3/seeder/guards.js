@@ -21,11 +21,11 @@ const GUARD_SALARY_EXPERIENCE_MULTIPLIER = 0.1;
 function generateGuard(start, end) {
   const sex = Math.random() < 0.1 ? "female" : "male";
   const employment = new Date(
-    Math.max(start.getTime() - rand(0, YEAR_IN_MS), START_TIMESTAMP)
+    Math.max(start.getTime() - rand(0, 0.4 * YEAR_IN_MS), START_TIMESTAMP)
   );
   let dismissal = new Date(
     end.getTime() +
-      normal(10 * YEAR_IN_MS, 2 * YEAR_IN_MS, 2 * YEAR_IN_MS, 20 * YEAR_IN_MS)
+      normal(3 * YEAR_IN_MS, YEAR_IN_MS, 0.5 * YEAR_IN_MS, 10 * YEAR_IN_MS)
   );
   if (dismissal > CURRENT_TIMESTAMP) {
     dismissal = null;
