@@ -2,10 +2,11 @@ import oracledb from "oracledb";
 import { createBlocks } from "./blocks.js";
 import { createGuards } from "./guards.js";
 import { createPrisoners } from "./prisoner.js";
+import { createReprimands } from "./reprimand.js";
 
 const USER = "system";
 const PASSWORD = "password";
-const CONNECT_STRING = "172.28.192.1:1521/XEPDB1";
+const CONNECT_STRING = "172.27.240.1:1521/XEPDB1";
 
 /** @param {oracledb.Connection} con */
 async function truncate(con) {
@@ -49,6 +50,8 @@ async function countRows(con, table) {
   await createPrisoners(con);
   await countRows(con, "prisoner");
   await countRows(con, "sentence");
+  await createReprimands(con);
+  await countRows(con, "reprimand");
 
   await con.close();
 })();

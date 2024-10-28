@@ -3,8 +3,8 @@ import progress from "cli-progress";
 import { fakerPL } from "@faker-js/faker";
 import { normal, rand, poisson } from "./util.js";
 
-const PRISONER_COUNT_MIN = 100_000;
-const PRISONER_COUNT_MAX = 500_000;
+const PRISONER_COUNT_MIN = 200_000;
+const PRISONER_COUNT_MAX = 300_000;
 const BIRTHDAY_START = new Date("1960-01-01");
 const BIRTHDAY_END = new Date("1999-12-31");
 const SENTENCE_START_DATE = new Date("2000-01-01");
@@ -224,7 +224,6 @@ export async function createPrisoners(con) {
   const prisonersDb = (await con.execute(`select id, birthday from prisoner`))
     .rows;
 
-  // Generate sentences for each prisoner
   console.log("\tGenerating sentences...");
   const sentences = [];
   bar.start(prisonerCount, 0);
@@ -253,16 +252,6 @@ export async function createPrisoners(con) {
       },
     }
   );
-
-  // Bulk insert sentences
-
-  // -- Reprimands --
-  // SELECT all prisoner ids
-  // For each prisoner generate number of reprimands
-  // SELECT all guard ids, emloyment dates and dismissal dates
-  // For each prisoner with reprimands SELECT their sentences start_dates and end_dates
-  // Generate reprimands for each prisoner in random sentences
-  // Bulk insert reprimands
 
   await con.commit();
 }
