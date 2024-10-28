@@ -1,18 +1,81 @@
 import oracledb from "oracledb";
 import progress from "cli-progress";
 import { fakerPL } from "@faker-js/faker";
-import { normal, rand } from "./util.js";
+import { normal, rand, poisson } from "./util.js";
 
 const PRISONER_COUNT_MIN = 100_000;
 const PRISONER_COUNT_MAX = 500_000;
 const BIRTHDAY_START = new Date("1960-01-01");
 const BIRTHDAY_END = new Date("1999-12-31");
+const SENTENCE_START_DATE = new Date("2000-01-01");
+const CURRENT_DATE = new Date("2024-10-27");
+const BASE_SENTENCE_DURATION_MS = 3 * 365 * 24 * 60 * 60 * 1000; // 3 years
+const SENTENCES = [
+  "Zabójstwo",
+  "Pobicie",
+  "Kradzież",
+  "Rozbój",
+  "Oszustwo",
+  "Gwałt",
+  "Szantaż",
+  "Handel narkotykami",
+  "Korupcja",
+  "Terroryzm",
+  "Przemyt",
+  "Paserstwo",
+  "Podpalenie",
+  "Porwanie",
+  "Defraudacja",
+  "Groźby",
+  "Stalking",
+  "Pedofilia",
+  "Fałszerstwo",
+  "Lichwa",
+  "Przemoc",
+  "Podrabianie",
+  "Molestowanie",
+  "Włamanie",
+  "Szpiegostwo",
+  "Przekupstwo",
+  "Piractwo",
+  "Prześladowanie",
+  "Zniesławienie",
+  "Nadużycie",
+  "Przekręt",
+  "Zmuszanie",
+  "Eksploatacja",
+  "Znieważenie",
+  "Podszywanie",
+  "Łapownictwo",
+  "Skłusowanie",
+  "Korupcja",
+  "Sabotowanie",
+  "Niszczenie mienia",
+  "Mataczenie",
+  "Dewastacja",
+  "Napad",
+  "Skorumpowanie",
+  "Haracz",
+  "Szkalowanie",
+  "Uprowadzenie",
+  "Chuligaństwo",
+  "Wandalizm",
+  "Zabójstwo",
+  "Uprawa narkotyków",
+  "Dystrybucja narkotyków",
+  "Pranie brudnych pieniędzy",
+  "Przemoc domowa",
+  "Rozpowszechnianie pornografii",
+  "Handel ludźmi",
+  "Zmuszanie do prostytucji",
+  "Przemoc seksualna",
+];
 
 const pesels = new Set();
 
 /**
  * @param {Date} birthday
- * @param {1 | 2} sex
+ * @param {'female' | 'male'} sex
  * @returns {string}
  */
 function generatePesel(birthday, sex) {
@@ -78,6 +141,15 @@ function generatePrisoner() {
   };
 }
 
+/**
+ * @param {number} prisonerId
+ * @param {Date} prisonerBirthday
+ * @returns {{fk_prisoner: number, crime: string, start_date: Date, planned_end_date: Date, real_end_date: Date | null}}
+ */
+function generateSentence(prisonerId, prisonerBirthday) {
+  const numberOfCrimes = poisson(3, 1, 10);
+}
+
 /** @param {oracledb.Connection} con */
 export async function createPrisoners(con) {
   const bar = new progress.SingleBar({});
@@ -112,6 +184,28 @@ export async function createPrisoners(con) {
       },
     }
   );
+
+  // SELECT all prisoner ids and birthdays
+  const prisonersDb = [];
+
+  // Generate sentences for each prisoner
+  const sentences = [];
+  for (const [prisonerId, prisonerBirthday] of prisonersDb) {
+    const numberOfSentences = poisson(1, 1, 5);
+    for (let i = 0; i < numberOfSentences; i++) {
+      sentences.push(generateSentence(prisonerId, prisonerBirthday));
+    }
+  }
+
+  // Bulk insert sentences
+
+  // -- Reprimands --
+  // SELECT all prisoner ids
+  // For each prisoner generate number of reprimands
+  // SELECT all guard ids, emloyment dates and dismissal dates
+  // For each prisoner with reprimands SELECT their sentences start_dates and end_dates
+  // Generate reprimands for each prisoner in random sentences
+  // Bulk insert reprimands
 
   await con.commit();
 }
