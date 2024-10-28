@@ -8,6 +8,7 @@
   "dependencies": {
     "@faker-js/faker": "^9.1.0",
     "cli-progress": "^3.12.0",
+    "lodash": "^4.17.21",
     "oracledb": "^6.6.0",
     "probability-distributions": "^0.9.1"
   }

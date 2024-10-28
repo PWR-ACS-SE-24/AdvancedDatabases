@@ -3,6 +3,7 @@ import { createBlocks } from "./blocks.js";
 import { createGuards } from "./guards.js";
 import { createPrisoners } from "./prisoner.js";
 import { createReprimands } from "./reprimand.js";
+import { createAccommodations } from "./accommodations.js";
 
 const USER = "system";
 const PASSWORD = "password";
@@ -52,6 +53,8 @@ async function countRows(con, table) {
   await countRows(con, "sentence");
   // await createReprimands(con);
   await countRows(con, "reprimand");
+  await createAccommodations(con);
+  await countRows(con, "accommodation");
 
   await con.close();
 })();
