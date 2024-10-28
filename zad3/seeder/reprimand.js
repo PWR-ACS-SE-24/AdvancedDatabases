@@ -100,10 +100,10 @@ export async function createReprimands(con) {
         ({ employment, dismissal }) =>
           employment <= start && (dismissal === null || dismissal >= end)
       );
-      const guard =
-        possibleGuards[Math.floor(Math.random() * possibleGuards.length)];
-
-      reprimandList.push(generateReprimand(id, guard.id, start, end));
+      if (possibleGuards.length > 0) {
+        const guard = possibleGuards[rand(0, possibleGuards.length - 1)];
+        reprimandList.push(generateReprimand(id, guard.id, start, end));
+      }
     }
     bar.increment();
   }

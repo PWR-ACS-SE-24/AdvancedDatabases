@@ -6,7 +6,7 @@ import { createReprimands } from "./reprimand.js";
 
 const USER = "system";
 const PASSWORD = "password";
-const CONNECT_STRING = "172.27.240.1:1521/XEPDB1";
+const CONNECT_STRING = "172.28.192.1:1521/XEPDB1";
 
 /** @param {oracledb.Connection} con */
 async function truncate(con) {
