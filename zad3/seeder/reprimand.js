@@ -95,11 +95,11 @@ export async function createReprimands(con) {
   bar.start(prisonerSentences.length, 0);
   const reprimandList = [];
   for (const { id, start, end, reprimands } of prisonerSentences) {
+    const possibleGuards = guards.filter(
+      ({ employment, dismissal }) =>
+        employment <= start && (dismissal === null || dismissal >= end)
+    );
     for (let i = 0; i < reprimands; i++) {
-      const possibleGuards = guards.filter(
-        ({ employment, dismissal }) =>
-          employment <= start && (dismissal === null || dismissal >= end)
-      );
       if (possibleGuards.length > 0) {
         const guard = possibleGuards[rand(0, possibleGuards.length - 1)];
         reprimandList.push(generateReprimand(id, guard.id, start, end));
