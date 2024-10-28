@@ -224,11 +224,8 @@ export async function createPrisoners(con) {
     }
   );
 
-  const prisonersDb = (
-    await con.execute(`select id, birthday from prisoner`)
-  ).rows.map(([id, birthday]) => {
-    id, birthday;
-  });
+  const prisonersDb = (await con.execute(`select id, birthday from prisoner`))
+    .rows;
 
   // Generate sentences for each prisoner
   console.log("\tGenerating sentences...");
