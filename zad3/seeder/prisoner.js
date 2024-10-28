@@ -9,7 +9,9 @@ const BIRTHDAY_START = new Date("1960-01-01");
 const BIRTHDAY_END = new Date("1999-12-31");
 const SENTENCE_START_DATE = new Date("2000-01-01");
 const CURRENT_DATE = new Date("2024-10-27");
-const BASE_SENTENCE_DURATION_MS = 3 * 365 * 24 * 60 * 60 * 1000; // 3 years
+const YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000;
+const SHORTEST_SENTENCE_MS = 0.5 * YEAR_IN_MS;
+const LONGEST_SENTENCE_MS = 25 * YEAR_IN_MS;
 const SENTENCES = [
   "Zabójstwo",
   "Pobicie",
@@ -142,12 +144,49 @@ function generatePrisoner() {
 }
 
 /**
- * @param {number} prisonerId
- * @param {Date} prisonerBirthday
- * @returns {{fk_prisoner: number, crime: string, start_date: Date, planned_end_date: Date, real_end_date: Date | null}}
+ * @param {number} prisoner
+ * @param {Date} birthday
+ * @returns {{ prisoner: number, crime: string, s: Date, pe: Date, re: Date | null }}
  */
-function generateSentence(prisonerId, prisonerBirthday) {
+function generateSentence(prisoner, birthday) {
   const numberOfCrimes = poisson(3, 1, 10);
+  const crimes = [];
+  for (let i = 0; i < numberOfCrimes; i++) {
+    crimes.push(SENTENCES[rand(0, SENTENCES.length - 1)]);
+  }
+  const crime = crimes.join(", ");
+
+  const lowestSentenceStart = Math.max(
+    birthday.getTime() + 17 * YEAR_IN_MS,
+    SENTENCE_START_DATE.getTime()
+  );
+  const sentenceStart = rand(lowestSentenceStart, CURRENT_DATE.getTime());
+  const s = new Date(sentenceStart);
+  const sentenceDuration = normal(
+    2 * YEAR_IN_MS * crimes.length,
+    5 * YEAR_IN_MS,
+    SHORTEST_SENTENCE_MS,
+    LONGEST_SENTENCE_MS
+  );
+  const pe = new Date(sentenceStart + sentenceDuration);
+  let realEnd = normal(
+    sentenceStart + sentenceDuration,
+    0.5 * YEAR_IN_MS,
+    sentenceStart + SHORTEST_SENTENCE_MS,
+    sentenceStart + LONGEST_SENTENCE_MS
+  );
+  if (realEnd > CURRENT_DATE.getTime()) {
+    realEnd = null;
+  }
+  const re = new Date(realEnd);
+
+  return {
+    prisoner,
+    crime,
+    s,
+    pe,
+    re,
+  };
 }
 
 /** @param {oracledb.Connection} con */
@@ -156,7 +195,7 @@ export async function createPrisoners(con) {
 
   console.log("STAGE #3: Creating prisoners...");
 
-  console.log("\tCreating prisoners...");
+  console.log("\tGenerating prisoners...");
   const prisonerCount = rand(PRISONER_COUNT_MIN, PRISONER_COUNT_MAX);
   const prisoners = [];
   bar.start(prisonerCount, 0);
@@ -185,17 +224,41 @@ export async function createPrisoners(con) {
     }
   );
 
-  // SELECT all prisoner ids and birthdays
-  const prisonersDb = [];
+  const prisonersDb = (
+    await con.execute(`select id, birthday from prisoner`)
+  ).rows.map(([id, birthday]) => {
+    id, birthday;
+  });
 
   // Generate sentences for each prisoner
+  console.log("\tGenerating sentences...");
   const sentences = [];
+  bar.start(prisonerCount, 0);
   for (const [prisonerId, prisonerBirthday] of prisonersDb) {
     const numberOfSentences = poisson(1, 1, 5);
     for (let i = 0; i < numberOfSentences; i++) {
       sentences.push(generateSentence(prisonerId, prisonerBirthday));
     }
+    bar.increment();
   }
+  bar.stop();
+
+  console.log("\tInserting sentences...");
+  await con.executeMany(
+    `insert into sentence(fk_prisoner, crime, start_date, planned_end_date, real_end_date)
+    values (:prisoner, :crime, :s, :pe, :re)`,
+    sentences,
+    {
+      autoCommit: true,
+      bindDefs: {
+        prisoner: { type: oracledb.NUMBER },
+        crime: { type: oracledb.STRING, maxSize: 1000 },
+        s: { type: oracledb.DATE },
+        pe: { type: oracledb.DATE },
+        re: { type: oracledb.DATE },
+      },
+    }
+  );
 
   // Bulk insert sentences
 
