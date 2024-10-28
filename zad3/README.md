@@ -214,6 +214,14 @@ create table reprimand (
 
 ### Dokumentacja wolumetrii
 
-| *Tabela* | *Liczba rekordów* |
-| -------- | ----------------- |
-TODO
+| *Tabela*        | *Liczba rekordów* |
+| --------------- | ----------------- |
+| `patrol`        | 71174808          |
+| `accommodation` | 1445370           |
+| `sentence`      | 458707            |
+| `reprimand`     | 372889            |
+| `prisoner`      | 290678            |
+| `cell`          | 255216            |
+| `patrol_slot`   | 27396             |
+| `guard`         | 14236             |
+| `prison_block`  | 100               |

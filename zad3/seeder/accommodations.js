@@ -2,8 +2,25 @@ import oracledb from "oracledb";
 import _ from "lodash";
 import progress from "cli-progress";
 import { poisson, rand } from "./util.js";
+import { Room } from "./room.js";
 
 const CURRENT_DATE = new Date("2024-10-27T00:00:00Z");
+
+/**
+ * @param {{ id: number, room: Room }[]} cells
+ * @param {Date} s
+ * @param {Date} e
+ * @returns {number}
+ */
+function findCell(cells, s, e) {
+  while (true) {
+    const idx = rand(0, cells.length - 1);
+    if (cells[idx].room.canFit(s, e)) {
+      cells[idx].room.goIn(s, e);
+      return cells[idx].id;
+    }
+  }
+}
 
 /** @param {oracledb.Connection} con */
 export async function createAccommodations(con) {
@@ -11,6 +28,7 @@ export async function createAccommodations(con) {
 
   console.log("STAGE #5: Creating accommodations...");
 
+  console.log("\tFetching prisoner sentences...");
   const prisonerSentences = (
     await con.execute(
       `select p.id, s.start_date, s.real_end_date from prisoner p
@@ -49,15 +67,14 @@ export async function createAccommodations(con) {
     }
   );
 
-  // const cells = (
-  //   await con.execute("select id, place_count from cell")
-  // ).rows.map(([id, places]) => ({ id, places, accommodations: [] }));
+  const cells = (
+    await con.execute("select id, place_count from cell")
+  ).rows.map(([id, places]) => ({ id, room: new Room(places) }));
 
   console.log("\tGenerating accommodations...");
   const accommodations = [];
   bar.start(Object.entries(prisoners).length, 0);
   for (const id in prisoners) {
-    console.log("----");
     const intervals = prisoners[id];
     const accommodationCount = poisson(5, intervals.length, 10);
     const intervalSplitCount = accommodationCount - intervals.length;
@@ -76,10 +93,12 @@ export async function createAccommodations(con) {
       intervals[idx].e = splitPoint;
     }
 
+    const prisoner = parseInt(id, 10);
     for (const { s, e } of intervals) {
+      const cell = findCell(cells, s, e);
       accommodations.push({
-        cell: null, // TODO
-        prisoner: id,
+        cell,
+        prisoner,
         s,
         e,
       });
@@ -89,6 +108,7 @@ export async function createAccommodations(con) {
   }
   bar.stop();
 
+  console.log("\tInserting accommodations...");
   await con.executeMany(
     `insert into accommodation(fk_cell, fk_prisoner, start_date, end_date)
     values (:cell, :prisoner, :s, :e)`,
