@@ -175,7 +175,7 @@ function generateSentence(prisoner, birthday) {
     sentenceStart + SHORTEST_SENTENCE_MS,
     sentenceStart + LONGEST_SENTENCE_MS
   );
-  const re = realEnd > CURRENT_DATE.getTime() ? new Date(realEnd) : null;
+  const re = realEnd < CURRENT_DATE.getTime() ? new Date(realEnd) : null;
 
   return {
     prisoner,
