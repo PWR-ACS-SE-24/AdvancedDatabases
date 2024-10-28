@@ -21,11 +21,10 @@ const GUARD_SALARY_EXPERIENCE_MULTIPLIER = 0.1;
 function generateGuard(start, end) {
   const sex = Math.random() < 0.1 ? "female" : "male";
   const employment = new Date(
-    Math.max(start.getTime() - rand(0, 0.4 * YEAR_IN_MS), START_TIMESTAMP)
+    Math.max(start.getTime() - rand(0, 0.5 * YEAR_IN_MS), START_TIMESTAMP)
   );
   let dismissal = new Date(
-    end.getTime() +
-      normal(3 * YEAR_IN_MS, YEAR_IN_MS, 0.5 * YEAR_IN_MS, 10 * YEAR_IN_MS)
+    end.getTime() + normal(5 * YEAR_IN_MS, 2 * YEAR_IN_MS, 0, 10 * YEAR_IN_MS)
   );
   if (dismissal > CURRENT_TIMESTAMP) {
     dismissal = null;
@@ -92,13 +91,13 @@ export async function createGuards(con) {
   for (const [patrolSlotId, start, end] of patrolSlots) {
     const availableGuards = (
       await con.execute(
-        `
-      SELECT g.id, g.has_disability_class FROM guard g
-      LEFT JOIN patrol p ON p.fk_guard = g.id AND p.fk_patrol_slot = :psid
-      WHERE p.fk_guard IS NULL and g.employment_date <= :s
-          and (g.dismissal_date is null or g.dismissal_date >= :e)
-      `,
-        { psid: patrolSlotId, s: start, e: end }
+        `select g.id, g.has_disability_class from guard g
+        where (g.dismissal_date is null or g.dismissal_date >= :e)
+          and g.id not in (
+            select p.id from patrol p
+            where p.fk_patrol_slot = :psid
+          )`,
+        { psid: patrolSlotId, e: end }
       )
     ).rows.map((row) => ({ id: row[0], disability: row[1] }));
 

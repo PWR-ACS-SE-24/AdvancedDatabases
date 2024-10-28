@@ -147,3 +147,16 @@ create table reprimand (
       references prisoner ( id ),
    check ( reason <> '' )
 );
+
+create index guard_dismissal_date_index on
+   guard (
+      dismissal_date
+   );
+create index patrol_fk_guard_index on
+   patrol (
+      fk_guard
+   );
+create index patrol_fk_patrol_slot_index on
+   patrol (
+      fk_patrol_slot
+   );

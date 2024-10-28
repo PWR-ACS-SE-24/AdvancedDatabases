@@ -195,7 +195,7 @@ create table reprimand (
 - `guard.first_name` - rzeczywiste imię odpowiadające płci strażnika
 - `guard.last_name` - rzeczywiste nazwisko
 - `guard.employment_date` - data z przeszłości (od 2000 roku)
-- `guard.dismissal_date` - jeżeli istnieje jest późniejsza niż data zatrudnienia, średni czas pracy to 2 lata zgodnie z rozkładem normalnym
+- `guard.dismissal_date` - jeżeli istnieje jest późniejsza niż data zatrudnienia, średni czas pracy to 5 lat zgodnie z rozkładem normalnym
 - `guard.has_disability_class` - około 5% strażników ma niepełnosprawność (lekką)
 - `guard.monthly_salary_pln` - wynagrodzenie strażnika uwzględnia inflację (5% rok do roku) oraz jest zależna od stażu pracy
 - `patrol_slot.start_time`, `patrol_slot.end_time` - warty zaczynają się co godzinę (24 dziennie), prowadzimy ewidencję od 2000 roku
