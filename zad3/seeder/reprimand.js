@@ -1,7 +1,8 @@
 import oracledb from "oracledb";
 import progress from "cli-progress";
-import { poisson } from "./util.js";
+import { poisson, rand } from "./util.js";
 
+const CURRENT_DATE = new Date("2024-10-27");
 const REASONS = [
   "Niesubordynacja",
   "Niewłaściwe zachowanie",
@@ -44,6 +45,9 @@ const REASONS = [
  * @returns {{fk_guard: number, fk_prisoner: number, issue_date: Date, reason: string}}
  */
 function generateReprimand(prisonerId, guardId, start, end) {
+  if (end == null) {
+    end = CURRENT_DATE;
+  }
   const issue_date = new Date(
     start.getTime() + Math.random() * (end.getTime() - start.getTime())
   );
@@ -53,7 +57,7 @@ function generateReprimand(prisonerId, guardId, start, end) {
   for (let i = 0; i < numberOfReprimands; i++) {
     reasonList.push(REASONS[rand(0, REASONS.length - 1)]);
   }
-  const reason = reprimandsList.join(", ");
+  const reason = reasonList.join(", ");
 
   return {
     fk_guard: guardId,
@@ -89,7 +93,7 @@ export async function createReprimands(con) {
   ).rows.map(([id, employment, dismissal]) => ({ id, employment, dismissal }));
 
   bar.start(prisonerSentences.length, 0);
-  const reprimands = [];
+  const reprimandList = [];
   for (const { id, start, end, reprimands } of prisonerSentences) {
     for (let i = 0; i < reprimands; i++) {
       const possibleGuards = guards.filter(
@@ -99,7 +103,7 @@ export async function createReprimands(con) {
       const guard =
         possibleGuards[Math.floor(Math.random() * possibleGuards.length)];
 
-      reprimands.push(generateReprimand(id, guard.id, start, end));
+      reprimandList.push(generateReprimand(id, guard.id, start, end));
     }
     bar.increment();
   }
@@ -109,7 +113,7 @@ export async function createReprimands(con) {
 
   await con.executeMany(
     "insert into reprimand(fk_guard, fk_prisoner, issue_date, reason) values (:fk_guard, :fk_prisoner, :issue_date, :reason)",
-    reprimands,
+    reprimandList,
     {
       autoCommit: true,
       bindDefs: {
