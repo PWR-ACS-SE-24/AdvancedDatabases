@@ -179,7 +179,7 @@ create table reprimand (
 - każdy `prisoner` miał co najmniej 1 `accommodation`, może mieć więcej zgodnie z rozkładem Poissona dla `λ = 5`, wszystkie muszą mieć miejsce w czasie trwania przynajmniej jednej `sentence`; `prisoner`, który nadal odbywa karę ma aktywne `accommodation`; `accomodation` dla danego więźnia nie mogą się pokrywać w czasie; `prisoner` powinien w każdym momencie odbywania kary mieć aktywne `accommodation`
 - każdy `cell` ma w dowolnym momencie w czasie co najwyżej tyle `accommodation`, ile wynosi `cell.place_count`
 - `patrol` obsadza każdy `prison_block` dla każdego `patrol_slot`, za pomocą co najmniej jednego `guard` (liczba skorelowana z liczbą cel w bloku), który jest zatrudniony w czasie warty
-- `prisoner` ma liczbę `reprimand` zgodną z rozkładem Poissona dla `λ = 1` (włącznie z zerem)
+- `prisoner` ma liczbę `reprimand`w trakcie wyroku zgodną z rozkładem Poissona dla `λ = 1` (włącznie z zerem)
 
 #### Kolumny
 - `prisoner.pesel` - spełnia reguły walidacji numerów PESEL, jest unikalny i zgodny z datą urodzenia i płcią więźnia
