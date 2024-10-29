@@ -216,12 +216,12 @@ create table reprimand (
 
 | *Tabela*        | *Liczba rekordów* |
 | --------------- | ----------------- |
-| `patrol`        | 71174808          |
-| `accommodation` | 1445370           |
-| `sentence`      | 458707            |
-| `reprimand`     | 372889            |
-| `prisoner`      | 290678            |
-| `cell`          | 255216            |
+| `patrol`        | 70462512          |
+| `accommodation` | 1493036           |
+| `sentence`      | 473183            |
+| `reprimand`     | 422164            |
+| `prisoner`      | 299986            |
+| `cell`          | 251753            |
 | `patrol_slot`   | 27396             |
-| `guard`         | 14236             |
+| `guard`         | 14217             |
 | `prison_block`  | 100               |
