@@ -59,7 +59,7 @@ Wyszukanie wydarzeń związanych z więźniami w danym bloku `block_number`, kt�
 
 | Parametry         |
 | ----------------- |
-| `block_id`        |
+| `block_number`    |
 | `start_time`      |
 | `end_time`        |
 | `event_type`      |
@@ -70,12 +70,12 @@ Wyszukanie wydarzeń związanych z więźniami w danym bloku `block_number`, kt�
 
 ### Zapytanie 4 (dodatkowe)
 
-Zwrócenie raportu dotyczącego minimalnej, maksymalnej i średniej dla wzrostu, wagi, liczby wyroków, liczby reprymend, liczby przekwaterowań, czasu spędzonego w więzieniu dla więźniów w danym bloku `block_id`. Można filtrować wyniki według płci więźniów (`sex`).
+Zwrócenie raportu dotyczącego minimalnej, maksymalnej i średniej dla wzrostu, wagi, liczby wyroków, liczby reprymend, liczby przekwaterowań dla więźniów w danym bloku `block_number`. Można filtrować wyniki według płci więźniów (`sex`).
 
-| Parametry  |
-| ---------- |
-| `block_id` |
-| `sex`      |
+| Parametry      |
+| -------------- |
+| `block_number` |
+| `sex`          |
 
 ### Zmiana danych 1
 
