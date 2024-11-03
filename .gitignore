@@ -1,3 +1,4 @@
 *.bkp
 *.pdf
 node_modules
+oracle.sh # Docker start script

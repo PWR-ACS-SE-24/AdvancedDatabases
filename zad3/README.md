@@ -172,6 +172,10 @@ create table reprimand (
 
 ### Odzwierciedlone zależności
 
+W poniższych zależnościach występuje rozkład Poissona, który jest dyskretnym rozkładem prawdopodobieństwa, o kształcie rozkładu zbliżonym do rozkładu normalnego. Wartość oczekiwana rozkładu Poissona wynosi λ, czyli np. dla liczby zameldowań zgodnej z λ = 5, oczekujemy, że więzień będzie miał średnio 5 zameldowań. Rozkład prawdopodobieństwa został przedstawiony na wykresie poniżej.
+
+<img src="./img/poisson.png" width="550" />
+
 #### Powiązania
 - `prisoner` ma liczbę `sentence` co najmniej 1, zgodną z rozkładem Poissona dla `λ = 1`
 - istnieje 100 `prison_block` w więzieniu
