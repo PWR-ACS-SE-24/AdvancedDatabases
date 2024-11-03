@@ -45,3 +45,4 @@
 1. [Zadanie 1 - Model danych](./zad1/)
 2. [Zadanie 2 - Workload](./zad2/)
 3. [Zadanie 3 - Baza danych](./zad3/)
+4. [Zadanie 4 - Workload](./zad4/)
