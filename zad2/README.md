@@ -20,7 +20,7 @@ Wyszukanie strażników, którzy mogą obsadzić patrol w danym przedziale czaso
 
 ### Zapytanie 2
 
-Zwrócenie procentu (spośród wszystkich więźniów) i liczby więźniów o danych cechach z podziałem na bloki, w których przebywają. Więźniów można filtrować według następujących parametrów:
+Liczby więźniów o danych cechach z podziałem na bloki, w których przebywają. Więźniów można filtrować według następujących parametrów:
 
 - wiek więźnia pomiędzy `min_age` a `max_age`,
 - płeć więźnia (`sex`),
@@ -55,7 +55,7 @@ Zwrócenie procentu (spośród wszystkich więźniów) i liczby więźniów o da
 
 ### Zapytanie 3
 
-Wyszukanie wydarzeń związanych z więźniami w danym bloku `block_id`, które miały miejsce w określonym przedziale czasowym (`start_time` - `end_time`). Wyniki mogą być filtrowane według typu wydarzenia `event_type`, np. ucieczka, bójka. Można ograniczyć wyniki do wydarzeń dotyczących więźniów o określonych cechach: liczba wyroków (`sentence_count`), przestępstwo (`crime`), liczba reprymend (`reprimand_count`), czy obecność w izolatce (`is_in_solitary`). Zwracana jest lista wydarzeń wraz z datą, treścią reprymendy oraz danymi więźnia i strażnika.
+Wyszukanie wydarzeń związanych z więźniami w danym bloku `block_number`, które miały miejsce w określonym przedziale czasowym (`start_date` - `end_date`). Wyniki mogą być filtrowane według typu wydarzenia `event_type`, np. ucieczka, bójka. Można ograniczyć wyniki do wydarzeń dotyczących więźniów o określonych cechach: liczba wyroków (`sentence_count`), przestępstwo (`crime`), liczba reprymend (`reprimand_count`), czy obecność w izolatce (`is_in_solitary`). Zwracana jest lista wydarzeń wraz z datą, danymi więźnia i strażnika oraz treścią reprymendy.
 
 | Parametry         |
 | ----------------- |
