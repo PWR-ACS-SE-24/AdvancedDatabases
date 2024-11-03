@@ -12,8 +12,9 @@ with prisoner_blocks as (
    on a.fk_prisoner = p.id
     where a.start_date <= to_date(:now,
            'YYYY-MM-DD')
-      and a.end_date >= to_date(:now,
-        'YYYY-MM-DD')
+      and ( a.end_date is null
+       or a.end_date >= to_date(:now,
+        'YYYY-MM-DD') )
 ),prisoners_details as (
    select prisoner.id,
           min(prisoner.height_m) as height,

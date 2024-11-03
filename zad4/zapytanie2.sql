@@ -52,8 +52,9 @@ on p.id = pc.id
 on p.id = ps.id
  where a.start_date <= to_date(:now,
            'YYYY-MM-DD')
-   and a.end_date >= to_date(:now,
-        'YYYY-MM-DD')
+   and ( a.end_date is null
+    or a.end_date >= to_date(:now,
+        'YYYY-MM-DD') )
    and ( :min_age is null
     or months_between(
    :now,

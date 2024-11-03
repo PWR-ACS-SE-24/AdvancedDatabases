@@ -111,11 +111,11 @@ Przeniesienie więźniów, którzy w przedziale czasowym (`start_time` - `end_ti
 
 ### Zamiana danych 4 (dodatkowa)
 
-Wystawienie reprymendy o treści `reason` przez strażnika `guard_id` wszystkim więźniom niebędącym w izolatce i znajdującym się w bloku `block_id` w momencie `event_time`.
+Wystawienie reprymendy o treści `reason` przez strażnika `guard_id` wszystkim więźniom niebędącym w izolatce i znajdującym się w bloku `block_number` w momencie `event_time`.
 
-| Parametry    |
-| ------------ |
-| `block_id`   |
-| `event_time` |
-| `guard_id`   |
-| `reason`     |
+| Parametry      |
+| -------------- |
+| `block_number` |
+| `event_time`   |
+| `guard_id`     |
+| `reason`       |

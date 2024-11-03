@@ -14,8 +14,9 @@ with prisoner_blocks as (
    on a.fk_prisoner = p.id
     where a.start_date <= to_date(:start_date,
            'YYYY-MM-DD')
-      and a.end_date >= to_date(:end_date,
-        'YYYY-MM-DD')
+      and ( a.end_date is null
+       or a.end_date >= to_date(:end_date,
+        'YYYY-MM-DD') )
 ),prisoner_counts as (
    select p.id,
           count(r.id) as reprimands,
