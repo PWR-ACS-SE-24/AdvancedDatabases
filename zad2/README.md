@@ -79,11 +79,11 @@ Zwrócenie raportu dotyczącego minimalnej, maksymalnej i średniej dla wzrostu,
 
 ### Zmiana danych 1
 
-Zwolnienie wszystkich strażników ze stażem mniejszym niż `experience_months` miesięcy, którzy nie mają zaplanowanych patroli w przyszłości oraz patrolowali blok `block_id` w określonym przedziale czasowym (`start_time` - `end_time`).
+Zwolnienie wszystkich strażników ze stażem mniejszym niż `experience_months` miesięcy, którzy nie mają zaplanowanych patroli w przyszłości oraz patrolowali blok `block_number` w określonym przedziale czasowym (`start_time` - `end_time`).
 
 | Parametry           |
 | ------------------- |
-| `block_id`          |
+| `block_number`      |
 | `start_time`        |
 | `end_time`          |
 | `experience_months` |
