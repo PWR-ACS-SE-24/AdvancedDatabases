@@ -1,5 +1,11 @@
 -- Przeniesienie więźniów, którzy w przedziale czasowym (`start_time` - `end_time`) dostali reprymendę zawierającą w treści `event_type` do wolnej izolatki w bloku `block_id` z obecnego zakwaterowania. Jeżeli wolnych izolatek nie ma, to więźniowie pozostają w swoich celach.
 
+create index idx_reprimand_reason on
+   reprimand (
+      reason
+   )
+      indextype is ctxsys.context;
+
 -- TODO insert
 select c.id as fk_cell,
        p.id as fk_prisoner,
@@ -18,6 +24,11 @@ select c.id as fk_cell,
     where r.issue_date between to_date(:start_time,
         'YYYY-MM-DD') and to_date(:end_time,
         'YYYY-MM-DD')
+      and contains(
+      r.reason,
+      :event_type,
+      1
+   ) > 0
 ) p
  inner join (
    select rownum as n,
