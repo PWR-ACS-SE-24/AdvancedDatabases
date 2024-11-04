@@ -100,7 +100,7 @@ Wygenerowanie wart (patrol slot) w przedziale czasowym (`start_time` - `end_time
 
 ### Zmiana danych 3
 
-Przeniesienie więźniów, którzy w przedziale czasowym (`start_time` - `end_time`) dostali reprymendę zawierającą w treści `event_type` do wolnej izolatki w bloku `block_id` z obecnego zakwaterowania. Jeżeli wolnych izolatek nie ma, to więźniowie pozostają w swoich celach.
+Przeniesienie więźniów, którzy w przedziale czasowym (`start_date` - `end_date`) dostali reprymendę zawierającą w treści `event_type` do wolnej izolatki w bloku `block_id` z obecnego zakwaterowania. Jeżeli wolnych izolatek nie ma, to więźniowie pozostają w swoich celach.
 
 | Parametry    |
 | ------------ |
