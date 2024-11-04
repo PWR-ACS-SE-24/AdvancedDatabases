@@ -6,29 +6,32 @@ create index idx_reprimand_reason on
    )
       indextype is ctxsys.context;
 
--- TODO insert
+-- insert into accommodation (
+--    fk_cell,
+--    fk_prisoner,
+--    start_date,
+--    end_date
+-- )
 select c.id as fk_cell,
        p.id as fk_prisoner,
        to_timestamp(:now,
                     'YYYY-MM-DD HH24:MI:SS') as start_date,
        null as end_date
   from (
-  -- TODO dodac filtrowanie po reason
    select rownum as n,
-          p.id,
-          p.first_name,
-          p.last_name
+          p.id
      from prisoner p
     inner join reprimand r
    on p.id = r.fk_prisoner
     where r.issue_date between to_date(:start_date,
         'YYYY-MM-DD') and to_date(:end_date,
         'YYYY-MM-DD')
-      and contains(
+      and ( :event_type is null
+       or contains(
       r.reason,
       :event_type,
       1
-   ) > 0
+   ) > 0 )
 ) p
  inner join (
    select rownum as n,
