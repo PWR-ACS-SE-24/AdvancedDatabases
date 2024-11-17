@@ -16,7 +16,7 @@ export async function query1(con) {
                         || g.id
                         || ')',
                         ', ') within group(
-                  order by g.id)
+                  order by dbms_random.value)
                 from (
                 select id,
                         first_name,
