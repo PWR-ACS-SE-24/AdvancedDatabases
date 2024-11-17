@@ -1,0 +1,74 @@
+Plan hash value: 1379684122
+ 
+-------------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name          | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |               |     1 |    78 |       |  7139   (2)| 00:00:01 |
+|   1 |  HASH GROUP BY                      |               |     1 |    78 |       |  7139   (2)| 00:00:01 |
+|   2 |   NESTED LOOPS                      |               |     1 |    78 |       |  7138   (2)| 00:00:01 |
+|   3 |    NESTED LOOPS                     |               |     1 |    78 |       |  7138   (2)| 00:00:01 |
+|   4 |     NESTED LOOPS                    |               |     1 |    71 |       |  7137   (2)| 00:00:01 |
+|*  5 |      HASH JOIN                      |               |     1 |    60 |       |  7136   (2)| 00:00:01 |
+|*  6 |       HASH JOIN                     |               |     1 |    34 |       |  5371   (1)| 00:00:01 |
+|   7 |        JOIN FILTER CREATE           | :BF0000       |     1 |    29 |       |  1218   (1)| 00:00:01 |
+|   8 |         NESTED LOOPS                |               |     1 |    29 |       |  1218   (1)| 00:00:01 |
+|   9 |          NESTED LOOPS               |               |     1 |    29 |       |  1218   (1)| 00:00:01 |
+|  10 |           VIEW                      |               |     1 |     5 |       |  1217   (1)| 00:00:01 |
+|* 11 |            FILTER                   |               |       |       |       |            |          |
+|  12 |             SORT GROUP BY           |               |     1 |    72 |       |  1217   (1)| 00:00:01 |
+|* 13 |              TABLE ACCESS FULL      | SENTENCE      |  8470 |   595K|       |  1216   (1)| 00:00:01 |
+|* 14 |           INDEX UNIQUE SCAN         | SYS_C008234   |     1 |       |       |     0   (0)| 00:00:01 |
+|* 15 |          TABLE ACCESS BY INDEX ROWID| PRISONER      |     1 |    24 |       |     1   (0)| 00:00:01 |
+|  16 |        VIEW                         |               |    24 |   120 |       |  4154   (1)| 00:00:01 |
+|* 17 |         FILTER                      |               |       |       |       |            |          |
+|  18 |          HASH GROUP BY              |               |    24 |   600 |       |  4154   (1)| 00:00:01 |
+|* 19 |           HASH JOIN RIGHT OUTER     |               |   709K|    16M|  7992K|  4136   (1)| 00:00:01 |
+|  20 |            TABLE ACCESS FULL        | REPRIMAND     |   371K|  3630K|       |  1221   (1)| 00:00:01 |
+|  21 |            JOIN FILTER USE          | :BF0000       |   412K|  6041K|       |  1996   (1)| 00:00:01 |
+|* 22 |             HASH JOIN OUTER         |               |   412K|  6041K|  4400K|  1996   (1)| 00:00:01 |
+|  23 |              INDEX FAST FULL SCAN   | SYS_C008234   |   264K|  1291K|       |   137   (1)| 00:00:01 |
+|  24 |              TABLE ACCESS FULL      | SENTENCE      |   416K|  4070K|       |  1209   (1)| 00:00:01 |
+|* 25 |       TABLE ACCESS FULL             | ACCOMMODATION |  9279 |   235K|       |  1764   (2)| 00:00:01 |
+|* 26 |      TABLE ACCESS BY INDEX ROWID    | CELL          |     1 |    11 |       |     1   (0)| 00:00:01 |
+|* 27 |       INDEX UNIQUE SCAN             | SYS_C008269   |     1 |       |       |     0   (0)| 00:00:01 |
+|* 28 |     INDEX UNIQUE SCAN               | SYS_C008241   |     1 |       |       |     0   (0)| 00:00:01 |
+|  29 |    TABLE ACCESS BY INDEX ROWID      | PRISON_BLOCK  |     1 |     7 |       |     1   (0)| 00:00:01 |
+-------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   5 - access("A"."FK_PRISONER"="P"."ID")
+   6 - access("P"."ID"="PC"."ID")
+  11 - filter((:CRIME IS NULL OR INSTR(LISTAGG("S"."CRIME",', ') WITHIN GROUP ( ORDER BY 
+              "S"."ID"),:CRIME)>0) AND (:MIN_STAY_MONTHS IS NULL OR 
+              MONTHS_BETWEEN(:NOW,MIN("S"."START_DATE"))>=TO_NUMBER(:MIN_STAY_MONTHS)) AND (:MAX_STAY_MONTHS IS 
+              NULL OR MONTHS_BETWEEN(:NOW,MIN("S"."START_DATE"))<=TO_NUMBER(:MAX_STAY_MONTHS)) AND 
+              (:MIN_RELEASE_MONTHS IS NULL OR MONTHS_BETWEEN(MAX("S"."PLANNED_END_DATE"),:NOW)>=TO_NUMBER(:MIN_RELE
+              ASE_MONTHS)) AND (:MAX_RELEASE_MONTHS IS NULL OR MONTHS_BETWEEN(MAX("S"."PLANNED_END_DATE"),:NOW)<=TO
+              _NUMBER(:MAX_RELEASE_MONTHS)))
+  13 - filter("S"."START_DATE"<=TO_DATE(:NOW,'YYYY-MM-DD') AND ("S"."REAL_END_DATE" IS NULL OR 
+              "S"."REAL_END_DATE">=TO_DATE(:NOW,'YYYY-MM-DD')))
+  14 - access("P"."ID"="PS"."ID")
+  15 - filter((:MIN_HEIGHT_M IS NULL OR "P"."HEIGHT_M">=TO_NUMBER(:MIN_HEIGHT_M)) AND (:MAX_HEIGHT_M 
+              IS NULL OR "P"."HEIGHT_M"<=TO_NUMBER(:MAX_HEIGHT_M)) AND (:MIN_WEIGHT_KG IS NULL OR 
+              "P"."WEIGHT_KG">=TO_NUMBER(:MIN_WEIGHT_KG)) AND (:MAX_WEIGHT_KG IS NULL OR 
+              "P"."WEIGHT_KG"<=TO_NUMBER(:MAX_WEIGHT_KG)) AND ("P"."SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL) AND 
+              (:MIN_AGE IS NULL OR MONTHS_BETWEEN(:NOW,INTERNAL_FUNCTION("P"."BIRTHDAY"))>=TO_NUMBER(:MIN_AGE)*12) 
+              AND (:MAX_AGE IS NULL OR MONTHS_BETWEEN(:NOW,INTERNAL_FUNCTION("P"."BIRTHDAY"))<=TO_NUMBER(:MAX_AGE)*
+              12))
+  17 - filter((:MIN_SENTENCES IS NULL OR COUNT("S"."ID")>=TO_NUMBER(:MIN_SENTENCES)) AND 
+              (:MAX_SENTENCES IS NULL OR COUNT("S"."ID")<=TO_NUMBER(:MAX_SENTENCES)) AND (:MIN_REPRIMANDS IS NULL 
+              OR COUNT("R"."ID")>=TO_NUMBER(:MIN_REPRIMANDS)) AND (:MAX_REPRIMANDS IS NULL OR 
+              COUNT("R"."ID")<=TO_NUMBER(:MAX_REPRIMANDS)))
+  19 - access("P"."ID"="R"."FK_PRISONER"(+))
+  22 - access("P"."ID"="S"."FK_PRISONER"(+))
+  25 - filter("A"."START_DATE"<=TO_DATE(:NOW,'YYYY-MM-DD') AND ("A"."END_DATE" IS NULL OR 
+              "A"."END_DATE">=TO_DATE(:NOW,'YYYY-MM-DD')))
+  26 - filter("C"."IS_SOLITARY"=TO_NUMBER(:IS_IN_SOLITARY) OR :IS_IN_SOLITARY IS NULL)
+  27 - access("C"."ID"="A"."FK_CELL")
+  28 - access("PB"."ID"="C"."FK_BLOCK")
+ 
+Note
+-----
+   - this is an adaptive plan

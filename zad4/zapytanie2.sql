@@ -79,10 +79,9 @@ on p.id = ps.id
    and ( :max_sentences is null
     or pc.sentences <= :max_sentences )
    and ( :crime is null
-    or contains(
+    or instr(
    ps.crime,
-   :crime,
-   1
+   :crime
 ) > 0 )
    and ( :min_reprimands is null
     or pc.reprimands >= :min_reprimands )

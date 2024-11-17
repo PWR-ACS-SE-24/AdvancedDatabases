@@ -74,20 +74,18 @@ on p.id = ps.id
    and ( :block_number is null
     or pb.block_number = :block_number )
    and ( :event_type is null
-    or contains(
+    or instr(
    r.reason,
-   :event_type,
-   1
+   :event_type
 ) > 0 )
    and ( :sentence_count is null
     or pc.sentences = :sentence_count )
    and ( :reprimand_count is null
     or pc.reprimands = :reprimand_count )
    and ( :crime is null
-    or contains(
+    or instr(
    ps.crime,
-   :crime,
-   1
+   :crime
 ) > 0 )
    and ( :is_in_solitary is null
     or pb.is_solitary = :is_in_solitary );
