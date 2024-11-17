@@ -15,7 +15,7 @@ export async function query2(con) {
     inner join prisoner p
     on a.fk_prisoner = p.id
     inner join (
-      select p.id,
+      select min(p.id) as id,
               count(r.id) as reprimands,
               count(s.id) as sentences
         from prisoner p
@@ -23,11 +23,11 @@ export async function query2(con) {
       on p.id = r.fk_prisoner
         left join sentence s
       on p.id = s.fk_prisoner
-        group by p.id
+        group by p.pesel
     ) pc
     on p.id = pc.id
     inner join (
-      select p.id,
+      select min(p.id) as id,
               listagg(s.crime,
                       ', ') within group(
               order by s.id) as crime,
@@ -41,7 +41,7 @@ export async function query2(con) {
           and ( s.real_end_date is null
           or s.real_end_date >= to_date(:now,
             'YYYY-MM-DD') )
-        group by p.id
+        group by p.pesel
     ) ps
     on p.id = ps.id
     where a.start_date <= to_date(:now,

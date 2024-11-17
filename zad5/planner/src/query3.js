@@ -37,15 +37,13 @@ export async function query3(con) {
       on c.id = a.fk_cell
         inner join prisoner p
       on a.fk_prisoner = p.id
-        where a.start_date <= to_date(:start_date,
-              'YYYY-MM-DD')
+        where to_char(a.start_date, 'YYYY-MM-DD') <= :start_date
           and ( a.end_date is null
-          or a.end_date >= to_date(:end_date,
-            'YYYY-MM-DD') )
+          or to_char(a.end_date, 'YYYY-MM-DD') >= :end_date )
     ) pb
     on p.id = pb.id
       join (
-      select p.id,
+      select min(p.id) as id,
               count(r.id) as reprimands,
               count(s.id) as sentences
         from prisoner p
@@ -53,29 +51,25 @@ export async function query3(con) {
       on p.id = r.fk_prisoner
         inner join sentence s
       on p.id = s.fk_prisoner
-        group by p.id
+        group by p.pesel
     ) pc
     on p.id = pc.id
       join (
-      select p.id,
+      select min(p.id) as id,
               listagg(s.crime,
                       ',') within group(
-              order by s.id) as crime
+              order by dbms_random.value) as crime
         from prisoner p
         inner join sentence s
       on p.id = s.fk_prisoner
-        where s.start_date <= to_date(:start_date,
-              'YYYY-MM-DD')
+        where to_char(s.start_date, 'YYYY-MM-DD') <= :start_date
           and ( s.real_end_date is null
-          or s.real_end_date >= to_date(:end_date,
-            'YYYY-MM-DD') )
-        group by p.id
+          or to_char(s.real_end_date, 'YYYY-MM-DD') >= :end_date )
+        group by p.pesel
     ) ps
     on p.id = ps.id
-    where r.issue_date >= to_date(:start_date,
-              'YYYY-MM-DD')
-      and r.issue_date <= to_date(:end_date,
-            'YYYY-MM-DD')
+    where to_char(r.issue_date, 'YYYY-MM-DD') >= :start_date
+      and to_char(r.issue_date, 'YYYY-MM-DD') <= :end_date
       and ( :block_number is null
         or pb.block_number = :block_number )
       and ( :event_type is null

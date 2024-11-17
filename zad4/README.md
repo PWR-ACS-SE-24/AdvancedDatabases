@@ -80,13 +80,13 @@ Liczby więźniów o danych cechach z podziałem na bloki, w których przebywaj�
 select pb.block_number,
        count(p.id) as prisoners_count
   from prison_block pb
- inner join cell c
+ left join cell c
 on pb.id = c.fk_block
  inner join accommodation a
 on c.id = a.fk_cell
- inner join prisoner p
+ left join prisoner p
 on a.fk_prisoner = p.id
- inner join (
+ left join (
    select p.id,
           count(r.id) as reprimands,
           count(s.id) as sentences
