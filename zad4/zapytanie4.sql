@@ -1,41 +1,41 @@
 -- Zwrócenie raportu dotyczącego "Min", "Max", średniej, odchylenia standardowego i wariancji dla wzrostu, wagi, liczby wyroków, liczby reprymend, liczby przekwaterowań dla więźniów w danym bloku `block_number`. Można filtrować wyniki według płci więźniów (`sex`).
 
-with prisoner_blocks as (
+with prisoners_details as (
    select p.id,
-          pb.block_number
-     from prison_block pb
-    inner join cell c
-   on pb.id = c.fk_block
-    inner join accommodation a
-   on c.id = a.fk_cell
-    inner join prisoner p
-   on a.fk_prisoner = p.id
-    where a.start_date <= to_date(:now,
+          min(p.height_m) as height,
+          min(p.weight_kg) as weight,
+          count(distinct s.id) as sentencenumber,
+          count(distinct r.id) as reprimandnumber,
+          count(distinct a.id) as accommodationnumber
+     from prisoner p
+     left join sentence s
+   on p.id = s.fk_prisoner
+     left join reprimand r
+   on p.id = r.fk_prisoner
+     left join accommodation a
+   on p.id = a.fk_prisoner
+     left join (
+      select p.id,
+             pb.block_number
+        from prison_block pb
+       inner join cell c
+      on pb.id = c.fk_block
+       inner join accommodation a
+      on c.id = a.fk_cell
+       inner join prisoner p
+      on a.fk_prisoner = p.id
+       where a.start_date <= to_date(:now,
            'YYYY-MM-DD')
-      and ( a.end_date is null
-       or a.end_date >= to_date(:now,
+         and ( a.end_date is null
+          or a.end_date >= to_date(:now,
         'YYYY-MM-DD') )
-),prisoners_details as (
-   select prisoner.id,
-          min(prisoner.height_m) as height,
-          min(prisoner.weight_kg) as weight,
-          count(distinct sentence.id) as sentencenumber,
-          count(distinct reprimand.id) as reprimandnumber,
-          count(distinct accommodation.id) as accommodationnumber
-     from prisoner
-     left join sentence
-   on prisoner.id = sentence.fk_prisoner
-     left join reprimand
-   on prisoner.id = reprimand.fk_prisoner
-     left join accommodation
-   on prisoner.id = accommodation.fk_prisoner
-     left join prisoner_blocks
-   on prisoner.id = prisoner_blocks.id
+   ) pb
+   on p.id = pb.id
     where ( :block_number is null
-       or prisoner_blocks.block_number = :block_number )
+       or pb.block_number = :block_number )
       and ( :sex is null
-       or prisoner.sex = :sex )
-    group by prisoner.id
+       or p.sex = :sex )
+    group by p.id
 )
 select 'Height' as "Name",
        min(height) as "Min",

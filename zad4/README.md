@@ -11,28 +11,6 @@ Zespół B5 (baza danych dla więzienia): <br/> <b>Tomasz Chojnacki (260365), Ka
 Wyszukanie strażników, którzy mogą obsadzić patrol w danym przedziale czasowym (`start_time` - `end_time`). Kwerenda zwraca `proposal_count` propozycji strażników, którzy mogą patrolować blok dla każdej warty (patrol slot) w podanym przedziale czasowym. Można wybrać jedynie strażników, którzy posiadają lub nie posiadają oświadczenia o niepełnosprawności (`has_disability_class`). Strażnik musi mieć staż pracy większy niż `experience_months` miesięcy oraz musi nadal pracować w zakładzie karnym.
 
 ```sql
-with available_guards as (
-   select g.id,
-          g.first_name,
-          g.last_name,
-          ps.id as patrol_slot_id
-     from guard g
-    cross join patrol_slot ps
-     left join patrol p
-   on p.fk_guard = g.id
-      and p.fk_patrol_slot = ps.id
-    where p.id is null
-      and g.employment_date <= ps.start_time
-      and ( g.dismissal_date is null
-       or g.dismissal_date >= ps.end_time )
-      and ( :has_disability_class is null
-       or g.has_disability_class = :has_disability_class )
-      and ( :experience_months is null
-       or months_between(
-      ps.start_time,
-      g.employment_date
-   ) >= :experience_months )
-)
 select ps.start_time,
        ps.end_time,
        (
@@ -49,7 +27,28 @@ select ps.start_time,
              select id,
                     first_name,
                     last_name
-               from available_guards ag
+               from (
+                select g.id,
+                       g.first_name,
+                       g.last_name,
+                       ps.id as patrol_slot_id
+                  from guard g
+                 cross join patrol_slot ps
+                  left join patrol p
+                on p.fk_guard = g.id
+                   and p.fk_patrol_slot = ps.id
+                 where p.id is null
+                   and g.employment_date <= ps.start_time
+                   and ( g.dismissal_date is null
+                    or g.dismissal_date >= ps.end_time )
+                   and ( :has_disability_class is null
+                    or g.has_disability_class = :has_disability_class )
+                   and ( :experience_months is null
+                    or months_between(
+                   ps.start_time,
+                   g.employment_date
+                ) >= :experience_months )
+             ) ag
               where ag.patrol_slot_id = ps.id
               order by dbms_random.value
               fetch first :proposal_count rows only
@@ -78,7 +77,16 @@ Liczby więźniów o danych cechach z podziałem na bloki, w których przebywaj�
 - przebywanie w izolatce lub nie (`is_in_solitary`).
 
 ```sql
-with prisoner_counts as (
+select pb.block_number,
+       count(p.id) as prisoners_count
+  from prison_block pb
+ inner join cell c
+on pb.id = c.fk_block
+ inner join accommodation a
+on c.id = a.fk_cell
+ inner join prisoner p
+on a.fk_prisoner = p.id
+ inner join (
    select p.id,
           count(r.id) as reprimands,
           count(s.id) as sentences
@@ -88,7 +96,9 @@ with prisoner_counts as (
      left join sentence s
    on p.id = s.fk_prisoner
     group by p.id
-),prisoner_sentences as (
+) pc
+on p.id = pc.id
+ inner join (
    select p.id,
           listagg(s.crime,
                   ', ') within group(
@@ -104,19 +114,7 @@ with prisoner_counts as (
        or s.real_end_date >= to_date(:now,
         'YYYY-MM-DD') )
     group by p.id
-)
-select pb.block_number,
-       count(p.id) as prisoners_count
-  from prison_block pb
- inner join cell c
-on pb.id = c.fk_block
- inner join accommodation a
-on c.id = a.fk_cell
- inner join prisoner p
-on a.fk_prisoner = p.id
- inner join prisoner_counts pc
-on p.id = pc.id
- inner join prisoner_sentences ps
+) ps
 on p.id = ps.id
  where a.start_date <= to_date(:now,
            'YYYY-MM-DD')
@@ -188,48 +186,6 @@ on p.id = ps.id
 Wyszukanie wydarzeń związanych z więźniami w danym bloku `block_number`, które miały miejsce w określonym przedziale czasowym (`start_date` - `end_date`). Wyniki mogą być filtrowane według typu wydarzenia `event_type`, np. ucieczka, bójka. Można ograniczyć wyniki do wydarzeń dotyczących więźniów o określonych cechach: liczba wyroków (`sentence_count`), przestępstwo (`crime`), liczba reprymend (`reprimand_count`), czy obecność w izolatce (`is_in_solitary`). Zwracana jest lista wydarzeń wraz z datą, danymi więźnia i strażnika oraz treścią reprymendy.
 
 ```sql
-with prisoner_blocks as (
-   select p.id,
-          pb.id as block_id,
-          pb.block_number,
-          c.is_solitary
-     from prison_block pb
-    inner join cell c
-   on pb.id = c.fk_block
-    inner join accommodation a
-   on c.id = a.fk_cell
-    inner join prisoner p
-   on a.fk_prisoner = p.id
-    where a.start_date <= to_date(:start_date,
-           'YYYY-MM-DD')
-      and ( a.end_date is null
-       or a.end_date >= to_date(:end_date,
-        'YYYY-MM-DD') )
-),prisoner_counts as (
-   select p.id,
-          count(r.id) as reprimands,
-          count(s.id) as sentences
-     from prisoner p
-    inner join reprimand r
-   on p.id = r.fk_prisoner
-    inner join sentence s
-   on p.id = s.fk_prisoner
-    group by p.id
-),prisoner_sentences as (
-   select p.id,
-          listagg(s.crime,
-                  ',') within group(
-           order by s.id) as crime
-     from prisoner p
-    inner join sentence s
-   on p.id = s.fk_prisoner
-    where s.start_date <= to_date(:start_date,
-           'YYYY-MM-DD')
-      and ( s.real_end_date is null
-       or s.real_end_date >= to_date(:end_date,
-        'YYYY-MM-DD') )
-    group by p.id
-)
 select r.id,
        r.issue_date,
        p.first_name
@@ -250,11 +206,52 @@ select r.id,
 on r.fk_prisoner = p.id
   join guard g
 on r.fk_guard = g.id
-  join prisoner_blocks pb
+  join (
+   select p.id,
+          pb.id as block_id,
+          pb.block_number,
+          c.is_solitary
+     from prison_block pb
+    inner join cell c
+   on pb.id = c.fk_block
+    inner join accommodation a
+   on c.id = a.fk_cell
+    inner join prisoner p
+   on a.fk_prisoner = p.id
+    where a.start_date <= to_date(:start_date,
+           'YYYY-MM-DD')
+      and ( a.end_date is null
+       or a.end_date >= to_date(:end_date,
+        'YYYY-MM-DD') )
+) pb
 on p.id = pb.id
-  join prisoner_counts pc
+  join (
+   select p.id,
+          count(r.id) as reprimands,
+          count(s.id) as sentences
+     from prisoner p
+    inner join reprimand r
+   on p.id = r.fk_prisoner
+    inner join sentence s
+   on p.id = s.fk_prisoner
+    group by p.id
+) pc
 on p.id = pc.id
-  join prisoner_sentences ps
+  join (
+   select p.id,
+          listagg(s.crime,
+                  ',') within group(
+           order by s.id) as crime
+     from prisoner p
+    inner join sentence s
+   on p.id = s.fk_prisoner
+    where s.start_date <= to_date(:start_date,
+           'YYYY-MM-DD')
+      and ( s.real_end_date is null
+       or s.real_end_date >= to_date(:end_date,
+        'YYYY-MM-DD') )
+    group by p.id
+) ps
 on p.id = ps.id
  where r.issue_date >= to_date(:start_date,
            'YYYY-MM-DD')
@@ -287,42 +284,42 @@ on p.id = ps.id
 Zwrócenie raportu dotyczącego minimalnej, maksymalnej i średniej dla wzrostu, wagi, liczby wyroków, liczby reprymend, liczby przekwaterowań dla więźniów w danym bloku `block_number`. Można filtrować wyniki według płci więźniów (`sex`).
 
 ```sql
-with prisoner_blocks as (
+with prisoners_details as (
    select p.id,
-          pb.block_number
-     from prison_block pb
-    inner join cell c
-   on pb.id = c.fk_block
-    inner join accommodation a
-   on c.id = a.fk_cell
-    inner join prisoner p
-   on a.fk_prisoner = p.id
-    where a.start_date <= to_date(:now,
+          min(p.height_m) as height,
+          min(p.weight_kg) as weight,
+          count(distinct s.id) as sentencenumber,
+          count(distinct r.id) as reprimandnumber,
+          count(distinct a.id) as accommodationnumber
+     from prisoner p
+     left join sentence s
+   on p.id = s.fk_prisoner
+     left join reprimand r
+   on p.id = r.fk_prisoner
+     left join accommodation a
+   on p.id = a.fk_prisoner
+     left join (
+      select p.id,
+             pb.block_number
+        from prison_block pb
+       inner join cell c
+      on pb.id = c.fk_block
+       inner join accommodation a
+      on c.id = a.fk_cell
+       inner join prisoner p
+      on a.fk_prisoner = p.id
+       where a.start_date <= to_date(:now,
            'YYYY-MM-DD')
-      and ( a.end_date is null
-       or a.end_date >= to_date(:now,
+         and ( a.end_date is null
+          or a.end_date >= to_date(:now,
         'YYYY-MM-DD') )
-),prisoners_details as (
-   select prisoner.id,
-          min(prisoner.height_m) as height,
-          min(prisoner.weight_kg) as weight,
-          count(distinct sentence.id) as sentencenumber,
-          count(distinct reprimand.id) as reprimandnumber,
-          count(distinct accommodation.id) as accommodationnumber
-     from prisoner
-     left join sentence
-   on prisoner.id = sentence.fk_prisoner
-     left join reprimand
-   on prisoner.id = reprimand.fk_prisoner
-     left join accommodation
-   on prisoner.id = accommodation.fk_prisoner
-     left join prisoner_blocks
-   on prisoner.id = prisoner_blocks.id
+   ) pb
+   on p.id = pb.id
     where ( :block_number is null
-       or prisoner_blocks.block_number = :block_number )
+       or pb.block_number = :block_number )
       and ( :sex is null
-       or prisoner.sex = :sex )
-    group by prisoner.id
+       or p.sex = :sex )
+    group by p.id
 )
 select 'Height' as "Name",
        min(height) as "Min",

@@ -10,7 +10,16 @@
 -- - zwalnianie z więzienia w ciągu od `min_release_months` do `max_release_months` miesięcy,
 -- - przebywanie w izolatce lub nie (`is_in_solitary`).
 
-with prisoner_counts as (
+select pb.block_number,
+       count(p.id) as prisoners_count
+  from prison_block pb
+ inner join cell c
+on pb.id = c.fk_block
+ inner join accommodation a
+on c.id = a.fk_cell
+ inner join prisoner p
+on a.fk_prisoner = p.id
+ inner join (
    select p.id,
           count(r.id) as reprimands,
           count(s.id) as sentences
@@ -20,7 +29,9 @@ with prisoner_counts as (
      left join sentence s
    on p.id = s.fk_prisoner
     group by p.id
-),prisoner_sentences as (
+) pc
+on p.id = pc.id
+ inner join (
    select p.id,
           listagg(s.crime,
                   ', ') within group(
@@ -36,19 +47,7 @@ with prisoner_counts as (
        or s.real_end_date >= to_date(:now,
         'YYYY-MM-DD') )
     group by p.id
-)
-select pb.block_number,
-       count(p.id) as prisoners_count
-  from prison_block pb
- inner join cell c
-on pb.id = c.fk_block
- inner join accommodation a
-on c.id = a.fk_cell
- inner join prisoner p
-on a.fk_prisoner = p.id
- inner join prisoner_counts pc
-on p.id = pc.id
- inner join prisoner_sentences ps
+) ps
 on p.id = ps.id
  where a.start_date <= to_date(:now,
            'YYYY-MM-DD')
