@@ -1,0 +1,17 @@
+Plan hash value: 2763155797
+ 
+---------------------------------------------------------------------------------------
+| Id  | Operation                      | Name         | Rows  | Cost (%CPU)| Time     |
+---------------------------------------------------------------------------------------
+|   0 | INSERT STATEMENT               |              |     1 |     2   (0)| 00:00:01 |
+|   1 |  LOAD TABLE CONVENTIONAL       | PATROL_SLOT  |       |            |          |
+|   2 |   SEQUENCE                     | ISEQ$$_75800 |       |            |          |
+|*  3 |    CONNECT BY WITHOUT FILTERING|              |       |            |          |
+|   4 |     FAST DUAL                  |              |     1 |     2   (0)| 00:00:01 |
+---------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   3 - filter(LEVEL<=TRUNC(EXTRACT(DAY FROM INTERVAL'+000527039 
+              23:36:00.000000000' DAY(9) TO SECOND(9))/15))
