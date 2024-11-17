@@ -17,19 +17,18 @@ export async function change3(con) {
                           'YYYY-MM-DD HH24:MI:SS') as start_date,
               null as end_date
         from (
-          select rownum as n,
-                p.id
+          select min(rownum) as n,
+                min(p.id) as id
             from prisoner p
           inner join reprimand r
           on p.id = r.fk_prisoner
-          where r.issue_date between to_date(:start_date,
-            'YYYY-MM-DD') and to_date(:end_date,
-            'YYYY-MM-DD')
+          where to_char(r.issue_date, 'YYYY-MM-DD') between :start_date and :end_date
             and ( :event_type is null
               or instr(
             r.reason,
             :event_type
           ) > 0 )
+          group by p.pesel
       ) p
         inner join (
           select rownum as n,
@@ -43,10 +42,9 @@ export async function change3(con) {
             select fk_cell
               from accommodation a
               where ( a.end_date is null
-                or a.end_date >= to_timestamp(:now,
-                'YYYY-MM-DD HH24:MI:SS') )
-                and a.start_date <= to_timestamp(:now,
-                'YYYY-MM-DD HH24:MI:SS')
+                or to_char(a.end_date, 'YYYY-MM-DD HH24:MI:SS') >= :now )
+                and to_char(a.start_date, 'YYYY-MM-DD HH24:MI:SS') <= :now
+            group by fk_cell
           )
       ) c
       on p.n = c.n

@@ -1,29 +1,37 @@
-Plan hash value: 1944716788
+Plan hash value: 4220876432
  
------------------------------------------------------------------------------------------------------------------
-| Id  | Operation                         | Name                        | Rows  | Bytes | Cost (%CPU)| Time     |
------------------------------------------------------------------------------------------------------------------
-|   0 | UPDATE STATEMENT                  |                             |     1 |    35 | 20278   (1)| 00:00:01 |
-|   1 |  UPDATE                           | GUARD                       |       |       |            |          |
-|   2 |   NESTED LOOPS SEMI               |                             |     1 |    35 | 20278   (1)| 00:00:01 |
-|*  3 |    HASH JOIN ANTI                 |                             |     1 |    33 | 19289   (1)| 00:00:01 |
-|*  4 |     TABLE ACCESS FULL             | GUARD                       |   119 |  2380 |    27   (0)| 00:00:01 |
-|   5 |     VIEW                          | VW_NSO_1                    |  3243K|    40M| 19253   (1)| 00:00:01 |
-|   6 |      NESTED LOOPS                 |                             |  3243K|    80M| 19253   (1)| 00:00:01 |
-|   7 |       NESTED LOOPS                |                             |  3244K|    80M| 19253   (1)| 00:00:01 |
-|*  8 |        TABLE ACCESS FULL          | PATROL_SLOT                 |  1370 | 21920 |    34   (3)| 00:00:01 |
-|*  9 |        INDEX RANGE SCAN           | PATROL_FK_PATROL_SLOT_INDEX |  2368 |       |     5   (0)| 00:00:01 |
-|  10 |       TABLE ACCESS BY INDEX ROWID | PATROL                      |  2368 | 23680 |    14   (0)| 00:00:01 |
-|  11 |    VIEW PUSHED PREDICATE          | VW_NSO_2                    |     1 |     2 |   989   (1)| 00:00:01 |
-|  12 |     NESTED LOOPS                  |                             |     1 |    47 |   989   (1)| 00:00:01 |
-|  13 |      NESTED LOOPS                 |                             |   161K|    47 |   989   (1)| 00:00:01 |
-|  14 |       NESTED LOOPS                |                             |    68 |  2312 |    35   (3)| 00:00:01 |
-|  15 |        TABLE ACCESS BY INDEX ROWID| PRISON_BLOCK                |     1 |     7 |     1   (0)| 00:00:01 |
-|* 16 |         INDEX UNIQUE SCAN         | SYS_C008242                 |     1 |       |     0   (0)| 00:00:01 |
-|* 17 |        TABLE ACCESS FULL          | PATROL_SLOT                 |    68 |  1836 |    34   (3)| 00:00:01 |
-|* 18 |       INDEX RANGE SCAN            | PATROL_FK_PATROL_SLOT_INDEX |  2368 |       |     5   (0)| 00:00:01 |
-|* 19 |      TABLE ACCESS BY INDEX ROWID  | PATROL                      |     1 |    13 |    14   (0)| 00:00:01 |
------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                            | Name                        | Rows  | Bytes | Cost (%CPU)| Time     |
+--------------------------------------------------------------------------------------------------------------------
+|   0 | UPDATE STATEMENT                     |                             |     1 |    35 | 20358   (1)| 00:00:01 |
+|   1 |  UPDATE                              | GUARD                       |       |       |            |          |
+|   2 |   NESTED LOOPS SEMI                  |                             |     1 |    35 | 20358   (1)| 00:00:01 |
+|*  3 |    HASH JOIN ANTI                    |                             |     1 |    33 | 19368   (1)| 00:00:01 |
+|*  4 |     TABLE ACCESS FULL                | GUARD                       |   119 |  2380 |    27   (0)| 00:00:01 |
+|   5 |     VIEW                             | VW_NSO_1                    | 13140 |   166K| 19341   (1)| 00:00:01 |
+|   6 |      NESTED LOOPS SEMI               |                             | 13140 |   461K| 19341   (1)| 00:00:01 |
+|   7 |       VIEW                           | VW_GBF_20                   | 13140 |   166K| 19340   (1)| 00:00:01 |
+|   8 |        SORT GROUP BY                 |                             | 13140 |   333K| 19340   (1)| 00:00:01 |
+|   9 |         NESTED LOOPS                 |                             |  3243K|    80M| 19253   (1)| 00:00:01 |
+|  10 |          NESTED LOOPS                |                             |  3244K|    80M| 19253   (1)| 00:00:01 |
+|* 11 |           TABLE ACCESS FULL          | PATROL_SLOT                 |  1370 | 21920 |    34   (3)| 00:00:01 |
+|* 12 |           INDEX RANGE SCAN           | PATROL_FK_PATROL_SLOT_INDEX |  2368 |       |     5   (0)| 00:00:01 |
+|  13 |          TABLE ACCESS BY INDEX ROWID | PATROL                      |  2368 | 23680 |    14   (0)| 00:00:01 |
+|* 14 |       INDEX UNIQUE SCAN              | SYS_C008254                 |     1 |    23 |     0   (0)| 00:00:01 |
+|  15 |    VIEW PUSHED PREDICATE             | VW_NSO_2                    |     1 |     2 |   990   (1)| 00:00:01 |
+|  16 |     NESTED LOOPS                     |                             |     1 |    36 |   990   (1)| 00:00:01 |
+|* 17 |      INDEX UNIQUE SCAN               | SYS_C008254                 |     1 |    23 |     1   (0)| 00:00:01 |
+|  18 |      VIEW                            | VW_GBF_56                   |     1 |    13 |   989   (1)| 00:00:01 |
+|  19 |       SORT GROUP BY                  |                             |     1 |    47 |   989   (1)| 00:00:01 |
+|  20 |        NESTED LOOPS                  |                             |     1 |    47 |   989   (1)| 00:00:01 |
+|  21 |         NESTED LOOPS                 |                             |   161K|    47 |   989   (1)| 00:00:01 |
+|  22 |          NESTED LOOPS                |                             |    68 |  2312 |    35   (3)| 00:00:01 |
+|  23 |           TABLE ACCESS BY INDEX ROWID| PRISON_BLOCK                |     1 |     7 |     1   (0)| 00:00:01 |
+|* 24 |            INDEX UNIQUE SCAN         | SYS_C008242                 |     1 |       |     0   (0)| 00:00:01 |
+|* 25 |           TABLE ACCESS FULL          | PATROL_SLOT                 |    68 |  1836 |    34   (3)| 00:00:01 |
+|* 26 |          INDEX RANGE SCAN            | PATROL_FK_PATROL_SLOT_INDEX |  2368 |       |     5   (0)| 00:00:01 |
+|* 27 |         TABLE ACCESS BY INDEX ROWID  | PATROL                      |     1 |    13 |    14   (0)| 00:00:01 |
+--------------------------------------------------------------------------------------------------------------------
  
 Predicate Information (identified by operation id):
 ---------------------------------------------------
@@ -31,14 +39,12 @@ Predicate Information (identified by operation id):
    3 - access("ID"="ID")
    4 - filter("DISMISSAL_DATE" IS NULL AND MONTHS_BETWEEN(TO_TIMESTAMP(:NOW,'YYYY-MM-DD 
               HH24:MI:SS'),INTERNAL_FUNCTION("GUARD"."EMPLOYMENT_DATE"))<:EXPERIENCE_MONTHS)
-   8 - filter("PATROL_SLOT"."START_TIME">=TO_TIMESTAMP(:NOW,'YYYY-MM-DD HH24:MI:SS'))
-   9 - access("PATROL"."FK_PATROL_SLOT"="PATROL_SLOT"."ID")
-  16 - access("PRISON_BLOCK"."BLOCK_NUMBER"=:BLOCK_NUMBER)
-  17 - filter("PATROL_SLOT"."START_TIME">=TO_TIMESTAMP(:START_TIME,'YYYY-MM-DD HH24:MI:SS') AND 
-              "PATROL_SLOT"."END_TIME"<=TO_TIMESTAMP(:END_TIME,'YYYY-MM-DD HH24:MI:SS'))
-  18 - access("PATROL"."FK_PATROL_SLOT"="PATROL_SLOT"."ID")
-  19 - filter("PATROL"."FK_GUARD"="ID" AND "PATROL"."FK_BLOCK"="PRISON_BLOCK"."ID")
- 
-Note
------
-   - this is an adaptive plan
+  11 - filter(TO_CHAR(INTERNAL_FUNCTION("PATROL_SLOT"."START_TIME"),'YYYY-MM-DD HH24:MI:SS')>=:NOW)
+  12 - access("PATROL"."FK_PATROL_SLOT"="PATROL_SLOT"."ID")
+  14 - access("GUARD"."ID"="ITEM_1")
+  17 - access("GUARD"."ID"="ID")
+  24 - access("PRISON_BLOCK"."BLOCK_NUMBER"=:BLOCK_NUMBER)
+  25 - filter(TO_CHAR(INTERNAL_FUNCTION("PATROL_SLOT"."START_TIME"),'YYYY-MM-DD HH24:MI:SS')>=:START_TIME 
+              AND TO_CHAR(INTERNAL_FUNCTION("PATROL_SLOT"."END_TIME"),'YYYY-MM-DD HH24:MI:SS')<=:END_TIME)
+  26 - access("PATROL"."FK_PATROL_SLOT"="PATROL_SLOT"."ID")
+  27 - filter("PATROL"."FK_GUARD"="ID" AND "PATROL"."FK_BLOCK"="PRISON_BLOCK"."ID")

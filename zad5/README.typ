@@ -143,6 +143,8 @@ W drodze eksperymentacji zastąpiliśmy klauzule `LEFT JOIN` na `INNER JOIN` tam
 
 Następnie, zauważając, że w wielu miejscach grupujemy po kluczu głównym więźnia, zastąpiliśmy te grupowania PESELem, który również jest unikalny i jednoznacznie identyfikuje więźnia, ale nie ma na sobie indeksu. W efekcie, koszt wzrósł z 7139 do 8522.
 
+#pagebreak()
+
 #plan([
 ```
 Plan hash value: 3568620633
@@ -473,6 +475,8 @@ W poprzednim etapie wykorzystywaliśmy zapytanie pomocnicze nazwane za pomocą `
 
 Po zmianie, koszt zapytania wzrósł do 85677 oraz znacząco powiększyło się drzewo planu w związku z wielokrotnym wykorzystaniem takiego samego podzapytania, którego Oracle nie był w stanie zoptymalizować i liczy kilkukrotnie.
 
+#pagebreak()
+
 #plan([
 ```
 Plan hash value: 1418518406
@@ -750,54 +754,121 @@ Note
 
 == Zmiana danych 1
 
-// TODO: opis pogorszenia
+#description[Zwolnienie wszystkich strażników ze stażem mniejszym niż `experience_months` miesięcy, którzy nie mają zaplanowanych patroli w przyszłości oraz patrolowali blok `block_number` w określonym przedziale czasowym (`start_time` - `end_time`).]
+
+W poniższym przykładzie nie udało nam się wprowadzić dużego wzrostu kosztu. Jedyne dwie zmiany, jakich dokonaliśmy, to analogiczna do poprzednich przykładów zmiana wywołania funkcji na parametrze na wywołanie funkcji na danych: `patrol_slot.start_time >= to_timestamp(:start_time, 'YYYY-MM-DD HH24:MI:SS')` na `to_char(patrol_slot.start_time, 'YYYY-MM-DD HH24:MI:SS') >= :start_time` oraz wprowadzenie redundantnego grupowania `group by guard.id, guard.first_name, guard.last_name` w podzapytaniu, na którym stosujemy kwantyfikator `IN` / `NOT IN`.
+
+#pagebreak()
 
 #plan([
 ```
-Plan hash value: 3671726907
+Plan hash value: 1944716788
  
-------------------------------------------------------------------------------------------------------------------------
-| Id  | Operation                                | Name                        | Rows  | Bytes | Cost (%CPU)| Time     |
-------------------------------------------------------------------------------------------------------------------------
-|   0 | SELECT STATEMENT                         |                             |    68 |  1836 |  1628   (3)| 00:00:01 |
-|   1 |  SORT GROUP BY                           |                             |     1 |   284 |            |          |
-|*  2 |   VIEW                                   |                             |     5 |  1420 |    46   (3)| 00:00:01 |
-|*  3 |    WINDOW SORT PUSHED RANK               |                             |     5 |   420 |    46   (3)| 00:00:01 |
-|*  4 |     FILTER                               |                             |       |       |            |          |
-|*  5 |      HASH JOIN OUTER                     |                             |     5 |   420 |    45   (0)| 00:00:01 |
-|   6 |       NESTED LOOPS                       |                             |     7 |   476 |    29   (0)| 00:00:01 |
-|   7 |        TABLE ACCESS BY INDEX ROWID       | PATROL_SLOT                 |     1 |    27 |     2   (0)| 00:00:01 |
-|*  8 |         INDEX UNIQUE SCAN                | SYS_C008259                 |     1 |       |     1   (0)| 00:00:01 |
-|*  9 |        TABLE ACCESS FULL                 | GUARD                       |     7 |   287 |    27   (0)| 00:00:01 |
-|  10 |       TABLE ACCESS BY INDEX ROWID BATCHED| PATROL                      |  2368 | 37888 |    16   (0)| 00:00:01 |
-|* 11 |        INDEX RANGE SCAN                  | PATROL_FK_PATROL_SLOT_INDEX |  2368 |       |     7   (0)| 00:00:01 |
-|* 12 |  TABLE ACCESS FULL                       | PATROL_SLOT                 |    68 |  1836 |    34   (3)| 00:00:01 |
-------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+| Id  | Operation                         | Name                        | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------------------------
+|   0 | UPDATE STATEMENT                  |                             |     1 |    35 | 20278   (1)| 00:00:01 |
+|   1 |  UPDATE                           | GUARD                       |       |       |            |          |
+|   2 |   NESTED LOOPS SEMI               |                             |     1 |    35 | 20278   (1)| 00:00:01 |
+|*  3 |    HASH JOIN ANTI                 |                             |     1 |    33 | 19289   (1)| 00:00:01 |
+|*  4 |     TABLE ACCESS FULL             | GUARD                       |   119 |  2380 |    27   (0)| 00:00:01 |
+|   5 |     VIEW                          | VW_NSO_1                    |  3243K|    40M| 19253   (1)| 00:00:01 |
+|   6 |      NESTED LOOPS                 |                             |  3243K|    80M| 19253   (1)| 00:00:01 |
+|   7 |       NESTED LOOPS                |                             |  3244K|    80M| 19253   (1)| 00:00:01 |
+|*  8 |        TABLE ACCESS FULL          | PATROL_SLOT                 |  1370 | 21920 |    34   (3)| 00:00:01 |
+|*  9 |        INDEX RANGE SCAN           | PATROL_FK_PATROL_SLOT_INDEX |  2368 |       |     5   (0)| 00:00:01 |
+|  10 |       TABLE ACCESS BY INDEX ROWID | PATROL                      |  2368 | 23680 |    14   (0)| 00:00:01 |
+|  11 |    VIEW PUSHED PREDICATE          | VW_NSO_2                    |     1 |     2 |   989   (1)| 00:00:01 |
+|  12 |     NESTED LOOPS                  |                             |     1 |    47 |   989   (1)| 00:00:01 |
+|  13 |      NESTED LOOPS                 |                             |   161K|    47 |   989   (1)| 00:00:01 |
+|  14 |       NESTED LOOPS                |                             |    68 |  2312 |    35   (3)| 00:00:01 |
+|  15 |        TABLE ACCESS BY INDEX ROWID| PRISON_BLOCK                |     1 |     7 |     1   (0)| 00:00:01 |
+|* 16 |         INDEX UNIQUE SCAN         | SYS_C008242                 |     1 |       |     0   (0)| 00:00:01 |
+|* 17 |        TABLE ACCESS FULL          | PATROL_SLOT                 |    68 |  1836 |    34   (3)| 00:00:01 |
+|* 18 |       INDEX RANGE SCAN            | PATROL_FK_PATROL_SLOT_INDEX |  2368 |       |     5   (0)| 00:00:01 |
+|* 19 |      TABLE ACCESS BY INDEX ROWID  | PATROL                      |     1 |    13 |    14   (0)| 00:00:01 |
+-----------------------------------------------------------------------------------------------------------------
  
 Predicate Information (identified by operation id):
 ---------------------------------------------------
  
-   2 - filter("from$_subquery$_008"."rowlimit_$$_rownumber"<=:PROPOSAL_COUNT)
-   3 - filter(ROW_NUMBER() OVER ( ORDER BY "DBMS_RANDOM"."VALUE"())<=:PROPOSAL_COUNT)
-   4 - filter("P"."ID" IS NULL)
-   5 - access("P"."FK_GUARD"(+)="G"."ID" AND "P"."FK_PATROL_SLOT"(+)="PS"."ID")
-   8 - access("PS"."ID"=:B1)
-   9 - filter(("G"."HAS_DISABILITY_CLASS"=:HAS_DISABILITY_CLASS OR :HAS_DISABILITY_CLASS IS NULL) AND 
-              "PS"."START_TIME">=INTERNAL_FUNCTION("G"."EMPLOYMENT_DATE") AND ("G"."DISMISSAL_DATE" IS NULL OR 
-              "PS"."END_TIME"<=INTERNAL_FUNCTION("G"."DISMISSAL_DATE")) AND (:EXPERIENCE_MONTHS IS NULL OR 
-              MONTHS_BETWEEN(INTERNAL_FUNCTION("PS"."START_TIME"),INTERNAL_FUNCTION("G"."EMPLOYMENT_DATE"))>=:EXPERIENCE_MONTH
-              S))
-  11 - access("P"."FK_PATROL_SLOT"(+)=:B1)
-  12 - filter("PS"."START_TIME">=TO_TIMESTAMP(:START_TIME,'YYYY-MM-DD HH24:MI:SS') AND 
-              "PS"."END_TIME"<=TO_TIMESTAMP(:END_TIME,'YYYY-MM-DD HH24:MI:SS'))
+   3 - access("ID"="ID")
+   4 - filter("DISMISSAL_DATE" IS NULL AND MONTHS_BETWEEN(TO_TIMESTAMP(:NOW,'YYYY-MM-DD 
+              HH24:MI:SS'),INTERNAL_FUNCTION("GUARD"."EMPLOYMENT_DATE"))<:EXPERIENCE_MONTHS)
+   8 - filter("PATROL_SLOT"."START_TIME">=TO_TIMESTAMP(:NOW,'YYYY-MM-DD HH24:MI:SS'))
+   9 - access("PATROL"."FK_PATROL_SLOT"="PATROL_SLOT"."ID")
+  16 - access("PRISON_BLOCK"."BLOCK_NUMBER"=:BLOCK_NUMBER)
+  17 - filter("PATROL_SLOT"."START_TIME">=TO_TIMESTAMP(:START_TIME,'YYYY-MM-DD HH24:MI:SS') AND 
+              "PATROL_SLOT"."END_TIME"<=TO_TIMESTAMP(:END_TIME,'YYYY-MM-DD HH24:MI:SS'))
+  18 - access("PATROL"."FK_PATROL_SLOT"="PATROL_SLOT"."ID")
+  19 - filter("PATROL"."FK_GUARD"="ID" AND "PATROL"."FK_BLOCK"="PRISON_BLOCK"."ID")
+ 
+Note
+-----
+   - this is an adaptive plan
 ```
-], [])
+], [
+```
+Plan hash value: 4220876432
+ 
+--------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                            | Name                        | Rows  | Bytes | Cost (%CPU)| Time     |
+--------------------------------------------------------------------------------------------------------------------
+|   0 | UPDATE STATEMENT                     |                             |     1 |    35 | 20358   (1)| 00:00:01 |
+|   1 |  UPDATE                              | GUARD                       |       |       |            |          |
+|   2 |   NESTED LOOPS SEMI                  |                             |     1 |    35 | 20358   (1)| 00:00:01 |
+|*  3 |    HASH JOIN ANTI                    |                             |     1 |    33 | 19368   (1)| 00:00:01 |
+|*  4 |     TABLE ACCESS FULL                | GUARD                       |   119 |  2380 |    27   (0)| 00:00:01 |
+|   5 |     VIEW                             | VW_NSO_1                    | 13140 |   166K| 19341   (1)| 00:00:01 |
+|   6 |      NESTED LOOPS SEMI               |                             | 13140 |   461K| 19341   (1)| 00:00:01 |
+|   7 |       VIEW                           | VW_GBF_20                   | 13140 |   166K| 19340   (1)| 00:00:01 |
+|   8 |        SORT GROUP BY                 |                             | 13140 |   333K| 19340   (1)| 00:00:01 |
+|   9 |         NESTED LOOPS                 |                             |  3243K|    80M| 19253   (1)| 00:00:01 |
+|  10 |          NESTED LOOPS                |                             |  3244K|    80M| 19253   (1)| 00:00:01 |
+|* 11 |           TABLE ACCESS FULL          | PATROL_SLOT                 |  1370 | 21920 |    34   (3)| 00:00:01 |
+|* 12 |           INDEX RANGE SCAN           | PATROL_FK_PATROL_SLOT_INDEX |  2368 |       |     5   (0)| 00:00:01 |
+|  13 |          TABLE ACCESS BY INDEX ROWID | PATROL                      |  2368 | 23680 |    14   (0)| 00:00:01 |
+|* 14 |       INDEX UNIQUE SCAN              | SYS_C008254                 |     1 |    23 |     0   (0)| 00:00:01 |
+|  15 |    VIEW PUSHED PREDICATE             | VW_NSO_2                    |     1 |     2 |   990   (1)| 00:00:01 |
+|  16 |     NESTED LOOPS                     |                             |     1 |    36 |   990   (1)| 00:00:01 |
+|* 17 |      INDEX UNIQUE SCAN               | SYS_C008254                 |     1 |    23 |     1   (0)| 00:00:01 |
+|  18 |      VIEW                            | VW_GBF_56                   |     1 |    13 |   989   (1)| 00:00:01 |
+|  19 |       SORT GROUP BY                  |                             |     1 |    47 |   989   (1)| 00:00:01 |
+|  20 |        NESTED LOOPS                  |                             |     1 |    47 |   989   (1)| 00:00:01 |
+|  21 |         NESTED LOOPS                 |                             |   161K|    47 |   989   (1)| 00:00:01 |
+|  22 |          NESTED LOOPS                |                             |    68 |  2312 |    35   (3)| 00:00:01 |
+|  23 |           TABLE ACCESS BY INDEX ROWID| PRISON_BLOCK                |     1 |     7 |     1   (0)| 00:00:01 |
+|* 24 |            INDEX UNIQUE SCAN         | SYS_C008242                 |     1 |       |     0   (0)| 00:00:01 |
+|* 25 |           TABLE ACCESS FULL          | PATROL_SLOT                 |    68 |  1836 |    34   (3)| 00:00:01 |
+|* 26 |          INDEX RANGE SCAN            | PATROL_FK_PATROL_SLOT_INDEX |  2368 |       |     5   (0)| 00:00:01 |
+|* 27 |         TABLE ACCESS BY INDEX ROWID  | PATROL                      |     1 |    13 |    14   (0)| 00:00:01 |
+--------------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   3 - access("ID"="ID")
+   4 - filter("DISMISSAL_DATE" IS NULL AND MONTHS_BETWEEN(TO_TIMESTAMP(:NOW,'YYYY-MM-DD 
+              HH24:MI:SS'),INTERNAL_FUNCTION("GUARD"."EMPLOYMENT_DATE"))<:EXPERIENCE_MONTHS)
+  11 - filter(TO_CHAR(INTERNAL_FUNCTION("PATROL_SLOT"."START_TIME"),'YYYY-MM-DD HH24:MI:SS')>=:NOW)
+  12 - access("PATROL"."FK_PATROL_SLOT"="PATROL_SLOT"."ID")
+  14 - access("GUARD"."ID"="ITEM_1")
+  17 - access("GUARD"."ID"="ID")
+  24 - access("PRISON_BLOCK"."BLOCK_NUMBER"=:BLOCK_NUMBER)
+  25 - filter(TO_CHAR(INTERNAL_FUNCTION("PATROL_SLOT"."START_TIME"),'YYYY-MM-DD HH24:MI:SS')>=:START_TIME 
+              AND TO_CHAR(INTERNAL_FUNCTION("PATROL_SLOT"."END_TIME"),'YYYY-MM-DD HH24:MI:SS')<=:END_TIME)
+  26 - access("PATROL"."FK_PATROL_SLOT"="PATROL_SLOT"."ID")
+  27 - filter("PATROL"."FK_GUARD"="ID" AND "PATROL"."FK_BLOCK"="PRISON_BLOCK"."ID")
+```
+])
 
 == Zmiana danych 2
 
 #description[Wygenerowanie wart (patrol slot) w przedziale czasowym (`start_time` - `end_time`) z określonym czasem trwania patrolu w minutach `slot_duration`.]
 
 Już w poprzednim etapie raportowaliśmy problemy związane z tym zapytaniem. Zauważyliśmy, że nie zależy ono od żadnej z istniejących w naszej bazie danych tabel. W związku z tym, próby jego pogarszania jak i optymalizacji nie przyniosłyby żadnych rezultatów. Jako że w ramach etapu 2 utworzyliśmy cztery kwerendy zmieniające dane, a wymagane były jedynie trzy, *podjęliśmy decyzję o usunięciu tego zapytania* z naszego zestawu. Dla kompletności, poniżej znajduje się plan dla tego zapytania.
+
+#pagebreak()
 
 #plan([
 ```
@@ -823,7 +894,9 @@ Predicate Information (identified by operation id):
 
 == Zmiana danych 3
 
-// TODO: opis pogorszenia
+#description[Umieszczenie więźniów, którzy w przedziale czasowym (`start_date` - `end_date`) dostali reprymendę zawierającą w treści `event_type` do wolnej izolatki w bloku `block_id` z obecnego zakwaterowania. Jeżeli wolnych izolatek nie ma, to więźniowie pozostają w swoich celach.]
+
+W zmianie danych nr 3 ponownie zastosowaliśmy redundantne operacje grupowania oraz wykorzystaliśmy kolumnę PESEL zamiast klucza głównego więźnia.
 
 #plan([
 ```
@@ -865,11 +938,61 @@ Predicate Information (identified by operation id):
               HH24:MI:SS') AND ("A"."END_DATE" IS NULL OR INTERNAL_FUNCTION("A"."END_DATE")>=TO_TIMESTAMP(
               :NOW,'YYYY-MM-DD HH24:MI:SS')))
 ```
-], [])
+], [
+```
+Plan hash value: 3737721188
+ 
+-----------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name          | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------------
+|   0 | INSERT STATEMENT                    |               |  1084 | 56368 |  3409   (2)| 00:00:01 |
+|   1 |  LOAD TABLE CONVENTIONAL            | ACCOMMODATION |       |       |            |          |
+|   2 |   SEQUENCE                          | ISEQ$$_75806  |       |       |            |          |
+|*  3 |    HASH JOIN                        |               |  1084 | 56368 |  3409   (2)| 00:00:01 |
+|   4 |     VIEW                            |               |    91 |  2366 |  1315   (1)| 00:00:01 |
+|   5 |      SORT GROUP BY                  |               |    91 |  8281 |  1315   (1)| 00:00:01 |
+|   6 |       COUNT                         |               |       |       |            |          |
+|*  7 |        FILTER                       |               |       |       |            |          |
+|   8 |         NESTED LOOPS                |               |    91 |  8281 |  1314   (1)| 00:00:01 |
+|   9 |          NESTED LOOPS               |               |    91 |  8281 |  1314   (1)| 00:00:01 |
+|* 10 |           TABLE ACCESS FULL         | REPRIMAND     |    91 |  6734 |  1223   (1)| 00:00:01 |
+|* 11 |           INDEX UNIQUE SCAN         | SYS_C008234   |     1 |       |     0   (0)| 00:00:01 |
+|  12 |          TABLE ACCESS BY INDEX ROWID| PRISONER      |     1 |    17 |     1   (0)| 00:00:01 |
+|  13 |     VIEW                            |               |  1191 | 30966 |  2093   (2)| 00:00:01 |
+|  14 |      COUNT                          |               |       |       |            |          |
+|* 15 |       HASH JOIN ANTI                |               |  1191 | 36921 |  2093   (2)| 00:00:01 |
+|  16 |        NESTED LOOPS                 |               |  1295 | 23310 |   326   (1)| 00:00:01 |
+|  17 |         TABLE ACCESS BY INDEX ROWID | PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
+|* 18 |          INDEX UNIQUE SCAN          | SYS_C008242   |     1 |       |     0   (0)| 00:00:01 |
+|* 19 |         TABLE ACCESS FULL           | CELL          |  1295 | 14245 |   325   (1)| 00:00:01 |
+|  20 |        VIEW                         | VW_NSO_1      |  9577 |   121K|  1767   (2)| 00:00:01 |
+|  21 |         SORT GROUP BY               |               |  9577 |   196K|  1767   (2)| 00:00:01 |
+|* 22 |          TABLE ACCESS FULL          | ACCOMMODATION |  9577 |   196K|  1766   (2)| 00:00:01 |
+-----------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   3 - access("P"."N"="C"."N")
+   7 - filter(:END_DATE>=:START_DATE)
+  10 - filter((:EVENT_TYPE IS NULL OR INSTR("R"."REASON",:EVENT_TYPE)>0) AND 
+              TO_CHAR(INTERNAL_FUNCTION("R"."ISSUE_DATE"),'YYYY-MM-DD')>=:START_DATE AND 
+              TO_CHAR(INTERNAL_FUNCTION("R"."ISSUE_DATE"),'YYYY-MM-DD')<=:END_DATE)
+  11 - access("P"."ID"="R"."FK_PRISONER")
+  15 - access("C"."ID"="FK_CELL")
+  18 - access("PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
+  19 - filter("PB"."ID"="C"."FK_BLOCK" AND "C"."IS_SOLITARY"=1)
+  22 - filter(TO_CHAR(INTERNAL_FUNCTION("A"."START_DATE"),'YYYY-MM-DD HH24:MI:SS')<=:NOW AND 
+              ("A"."END_DATE" IS NULL OR TO_CHAR(INTERNAL_FUNCTION("A"."END_DATE"),'YYYY-MM-DD 
+              HH24:MI:SS')>=:NOW))
+```
+])
 
 == Zmiana danych 4
 
-// TODO: opis pogorszenia
+#description[Wystawienie reprymendy o treści `reason` przez strażnika `guard_id` wszystkim więźniom niebędącym w izolatce i znajdującym się w bloku `block_number` w momencie `event_time`.]
+
+Zmiany danych numer 4 nie udało nam się pogorszyć.
 
 #plan([
 ```
@@ -899,4 +1022,4 @@ Predicate Information (identified by operation id):
               HH24:MI:SS') AND ("A"."END_DATE" IS NULL OR INTERNAL_FUNCTION("A"."END_DATE")>=TO_TIMESTA
               MP(:EVENT_TIME,'YYYY-MM-DD HH24:MI:SS')))
 ```
-], [])
+])

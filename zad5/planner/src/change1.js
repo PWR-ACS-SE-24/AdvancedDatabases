@@ -22,8 +22,8 @@ export async function change1(con) {
       on guard.id = patrol.fk_guard
         inner join patrol_slot
       on patrol.fk_patrol_slot = patrol_slot.id
-        where patrol_slot.start_time >= to_timestamp(:now,
-                'YYYY-MM-DD HH24:MI:SS')
+        where to_char(patrol_slot.start_time, 'YYYY-MM-DD HH24:MI:SS') >= :now
+      group by guard.id, guard.first_name, guard.last_name
     )
       and id in (
       select guard.id
@@ -34,11 +34,10 @@ export async function change1(con) {
       on patrol.fk_patrol_slot = patrol_slot.id
         inner join prison_block
       on patrol.fk_block = prison_block.id
-        where patrol_slot.start_time >= to_timestamp(:start_time,
-                    'YYYY-MM-DD HH24:MI:SS')
-          and patrol_slot.end_time <= to_timestamp(:end_time,
-                'YYYY-MM-DD HH24:MI:SS')
+        where to_char(patrol_slot.start_time, 'YYYY-MM-DD HH24:MI:SS') >= :start_time
+          and to_char(patrol_slot.end_time, 'YYYY-MM-DD HH24:MI:SS') <= :end_time
           and prison_block.block_number = :block_number
+      group by guard.id, guard.first_name, guard.last_name
     )
     `,
     {
