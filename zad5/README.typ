@@ -6,6 +6,14 @@
      stroke: (left: 4pt + blue),
      body
 )
+#let sql(body) = [
+     #set raw(lang: "sql")
+     #show raw: it => [
+          #set text(font: "Liberation Mono", size: 6pt)
+          #it
+     ]
+     #align(center, body)
+]
 #let plan(..children) = [
   #show raw: it => [
     #set text(font: "Liberation Mono", size: if children.pos().len() == 1 { 8pt } else { 4.5pt })
@@ -37,6 +45,40 @@ We wszystkich poniższych przykładach plan po lewej stronie przedstawia pierwot
 == Zapytanie 1
 
 #description[Wyszukanie strażników, którzy mogą obsadzić patrol w danym przedziale czasowym (`start_time` - `end_time`). Kwerenda zwraca `proposal_count` propozycji strażników, którzy mogą patrolować blok dla każdej warty (patrol slot) w podanym przedziale czasowym. Można wybrać jedynie strażników, którzy posiadają lub nie posiadają oświadczenia o niepełnosprawności (`has_disability_class`). Strażnik musi mieć staż pracy większy niż `experience_months` miesięcy oraz musi nadal pracować w zakładzie karnym.]
+
+#sql[
+```
+SELECT ps.start_time,
+       ps.end_time,
+  (SELECT listagg(g.first_name || ' ' || g.last_name || ' (' || g.id || ')', ', ') within group(ORDER BY dbms_random.value)
+   FROM
+     (SELECT id,
+             first_name,
+             last_name
+      FROM
+        (SELECT g.id,
+                g.first_name,
+                g.last_name,
+                ps.id AS patrol_slot_id
+         FROM guard g
+         CROSS JOIN patrol_slot ps
+         LEFT JOIN patrol p ON p.fk_guard = g.id
+         AND p.fk_patrol_slot = ps.id
+         WHERE p.id IS NULL
+           AND g.employment_date <= ps.start_time
+           AND (g.dismissal_date IS NULL
+                OR g.dismissal_date >= ps.end_time)
+           AND (:has_disability_class IS NULL
+                OR g.has_disability_class = :has_disability_class)
+           AND (:experience_months IS NULL
+                OR months_between(ps.start_time, g.employment_date) >= :experience_months)) ag
+      WHERE ag.patrol_slot_id = ps.id
+      ORDER BY dbms_random.value FETCH FIRST :proposal_count ROWS ONLY) g) AS guards
+FROM patrol_slot ps
+WHERE ps.start_time >= to_timestamp(:start_time, 'YYYY-MM-DD HH24:MI:SS')
+  AND ps.end_time <= to_timestamp(:end_time, 'YYYY-MM-DD HH24:MI:SS');
+```
+]
 
 Opis naszej kwerendy nie specyfikował w jakim uporządkowaniu należy zwrócić listę strażników. \ Zmieniliśmy jej kolejność z `ORDER BY g.id` na `ORDER BY dbms_random.value`, zwiększając koszt z 1594 do 1663.
 
@@ -122,6 +164,8 @@ Predicate Information (identified by operation id):
 ```     
 ])
 
+#pagebreak()
+
 == Zapytanie 2
 
 #description[
@@ -137,6 +181,77 @@ Liczby więźniów o danych cechach z podziałem na bloki, w których przebywaj�
 - przebywanie w więzieniu od `min_stay_months` do `max_stay_months` miesięcy,
 - zwalnianie z więzienia w ciągu od `min_release_months` do `max_release_months` miesięcy,
 - przebywanie w izolatce lub nie (`is_in_solitary`).
+]
+
+#sql[
+```
+
+SELECT pb.block_number,
+       count(p.id) AS prisoners_count
+FROM prison_block pb
+INNER JOIN cell c ON pb.id = c.fk_block
+INNER JOIN accommodation a ON c.id = a.fk_cell
+INNER JOIN prisoner p ON a.fk_prisoner = p.id
+INNER JOIN
+  (SELECT min(p.id) AS id,
+          count(r.id) AS reprimands,
+          count(s.id) AS sentences
+   FROM prisoner p
+   LEFT JOIN reprimand r ON p.id = r.fk_prisoner
+   LEFT JOIN sentence s ON p.id = s.fk_prisoner
+   GROUP BY p.pesel) pc ON p.id = pc.id
+INNER JOIN
+  (SELECT min(p.id) AS id,
+          listagg(s.crime, ', ') within group(
+                                              ORDER BY s.id) AS crime,
+                                        min(s.start_date) AS start_date,
+                                        max(s.planned_end_date) AS planned_end_date
+   FROM prisoner p
+   LEFT JOIN sentence s ON p.id = s.fk_prisoner
+   WHERE s.start_date <= to_date(:now, 'YYYY-MM-DD')
+     AND (s.real_end_date IS NULL
+          OR s.real_end_date >= to_date(:now, 'YYYY-MM-DD'))
+   GROUP BY p.pesel) ps ON p.id = ps.id
+WHERE a.start_date <= to_date(:now, 'YYYY-MM-DD')
+  AND (a.end_date IS NULL
+       OR a.end_date >= to_date(:now, 'YYYY-MM-DD'))
+  AND (:min_age IS NULL
+       OR months_between(:now, p.birthday) >= :min_age * 12)
+  AND (:max_age IS NULL
+       OR months_between(:now, p.birthday) <= :max_age * 12)
+  AND (:sex IS NULL
+       OR p.sex = :sex)
+  AND (:min_height_m IS NULL
+       OR p.height_m >= :min_height_m)
+  AND (:max_height_m IS NULL
+       OR p.height_m <= :max_height_m)
+  AND (:min_weight_kg IS NULL
+       OR p.weight_kg >= :min_weight_kg)
+  AND (:max_weight_kg IS NULL
+       OR p.weight_kg <= :max_weight_kg)
+  AND (:min_sentences IS NULL
+       OR pc.sentences >= :min_sentences)
+  AND (:max_sentences IS NULL
+       OR pc.sentences <= :max_sentences)
+  AND (:crime IS NULL
+       OR instr(ps.crime, :crime) > 0)
+  AND (:min_reprimands IS NULL
+       OR pc.reprimands >= :min_reprimands)
+  AND (:max_reprimands IS NULL
+       OR pc.reprimands <= :max_reprimands)
+  AND (:min_stay_months IS NULL
+       OR months_between(:now, ps.start_date) >= :min_stay_months)
+  AND (:max_stay_months IS NULL
+       OR months_between(:now, ps.start_date) <= :max_stay_months)
+  AND (:min_release_months IS NULL
+       OR months_between(ps.planned_end_date, :now) >= :min_release_months)
+  AND (:max_release_months IS NULL
+       OR months_between(ps.planned_end_date, :now) <= :max_release_months)
+  AND (:is_in_solitary IS NULL
+       OR c.is_solitary = :is_in_solitary)
+GROUP BY pb.id,
+         pb.block_number;
+```
 ]
 
 W drodze eksperymentacji zastąpiliśmy klauzule `LEFT JOIN` na `INNER JOIN` tam, gdzie mieliśmy pewność, że w prawej tabeli zawsze znajdzie się co najmniej jeden rekord. Miało to miejsce np. pomiędzy zakwaterowaniem a więźniem (każde zakwaterowanie ma dokładnie jednego więźnia), czy pomiędzy blokiem a celą (każdy blok ma co najmniej jedną celę). W wyniku zmian, koszt wzrósł z 5416 do 7139.
@@ -306,6 +421,63 @@ Note
 
 #description[Wyszukanie wydarzeń związanych z więźniami w danym bloku `block_number`, które miały miejsce w określonym przedziale czasowym (`start_date` - `end_date`). Wyniki mogą być filtrowane według typu wydarzenia `event_type`, np. ucieczka, bójka. Można ograniczyć wyniki do wydarzeń dotyczących więźniów o określonych cechach: liczba wyroków (`sentence_count`), przestępstwo (`crime`), liczba reprymend (`reprimand_count`), czy obecność w izolatce (`is_in_solitary`). Zwracana jest lista wydarzeń wraz z datą, danymi więźnia i strażnika oraz treścią reprymendy.]
 
+#sql[
+```
+SELECT r.id,
+       r.issue_date,
+       p.first_name || ' ' || p.last_name || ' (' || p.id || ')' AS prisoner,
+       g.first_name || ' ' || g.last_name || ' (' || g.id || ')' AS guard,
+       r.reason
+FROM reprimand r
+JOIN prisoner p ON r.fk_prisoner = p.id
+JOIN guard g ON r.fk_guard = g.id
+JOIN
+  (SELECT p.id,
+          pb.id AS block_id,
+          pb.block_number,
+          c.is_solitary
+   FROM prison_block pb
+   INNER JOIN cell c ON pb.id = c.fk_block
+   INNER JOIN accommodation a ON c.id = a.fk_cell
+   INNER JOIN prisoner p ON a.fk_prisoner = p.id
+   WHERE to_char(a.start_date, 'YYYY-MM-DD') <= :start_date
+     AND (a.end_date IS NULL
+          OR to_char(a.end_date, 'YYYY-MM-DD') >= :end_date)) pb ON p.id = pb.id
+JOIN
+  (SELECT min(p.id) AS id,
+          count(r.id) AS reprimands,
+          count(s.id) AS sentences
+   FROM prisoner p
+   INNER JOIN reprimand r ON p.id = r.fk_prisoner
+   INNER JOIN sentence s ON p.id = s.fk_prisoner
+   GROUP BY p.pesel) pc ON p.id = pc.id
+JOIN
+  (SELECT min(p.id) AS id,
+          listagg(s.crime, ',') within group(
+                                             ORDER BY dbms_random.value) AS crime
+   FROM prisoner p
+   INNER JOIN sentence s ON p.id = s.fk_prisoner
+   WHERE to_char(s.start_date, 'YYYY-MM-DD') <= :start_date
+     AND (s.real_end_date IS NULL
+          OR to_char(s.real_end_date, 'YYYY-MM-DD') >= :end_date)
+   GROUP BY p.pesel) ps ON p.id = ps.id
+WHERE to_char(r.issue_date, 'YYYY-MM-DD') >= :start_date
+  AND to_char(r.issue_date, 'YYYY-MM-DD') <= :end_date
+  AND (:block_number IS NULL
+       OR pb.block_number = :block_number)
+  AND (:event_type IS NULL
+       OR instr(r.reason, :event_type) > 0)
+  AND (:sentence_count IS NULL
+       OR pc.sentences = :sentence_count)
+  AND (:reprimand_count IS NULL
+       OR pc.reprimands = :reprimand_count)
+  AND (:crime IS NULL
+       OR instr(ps.crime, :crime) > 0)
+  AND (:is_in_solitary IS NULL
+       OR pb.is_solitary = :is_in_solitary);
+```
+]
+
 Podobnie do poprzedniego przykładu, zamieniliśmy zapytania grupujące po kluczu głównym więźnia na grupowanie po PESELu. Następnie analogicznie do zapytania pierwszego, zmieniliśmy uporządkowanie przestępstw na liście na losowe. Dodatkowo, zmieniliśmy porównania, w których używaliśmy funkcji na parametrze zapytania, tak aby używać funkcji na danych z tabeli, np. `a.start_date <= to_date(:start_date, 'YYYY-MM-DD')` zostało zamienione na równoważne `to_char(a.start_date, 'YYYY-MM-DD') <= :start_date`, co pozwoli w następnych etapach wykorzystać indeksy funkcyjne.
 
 Łącznie koszt zapytania wzrósł z 7381 do 9645.
@@ -470,6 +642,176 @@ Note
 == Zapytanie 4
 
 #description[Zwrócenie raportu dotyczącego minimalnej, maksymalnej i średniej dla wzrostu, wagi, liczby wyroków, liczby reprymend, liczby przekwaterowań dla więźniów w danym bloku `block_number`. Można filtrować wyniki według płci więźniów (`sex`).]
+
+#sql[
+```
+
+SELECT 'Height' AS "Name",
+       min(height) AS "Min",
+       max(height) AS "Max",
+       round(avg(height), 2) AS "Average",
+       round(stddev_pop(height), 2) AS "Standard deviation",
+       round(var_pop(height), 2) AS "Variance"
+FROM
+  (SELECT p.id,
+          min(p.height_m) AS height,
+          min(p.weight_kg) AS weight,
+          count(DISTINCT s.id) AS sentencenumber,
+          count(DISTINCT r.id) AS reprimandnumber,
+          count(DISTINCT a.id) AS accommodationnumber
+   FROM prisoner p
+   LEFT JOIN sentence s ON p.id = s.fk_prisoner
+   LEFT JOIN reprimand r ON p.id = r.fk_prisoner
+   LEFT JOIN accommodation a ON p.id = a.fk_prisoner
+   LEFT JOIN
+     (SELECT p.id,
+             pb.block_number
+      FROM prison_block pb
+      INNER JOIN cell c ON pb.id = c.fk_block
+      INNER JOIN accommodation a ON c.id = a.fk_cell
+      INNER JOIN prisoner p ON a.fk_prisoner = p.id
+      WHERE a.start_date <= to_date(:now, 'YYYY-MM-DD')
+        AND (a.end_date IS NULL
+             OR a.end_date >= to_date(:now, 'YYYY-MM-DD'))) pb ON p.id = pb.id
+   WHERE (:block_number IS NULL
+          OR pb.block_number = :block_number)
+     AND (:sex IS NULL
+          OR p.sex = :sex)
+   GROUP BY p.id)
+UNION
+SELECT 'Weight' AS "Name",
+       min(weight) AS "Min",
+       max(weight) AS "Max",
+       round(avg(weight), 2) AS "Average",
+       round(stddev_pop(weight), 2) AS "Standard deviation",
+       round(var_pop(weight), 2) AS "Variance"
+FROM
+  (SELECT p.id,
+          min(p.height_m) AS height,
+          min(p.weight_kg) AS weight,
+          count(DISTINCT s.id) AS sentencenumber,
+          count(DISTINCT r.id) AS reprimandnumber,
+          count(DISTINCT a.id) AS accommodationnumber
+   FROM prisoner p
+   LEFT JOIN sentence s ON p.id = s.fk_prisoner
+   LEFT JOIN reprimand r ON p.id = r.fk_prisoner
+   LEFT JOIN accommodation a ON p.id = a.fk_prisoner
+   LEFT JOIN
+     (SELECT p.id,
+             pb.block_number
+      FROM prison_block pb
+      INNER JOIN cell c ON pb.id = c.fk_block
+      INNER JOIN accommodation a ON c.id = a.fk_cell
+      INNER JOIN prisoner p ON a.fk_prisoner = p.id
+      WHERE a.start_date <= to_date(:now, 'YYYY-MM-DD')
+        AND (a.end_date IS NULL
+             OR a.end_date >= to_date(:now, 'YYYY-MM-DD'))) pb ON p.id = pb.id
+   WHERE (:block_number IS NULL
+          OR pb.block_number = :block_number)
+     AND (:sex IS NULL
+          OR p.sex = :sex)
+   GROUP BY p.id)
+UNION
+SELECT 'Sentences' AS "Name",
+       min(sentencenumber) AS "Min",
+       max(sentencenumber) AS "Max",
+       round(avg(sentencenumber), 2) AS "Average",
+       round(stddev_pop(sentencenumber), 2) AS "Standard deviation",
+       round(var_pop(sentencenumber), 2) AS "Variance"
+FROM
+  (SELECT p.id,
+          min(p.height_m) AS height,
+          min(p.weight_kg) AS weight,
+          count(DISTINCT s.id) AS sentencenumber,
+          count(DISTINCT r.id) AS reprimandnumber,
+          count(DISTINCT a.id) AS accommodationnumber
+   FROM prisoner p
+   LEFT JOIN sentence s ON p.id = s.fk_prisoner
+   LEFT JOIN reprimand r ON p.id = r.fk_prisoner
+   LEFT JOIN accommodation a ON p.id = a.fk_prisoner
+   LEFT JOIN
+     (SELECT p.id,
+             pb.block_number
+      FROM prison_block pb
+      INNER JOIN cell c ON pb.id = c.fk_block
+      INNER JOIN accommodation a ON c.id = a.fk_cell
+      INNER JOIN prisoner p ON a.fk_prisoner = p.id
+      WHERE a.start_date <= to_date(:now, 'YYYY-MM-DD')
+        AND (a.end_date IS NULL
+             OR a.end_date >= to_date(:now, 'YYYY-MM-DD'))) pb ON p.id = pb.id
+   WHERE (:block_number IS NULL
+          OR pb.block_number = :block_number)
+     AND (:sex IS NULL
+          OR p.sex = :sex)
+   GROUP BY p.id)
+UNION
+SELECT 'Reprimands' AS "Name",
+       min(reprimandnumber) AS "Min",
+       max(reprimandnumber) AS "Max",
+       round(avg(reprimandnumber), 2) AS "Average",
+       round(stddev_pop(reprimandnumber), 2) AS "Standard deviation",
+       round(var_pop(reprimandnumber), 2) AS "Variance"
+FROM
+  (SELECT p.id,
+          min(p.height_m) AS height,
+          min(p.weight_kg) AS weight,
+          count(DISTINCT s.id) AS sentencenumber,
+          count(DISTINCT r.id) AS reprimandnumber,
+          count(DISTINCT a.id) AS accommodationnumber
+   FROM prisoner p
+   LEFT JOIN sentence s ON p.id = s.fk_prisoner
+   LEFT JOIN reprimand r ON p.id = r.fk_prisoner
+   LEFT JOIN accommodation a ON p.id = a.fk_prisoner
+   LEFT JOIN
+     (SELECT p.id,
+             pb.block_number
+      FROM prison_block pb
+      INNER JOIN cell c ON pb.id = c.fk_block
+      INNER JOIN accommodation a ON c.id = a.fk_cell
+      INNER JOIN prisoner p ON a.fk_prisoner = p.id
+      WHERE a.start_date <= to_date(:now, 'YYYY-MM-DD')
+        AND (a.end_date IS NULL
+             OR a.end_date >= to_date(:now, 'YYYY-MM-DD'))) pb ON p.id = pb.id
+   WHERE (:block_number IS NULL
+          OR pb.block_number = :block_number)
+     AND (:sex IS NULL
+          OR p.sex = :sex)
+   GROUP BY p.id)
+UNION
+SELECT 'Accomodations' AS "Name",
+       min(accommodationnumber) AS "Min",
+       max(accommodationnumber) AS "Max",
+       round(avg(accommodationnumber), 2) AS "Average",
+       round(stddev_pop(accommodationnumber), 2) AS "Standard deviation",
+       round(var_pop(accommodationnumber), 2) AS "Variance"
+FROM
+  (SELECT p.id,
+          min(p.height_m) AS height,
+          min(p.weight_kg) AS weight,
+          count(DISTINCT s.id) AS sentencenumber,
+          count(DISTINCT r.id) AS reprimandnumber,
+          count(DISTINCT a.id) AS accommodationnumber
+   FROM prisoner p
+   LEFT JOIN sentence s ON p.id = s.fk_prisoner
+   LEFT JOIN reprimand r ON p.id = r.fk_prisoner
+   LEFT JOIN accommodation a ON p.id = a.fk_prisoner
+   LEFT JOIN
+     (SELECT p.id,
+             pb.block_number
+      FROM prison_block pb
+      INNER JOIN cell c ON pb.id = c.fk_block
+      INNER JOIN accommodation a ON c.id = a.fk_cell
+      INNER JOIN prisoner p ON a.fk_prisoner = p.id
+      WHERE a.start_date <= to_date(:now, 'YYYY-MM-DD')
+        AND (a.end_date IS NULL
+             OR a.end_date >= to_date(:now, 'YYYY-MM-DD'))) pb ON p.id = pb.id
+   WHERE (:block_number IS NULL
+          OR pb.block_number = :block_number)
+     AND (:sex IS NULL
+          OR p.sex = :sex)
+   GROUP BY p.id);
+```
+]
 
 W poprzednim etapie wykorzystywaliśmy zapytanie pomocnicze nazwane za pomocą `WITH`, które było następnie kilkukrotnie wykorzystywane w głównym zapytaniu. W celu pogorszenia planu zapytania, zastąpiliśmy każde jego wykorzystanie poprzez bezpośrednie wklejenie treści tego zapytania. Warto zauważyć, że po lewej stronie widzimy na w korzeniu koszt 4752, jednakże pod nim znajduje się gałąź z kosztem 16473 odpowiedzialna za obliczenie wyniku podzapytania. System przechował ten wynik w tabeli tymczasowej `SYS_TEMP_0FD9D6644_9D80EB`, co pozwoliło na wielokrotne wykorzystanie go w głównym zapytaniu.
 
@@ -752,9 +1094,42 @@ Note
 ```
 ])
 
+#pagebreak()
+
 == Zmiana danych 1
 
 #description[Zwolnienie wszystkich strażników ze stażem mniejszym niż `experience_months` miesięcy, którzy nie mają zaplanowanych patroli w przyszłości oraz patrolowali blok `block_number` w określonym przedziale czasowym (`start_time` - `end_time`).]
+
+#sql[
+```
+
+UPDATE guard
+SET dismissal_date = to_date(:now, 'YYYY-MM-DD')
+WHERE months_between(to_timestamp(:now, 'YYYY-MM-DD HH24:MI:SS'), guard.employment_date) < :experience_months
+  AND dismissal_date IS NULL
+  AND id NOT IN
+    (SELECT guard.id
+     FROM guard
+     INNER JOIN patrol ON guard.id = patrol.fk_guard
+     INNER JOIN patrol_slot ON patrol.fk_patrol_slot = patrol_slot.id
+     WHERE to_char(patrol_slot.start_time, 'YYYY-MM-DD HH24:MI:SS') >= :now
+     GROUP BY guard.id,
+              guard.first_name,
+              guard.last_name)
+  AND id IN
+    (SELECT guard.id
+     FROM guard
+     INNER JOIN patrol ON guard.id = patrol.fk_guard
+     INNER JOIN patrol_slot ON patrol.fk_patrol_slot = patrol_slot.id
+     INNER JOIN prison_block ON patrol.fk_block = prison_block.id
+     WHERE to_char(patrol_slot.start_time, 'YYYY-MM-DD HH24:MI:SS') >= :start_time
+       AND to_char(patrol_slot.end_time, 'YYYY-MM-DD HH24:MI:SS') <= :end_time
+       AND prison_block.block_number = :block_number
+     GROUP BY guard.id,
+              guard.first_name,
+              guard.last_name);
+```
+]
 
 W poniższym przykładzie nie udało nam się wprowadzić dużego wzrostu kosztu. Jedyne dwie zmiany, jakich dokonaliśmy, to analogiczna do poprzednich przykładów zmiana wywołania funkcji na parametrze na wywołanie funkcji na danych: `patrol_slot.start_time >= to_timestamp(:start_time, 'YYYY-MM-DD HH24:MI:SS')` na `to_char(patrol_slot.start_time, 'YYYY-MM-DD HH24:MI:SS') >= :start_time` oraz wprowadzenie redundantnego grupowania `group by guard.id, guard.first_name, guard.last_name` w podzapytaniu, na którym stosujemy kwantyfikator `IN` / `NOT IN`.
 
@@ -866,9 +1241,19 @@ Predicate Information (identified by operation id):
 
 #description[Wygenerowanie wart (patrol slot) w przedziale czasowym (`start_time` - `end_time`) z określonym czasem trwania patrolu w minutach `slot_duration`.]
 
-Już w poprzednim etapie raportowaliśmy problemy związane z tym zapytaniem. Zauważyliśmy, że nie zależy ono od żadnej z istniejących w naszej bazie danych tabel. W związku z tym, próby jego pogarszania jak i optymalizacji nie przyniosłyby żadnych rezultatów. Jako że w ramach etapu 2 utworzyliśmy cztery kwerendy zmieniające dane, a wymagane były jedynie trzy, *podjęliśmy decyzję o usunięciu tego zapytania* z naszego zestawu. Dla kompletności, poniżej znajduje się plan dla tego zapytania.
+#sql[
+```
+INSERT INTO patrol_slot (start_time, end_time)
+SELECT to_timestamp(:start+TIME, 'YYYY-MM-DD HH24:MI:SS') + (interval '1' MINUTE * :slot_duration * LEVEL) AS start_time,
+       to_timestamp(:start_time, 'YYYY-MM-DD HH24:MI:SS') + (interval '1' MINUTE * :slot_duration * (LEVEL + 1) - interval '1' SECOND) AS end_time
+FROM dual CONNECT BY LEVEL <= trunc(extract(DAY
+                                            FROM(to_timestamp(:end_time, 'YYYY-MM-DD HH24:MI:SS') - to_timestamp(:start_time, 'YYYY-MM-DD HH24:MI:SS')) * 24 * 60) / :slot_duration)
+```
+]
 
 #pagebreak()
+
+Już w poprzednim etapie raportowaliśmy problemy związane z tym zapytaniem. Zauważyliśmy, że nie zależy ono od żadnej z istniejących w naszej bazie danych tabel. W związku z tym, próby jego pogarszania jak i optymalizacji nie przyniosłyby żadnych rezultatów. Jako że w ramach etapu 2 utworzyliśmy cztery kwerendy zmieniające dane, a wymagane były jedynie trzy, *podjęliśmy decyzję o usunięciu tego zapytania* z naszego zestawu. Dla kompletności, poniżej znajduje się plan dla tego zapytania.
 
 #plan([
 ```
@@ -895,6 +1280,40 @@ Predicate Information (identified by operation id):
 == Zmiana danych 3
 
 #description[Umieszczenie więźniów, którzy w przedziale czasowym (`start_date` - `end_date`) dostali reprymendę zawierającą w treści `event_type` do wolnej izolatki w bloku `block_id` z obecnego zakwaterowania. Jeżeli wolnych izolatek nie ma, to więźniowie pozostają w swoich celach.]
+
+#sql[
+```
+
+INSERT INTO accommodation (fk_cell, fk_prisoner, start_date, end_date)
+SELECT c.id AS fk_cell,
+       p.id AS fk_prisoner,
+       to_timestamp(:now, 'YYYY-MM-DD HH24:MI:SS') AS start_date,
+       NULL AS end_date
+FROM
+  (SELECT min(rownum) AS n,
+          min(p.id) AS id
+   FROM prisoner p
+   INNER JOIN reprimand r ON p.id = r.fk_prisoner
+   WHERE to_char(r.issue_date, 'YYYY-MM-DD') BETWEEN :start_date AND :end_date
+     AND (:event_type IS NULL
+          OR instr(r.reason, :event_type) > 0)
+   GROUP BY p.pesel) p
+INNER JOIN
+  (SELECT rownum AS n,
+          c.id
+   FROM cell c
+   INNER JOIN prison_block pb ON pb.id = c.fk_block
+   WHERE pb.block_number = :block_number
+     AND c.is_solitary = 1
+     AND c.id NOT IN
+       (SELECT fk_cell
+        FROM accommodation a
+        WHERE (a.end_date IS NULL
+               OR to_char(a.end_date, 'YYYY-MM-DD HH24:MI:SS') >= :now)
+          AND to_char(a.start_date, 'YYYY-MM-DD HH24:MI:SS') <= :now
+        GROUP BY fk_cell)) c ON p.n = c.n;
+```
+]
 
 W zmianie danych nr 3 ponownie zastosowaliśmy redundantne operacje grupowania oraz wykorzystaliśmy kolumnę PESEL zamiast klucza głównego więźnia.
 
@@ -992,7 +1411,25 @@ Predicate Information (identified by operation id):
 
 #description[Wystawienie reprymendy o treści `reason` przez strażnika `guard_id` wszystkim więźniom niebędącym w izolatce i znajdującym się w bloku `block_number` w momencie `event_time`.]
 
-Zmiany danych numer 4 nie udało nam się pogorszyć.
+#sql[
+```
+
+INSERT INTO reprimand (fk_guard, fk_prisoner, reason, issue_date)
+SELECT :guard_id AS fk_guard,
+       p.id AS fk_prisoner,
+       :reason AS reason,
+       cast(to_timestamp(:event_time, 'YYYY-MM-DD HH24:MI:SS') AS date) AS issue_date
+FROM prisoner p
+INNER JOIN accommodation a ON p.id = a.fk_prisoner
+INNER JOIN cell c ON a.fk_cell = c.id
+INNER JOIN prison_block pb ON c.fk_block = pb.id
+WHERE pb.block_number = :block_number
+  AND a.start_date <= to_timestamp(:event_time, 'YYYY-MM-DD HH24:MI:SS')
+  AND (a.end_date IS NULL
+       OR a.end_date >= to_timestamp(:event_time, 'YYYY-MM-DD HH24:MI:SS'))
+  AND c.is_solitary = 0;
+```
+]
 
 #plan([
 ```
