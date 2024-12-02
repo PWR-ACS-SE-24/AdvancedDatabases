@@ -451,4 +451,16 @@ Planujemy porównanie czasów i kosztów czterech wariantów:
 - *widok* zmaterializowany (`MATERIALIZED VIEW`),
 - *widok* zmaterializowany *+ indeksy*.
 
-=== Eksperyment 3 -- porównanie indeksu z partycjonowaniem dla `issue_date`
+=== Eksperyment 3 -- porównanie efektywności indeksowania i partycjonowania dla kolumny `issue_date` w tabeli `reprimand`
+
+Partycjonowanie jest często stosowane w przypadku dużych tabel, szczególnie gdy zapytania operują na ograniczonych zakresach danych, np. wybranych przedziałach czasowych. W naszej bazie danych potencjalnym kandydatem do zastosowania tej techniki jest tabela `reprimand`, która zawiera \~500 tysięcy rekordów, z informacją o karach dla więźniów oraz ich dacie wystawienia (`issue_date`).
+
+Chociaż tabela `reprimand` nie jest największą w systemie, jej rozmiar jest wystarczający, aby ocenić wpływ partycjonowania na wydajność. Jednocześnie, jej umiarkowana wielkość sprawia, że korzyści z partycjonowania nie są oczywiste. Zakładamy jednak, że zapytania na tej tabeli często będą filtrować rekordy po kolumnie `issue_date`, co sprawia, że kolumna ta jest idealnym kandydatem zarówno do indeksowania, jak i partycjonowania.
+
+Planujemy porównanie czasów i kosztów następujacych wariantów:
+- *podstawowy* (stan na etap 6),
+- *indeks b-drzewo* na kolumnie `issue_date`,
+- *partycjonowanie* tabeli `reprimand` względem kolumny `issue_date`.
+- *partycjonowanie* tabeli `reprimand` względem kolumny `issue_date` *+ indeks b-drzewo* na kolumnie `issue_date`.
+
+Zapytania testujące będą filtrować rekordy po `issue_date` w różnych przedziałach czasowych, zarówno wąskich jak i szerokich, aby sprawdzić, jak partycjonowanie wpływa na wydajność w różnych przypadkach.
