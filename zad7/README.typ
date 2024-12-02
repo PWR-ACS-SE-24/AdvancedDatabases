@@ -251,6 +251,8 @@ on p.id = ps.id
   ]
 )
 
+#pagebreak()
+
 #indexprop(
   [
     - `sentence_start_date_to_char_idx`
@@ -348,7 +350,7 @@ on p.id = ps.id
   `cell_fk_block_is_solitary_idx`,
   [composite b-tree (`(fk_block, is_solitary)`)],
   [
-    W predykatach dla zapytań `change3` oraz `change4` występują filtrowania na dwóch kolumnach połączone spójnikiem `AND`, w tym przypadku indeks złożony na obu kolumnach powinien przyspieszyć zapytanie.
+    W predykatach dla zapytań `change3` oraz `change4` występują selekcje na dwóch kolumnach połączone spójnikiem `AND`, w tym przypadku indeks złożony na obu kolumnach powinien przyspieszyć zapytanie.
   ],
   [
     `change3`:
@@ -390,7 +392,7 @@ on p.id = ps.id
   `patrol_fk_guard_fk_block_idx`,
   [composite b-tree (`(fk_guard, fk_block)`)],
   [
-    W predykatach dla zapytania `change1` występuje filtrowanie na dwóch kolumnach połączone spójnikiem `AND`, w tym przypadku indeks złożony na obu kolumnach powinien przyspieszyć zapytanie.
+    W predykatach dla zapytania `change1` występuje selekcja na dwóch kolumnach połączone spójnikiem `AND`, w tym przypadku indeks złożony na obu kolumnach powinien przyspieszyć zapytanie.
   ],
   [```sql
    select guard.id
@@ -416,4 +418,26 @@ W trakcie naszych badań dowiedzieliśmy się, że baza danych Oracle w przeciwi
 
 == Propozycje eksperymentów
 
-TODO
+=== Eksperyment 1 -- porównanie indeksu b--tree, bitmapowego oraz złożonych dla `is_solitary`
+
+Niestety w naszej bazie danych, kolumny, na których możnaby zastosować indeks bitmapowy zawierają jedynie dwie możliwe wartości, są to `cell.is_solitary`, `patrol.is_with_dog`, `prisoner.sex` oraz `guard.has_disability_class`.
+
+Jednocześnie, według dokumentacji #footnote[https://docs.oracle.com/en/database/oracle/oracle-database/23/cncpt/indexes-and-index-organized-tables.html]
+
+=== Eksperyment 2 -- dodawanie indeksów w `MATERIALIZED VIEW`
+
+Kwerenda `query4` wykorzystuje kilkukrotnie to samo kosztowne podzapytanie w czterech segmentach, które są później połączone przez `UNION`. Mieliśmy problemy z wymyśleniem sposobu optymalizacji tego fragmentu z wykorzystaniem indeksów, ponieważ wszystkie selekcje i grupowania są stosowane na podzapytaniu, a nie kolumnach z tabel.
+
+Możliwe jest jednak wyciągnięcie warunków tak, aby wewnętrzne podzapytanie korzystało tylko z parametru `:now`:, który ma oznaczać obecną datę. Następnie z tego podzapytania można *utworzyć `MATERIALIZED VIEW`*, który byłby odświeżany codziennie (`REFRESH COMPLETE ON DEMAND`). Wtedy, zamiast wykonywać to podzapytanie czterokrotnie przy każdym wywołaniu kwerendy, obliczymy jego wartość raz na dobę.
+
+Opłacalność zastosowania tego widoku zależy od tego, jak często w rzeczywistym systemie będzie wykonywana kwerenda `query4`.
+
+Następnie, wszystkie cztery wystąpienia tego podzapytania (zastąpionego widokiem) zawierają selekcję w zależności od jego kolumn, w związku z czym można utworzyć na nich *indeksy*. Warto sprawdzić, czy takie indeksy przyspieszą zapytanie.
+
+Planujemy porównanie czasów i kosztów czterech wariantów:
+- *podstawowy* (stan na etap 6),
+- *wyciągnięcie podzapytania* (`WITH`),
+- *widok* zmaterializowany (`MATERIALIZED VIEW`),
+- *widok* zmaterializowany *+ indeksy*.
+
+=== Eksperyment 3 -- porównanie indeksu z partycjonowaniem dla `issue_date`
