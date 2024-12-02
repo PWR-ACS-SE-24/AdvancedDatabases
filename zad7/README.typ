@@ -422,7 +422,16 @@ W trakcie naszych badań dowiedzieliśmy się, że baza danych Oracle w przeciwi
 
 Niestety w naszej bazie danych, kolumny, na których możnaby zastosować indeks bitmapowy zawierają jedynie dwie możliwe wartości, są to `cell.is_solitary`, `patrol.is_with_dog`, `prisoner.sex` oraz `guard.has_disability_class`.
 
-Jednocześnie, według dokumentacji #footnote[https://docs.oracle.com/en/database/oracle/oracle-database/23/cncpt/indexes-and-index-organized-tables.html]
+Jednocześnie, według dokumentacji #footnote[https://docs.oracle.com/en/database/oracle/oracle-database/23/cncpt/indexes-and-index-organized-tables.html], Oracle DB nie wspiera indeksów hash, a indeksy funkcyjne pełnią inną rolę, więc pozostaje nam jedynie dość nieciekawe porównanie indeksu b-drzewo z indeksem bitmapowym.
+
+Najczęściej stosowaną w naszych zapytaniach z powyższych kolumną jest `cell.is_solitary`, więc to na nim przeprowadzimy eksperyment.
+
+Planujemy porównanie czasów i kosztów trzech wariantów:
+- *indeks b-drzewo* na samej kolumnie `cell.is_solitary`,
+- *indeks bitmapowy* na samej kolumnie `cell.is_solitary`,
+- *indeks złożony* b-drzewo na kolumnach `cell.is_solitary` oraz `cell.fk_block`.
+
+Według naszej wiedzy, popartej dokumentacją, indeks złożony z odpowiednią kolejnością kolumn (najpierw `cell.is_solitary`, a potem `cell.fk_block`) powinien móc być wykorzystany zarówno gdy zapytanie będzie korzystało z obu kolumn, jak i gdy będzie korzystało tylko z pierwszej z nich.
 
 === Eksperyment 2 -- dodawanie indeksów w `MATERIALIZED VIEW`
 
@@ -433,6 +442,8 @@ Możliwe jest jednak wyciągnięcie warunków tak, aby wewnętrzne podzapytanie 
 Opłacalność zastosowania tego widoku zależy od tego, jak często w rzeczywistym systemie będzie wykonywana kwerenda `query4`.
 
 Następnie, wszystkie cztery wystąpienia tego podzapytania (zastąpionego widokiem) zawierają selekcję w zależności od jego kolumn, w związku z czym można utworzyć na nich *indeksy*. Warto sprawdzić, czy takie indeksy przyspieszą zapytanie.
+
+#pagebreak()
 
 Planujemy porównanie czasów i kosztów czterech wariantów:
 - *podstawowy* (stan na etap 6),
