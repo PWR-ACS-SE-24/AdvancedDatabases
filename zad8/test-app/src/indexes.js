@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import oracledb from "oracledb";
 
 /** @param {string} name */
 const readIndex = async (name) => {
@@ -13,7 +14,7 @@ const readIndex = async (name) => {
   return { create, drop };
 };
 
-export const indexes = {
+const indexes = {
   i1: await readIndex("i1"),
   i2: await readIndex("i2"),
   i3: await readIndex("i3"),
@@ -35,3 +36,16 @@ export const indexSets = [
   [indexes.e12],
   [indexes.e13],
 ];
+
+/** @param {oracledb.Connection} con */
+export async function dropAllIndexes(con) {
+  console.log("Dropping all indexes...");
+  for (const index in indexes) {
+    for (const query of indexes[index].drop) {
+      try {
+        await con.execute(query);
+      } catch {}
+    }
+  }
+  console.log("Dropped all indexes.");
+}

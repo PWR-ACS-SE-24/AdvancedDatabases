@@ -7,7 +7,7 @@ import fs from "fs/promises";
 const readSql = (name) =>
   fs.readFile(`sql/${name}.sql`, "utf-8").then((text) => text.replace(";", ""));
 
-export const N = 10;
+export const N = 1;
 
 export const workload = {
   query1: {
