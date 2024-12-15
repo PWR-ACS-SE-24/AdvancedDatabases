@@ -33,7 +33,7 @@ export async function gatherAndSavePlans(con, set) {
  * @param {string} name
  * @param {Query} query
  */
-export async function calculateCost(con, query) {
+async function calculateCost(con, query) {
   const { sql, params } = query;
   await con.execute(`explain plan for ${sql}`, params);
   const result = await con.execute(
@@ -46,4 +46,16 @@ export async function calculateCost(con, query) {
       .filter((row) => row?.length > 0)
       .map((row) => parseInt(row, 10))
   );
+}
+
+/** @param {oracledb.Connection} con */
+export async function gatherCosts(con) {
+  console.log("Gathering costs...");
+  /** @type {Record<string, number>} */
+  const results = {};
+  for (const name in workload) {
+    results[name] = await calculateCost(con, workload[name]);
+  }
+  console.log("Gathered costs.");
+  return results;
 }

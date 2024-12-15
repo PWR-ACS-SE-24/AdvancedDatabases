@@ -75,7 +75,7 @@ export async function gatherMeasurements(con) {
   const oldCounts = await getCounts(con);
 
   for (let i = 0; i < N; i++) {
-    console.log(`Iteration #${i + 1}/${N}...`);
+    console.log(`\tIteration #${i + 1}/${N}...`);
     await flushMemory(con);
     for (const name in workload) {
       const time = await measureTime(con, workload[name]);
