@@ -19,6 +19,26 @@ export async function explainPlan(con, name, workload) {
 
 /**
  * @param {oracledb.Connection} con
+ * @param {string} name
+ * @param {{ sql: string; params: Record<string, any> }} workload
+ */
+export async function calculateCost(con, workload) {
+  const { sql, params } = workload;
+  await con.execute(`explain plan for ${sql}`, params);
+  const result = await con.execute(
+    "select plan_table_output from table(dbms_xplan.display(format => 'basic cost'))"
+  );
+  return Math.max(
+    ...result.rows
+      .slice(5)
+      .map(([row]) => row.split("|")[4]?.trim())
+      .filter((row) => row?.length > 0)
+      .map((row) => parseInt(row, 10))
+  );
+}
+
+/**
+ * @param {oracledb.Connection} con
  * @param {{ sql: string; params: Record<string, any> }} workload
  * @returns {Promise<number>} in milliseconds
  */

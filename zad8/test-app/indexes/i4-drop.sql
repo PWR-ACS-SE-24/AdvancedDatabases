@@ -1,0 +1,2 @@
+drop index cell_fk_block_is_solitary_idx;
+drop index patrol_fk_guard_fk_block_idx;

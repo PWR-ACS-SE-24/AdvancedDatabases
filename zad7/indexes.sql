@@ -104,16 +104,7 @@ create index patrol_fk_guard_fk_block_idx on
 drop index cell_fk_block_is_solitary_idx;
 drop index patrol_fk_guard_fk_block_idx;
 
--- ???
-
-create index accommodation_fk_prisoner_idx on
-   accommodation (
-      fk_prisoner
-   );
-
-drop index accommodation_fk_prisoner_idx;
-
--- Eksperyment 1
+-- Eksperyment 2
 create materialized view query4_mv
    build immediate
    refresh
