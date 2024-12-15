@@ -1,0 +1,52 @@
+Plan hash value: 293877394
+ 
+-----------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                                    | Name                               | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------------------------------------------
+|   0 | UPDATE STATEMENT                             |                                    |     1 |    35 | 21738   (1)| 00:00:01 |
+|   1 |  UPDATE                                      | GUARD                              |       |       |            |          |
+|   2 |   NESTED LOOPS SEMI                          |                                    |     1 |    35 | 21738   (1)| 00:00:01 |
+|*  3 |    HASH JOIN ANTI                            |                                    |     1 |    33 | 20710   (1)| 00:00:01 |
+|*  4 |     TABLE ACCESS FULL                        | GUARD                              |   119 |  2380 |    27   (0)| 00:00:01 |
+|   5 |     VIEW                                     | VW_NSO_1                           | 13140 |   166K| 20682   (1)| 00:00:01 |
+|   6 |      NESTED LOOPS SEMI                       |                                    | 13140 |   461K| 20682   (1)| 00:00:01 |
+|   7 |       VIEW                                   | VW_GBF_20                          | 13140 |   166K| 20682   (1)| 00:00:01 |
+|   8 |        SORT GROUP BY                         |                                    | 13140 |   333K| 20682   (1)| 00:00:01 |
+|   9 |         NESTED LOOPS                         |                                    |  3243K|    80M| 20595   (1)| 00:00:01 |
+|  10 |          NESTED LOOPS                        |                                    |  3244K|    80M| 20595   (1)| 00:00:01 |
+|  11 |           TABLE ACCESS BY INDEX ROWID BATCHED| PATROL_SLOT                        |  1370 | 21920 |     5   (0)| 00:00:01 |
+|* 12 |            INDEX RANGE SCAN                  | PATROL_SLOT_START_TIME_TO_CHAR_IDX |   247 |       |     3   (0)| 00:00:01 |
+|* 13 |           INDEX RANGE SCAN                   | PATROL_FK_PATROL_SLOT_IDX          |  2368 |       |     6   (0)| 00:00:01 |
+|  14 |          TABLE ACCESS BY INDEX ROWID         | PATROL                             |  2368 | 23680 |    15   (0)| 00:00:01 |
+|* 15 |       INDEX UNIQUE SCAN                      | SYS_C008254                        |     1 |    23 |     0   (0)| 00:00:01 |
+|  16 |    VIEW PUSHED PREDICATE                     | VW_NSO_2                           |     1 |     2 |  1028   (1)| 00:00:01 |
+|  17 |     NESTED LOOPS                             |                                    |     1 |    36 |  1028   (1)| 00:00:01 |
+|* 18 |      INDEX UNIQUE SCAN                       | SYS_C008254                        |     1 |    23 |     1   (0)| 00:00:01 |
+|  19 |      VIEW                                    | VW_GBF_56                          |     1 |    13 |  1027   (1)| 00:00:01 |
+|  20 |       SORT GROUP BY                          |                                    |     1 |    47 |  1027   (1)| 00:00:01 |
+|  21 |        NESTED LOOPS                          |                                    |     1 |    47 |  1027   (1)| 00:00:01 |
+|  22 |         NESTED LOOPS                         |                                    |   161K|    47 |  1027   (1)| 00:00:01 |
+|  23 |          NESTED LOOPS                        |                                    |    68 |  2312 |     5   (0)| 00:00:01 |
+|  24 |           TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK                       |     1 |     7 |     1   (0)| 00:00:01 |
+|* 25 |            INDEX UNIQUE SCAN                 | SYS_C008242                        |     1 |       |     0   (0)| 00:00:01 |
+|* 26 |           TABLE ACCESS BY INDEX ROWID BATCHED| PATROL_SLOT                        |    68 |  1836 |     4   (0)| 00:00:01 |
+|* 27 |            INDEX RANGE SCAN                  | PATROL_SLOT_END_TIME_TO_CHAR_IDX   |   247 |       |     2   (0)| 00:00:01 |
+|* 28 |          INDEX RANGE SCAN                    | PATROL_FK_PATROL_SLOT_IDX          |  2368 |       |     6   (0)| 00:00:01 |
+|* 29 |         TABLE ACCESS BY INDEX ROWID          | PATROL                             |     1 |    13 |    15   (0)| 00:00:01 |
+-----------------------------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   3 - access("ID"="ID")
+   4 - filter("DISMISSAL_DATE" IS NULL AND MONTHS_BETWEEN(TO_TIMESTAMP(:NOW,'YYYY-MM-DD 
+              HH24:MI:SS'),INTERNAL_FUNCTION("GUARD"."EMPLOYMENT_DATE"))<:EXPERIENCE_MONTHS)
+  12 - access(TO_CHAR(INTERNAL_FUNCTION("START_TIME"),'YYYY-MM-DD HH24:MI:SS')>=:NOW)
+  13 - access("PATROL"."FK_PATROL_SLOT"="PATROL_SLOT"."ID")
+  15 - access("GUARD"."ID"="ITEM_1")
+  18 - access("GUARD"."ID"="ID")
+  25 - access("PRISON_BLOCK"."BLOCK_NUMBER"=:BLOCK_NUMBER)
+  26 - filter(TO_CHAR(INTERNAL_FUNCTION("START_TIME"),'YYYY-MM-DD HH24:MI:SS')>=:START_TIME)
+  27 - access(TO_CHAR(INTERNAL_FUNCTION("END_TIME"),'YYYY-MM-DD HH24:MI:SS')<=:END_TIME)
+  28 - access("PATROL"."FK_PATROL_SLOT"="PATROL_SLOT"."ID")
+  29 - filter("PATROL"."FK_GUARD"="ID" AND "PATROL"."FK_BLOCK"="PRISON_BLOCK"."ID")

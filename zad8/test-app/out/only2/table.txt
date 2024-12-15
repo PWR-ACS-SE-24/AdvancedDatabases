@@ -1,0 +1,5 @@
+#table(
+  columns: 7,
+  align: right + horizon,
+  table.cell(rowspan: 2, colspan: 1)[*Name*], table.cell(rowspan: 1, colspan: 3)[*Czas [ms]*], table.cell(rowspan: 1, colspan: 3)[*Koszt*], [*Stary*], [*Nowy*], [*Zmiana*], [*Stary*], [*Nowy*], [*Zmiana*], [*`query1`*], [854.01], [1115.04], [#diff(261.03)], [1697], [1697], [#diff(0)], [*`query2`*], [1422.65], [1300.81], [#diff(-121.84)], [8524], [8524], [#diff(0)], [*`query3`*], [1990.81], [2190.04], [#diff(199.23)], [9649], [9649], [#diff(0)], [*`query4`*], [26047.93], [23423.06], [#diff(-2624.87)], [85687], [85687], [#diff(0)], [*`change1`*], [8212.77], [7112.98], [#diff(-1099.79)], [21796], [21796], [#diff(0)], [*`change3`*], [929.47], [1001.79], [#diff(72.32)], [3411], [3351], [#diff(-60)], [*`change4`*], [297.66], [257.04], [#diff(-40.62)], [2101], [2101], [#diff(0)]
+)

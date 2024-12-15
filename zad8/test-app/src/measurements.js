@@ -92,9 +92,11 @@ export async function gatherMeasurements(con) {
   }
 
   /** @type {Record<string, Stats>} */
-  const measurements = Object.entries(results).map(([name, times]) => {
-    return [name, calculateStats(times)];
-  });
+  const measurements = Object.fromEntries(
+    Object.entries(results).map(([name, times]) => {
+      return [name, calculateStats(times)];
+    })
+  );
 
   console.log("Gathered times.");
 
