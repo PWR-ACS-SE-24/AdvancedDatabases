@@ -43,7 +43,7 @@ for (const set in indexSets) {
     table.addCell(newCosts[name]);
     table.addCell(`#diff(${newCosts[name] - oldCosts[name]})`);
   }
-  await fs.writeFile(`out/${set}/table.txt`, table.render());
+  await fs.writeFile(`out/${set}/table.typ`, table.render());
 
   await dropIndexes(con, indexSets[set]);
 }
