@@ -17,7 +17,7 @@
     columns: 2,
     align: (left, right),
     column-gutter: 24pt,
-    ..children
+    ..children.pos().map(it => align(left, it))
   )
 ]
 
@@ -80,7 +80,11 @@ Plan hash value: 3600760484
 |   2 |   NESTED LOOPS                      |               |     1 |    78 |       |  9833   (3)| 00:00:01 |
 |   3 |    NESTED LOOPS                     |               |     1 |    78 |       |  9833   (3)| 00:00:01 |
 |   4 |     NESTED LOOPS                    |               |     1 |    71 |       |  9832   (3)| 00:00:01 |
+```
+#highlight[```
 |*  5 |      HASH JOIN                      |               |     1 |    60 |       |  9831   (3)| 00:00:01 |
+```]
+```
 |*  6 |       HASH JOIN                     |               |     1 |    34 |       |  7742   (2)| 00:00:01 |
 |   7 |        JOIN FILTER CREATE           | :BF0000       |     1 |    29 |       |  2046   (2)| 00:00:01 |
 |   8 |         NESTED LOOPS                |               |     1 |    29 |       |  2046   (2)| 00:00:01 |
@@ -89,7 +93,11 @@ Plan hash value: 3600760484
 |* 11 |            FILTER                   |               |       |       |       |            |          |
 |  12 |             SORT GROUP BY           |               |     1 |    89 |       |  2045   (2)| 00:00:01 |
 |* 13 |              HASH JOIN              |               |  9590 |   833K|       |  2044   (2)| 00:00:01 |
+```
+#highlight[```
 |* 14 |               TABLE ACCESS FULL     | SENTENCE      |  9590 |   674K|       |  1397   (2)| 00:00:01 |
+```]
+```
 |  15 |               TABLE ACCESS FULL     | PRISONER      |   299K|  4980K|       |   645   (1)| 00:00:01 |
 |* 16 |           INDEX UNIQUE SCAN         | SYS_C008848   |     1 |       |       |     0   (0)| 00:00:01 |
 |* 17 |          TABLE ACCESS BY INDEX ROWID| PRISONER      |     1 |    24 |       |     1   (0)| 00:00:01 |
@@ -102,7 +110,11 @@ Plan hash value: 3600760484
 |* 24 |             HASH JOIN OUTER         |               |   468K|    12M|  8496K|  2937   (1)| 00:00:01 |
 |  25 |              TABLE ACCESS FULL      | PRISONER      |   299K|  4980K|       |   645   (1)| 00:00:01 |
 |  26 |              TABLE ACCESS FULL      | SENTENCE      |   473K|  4620K|       |  1379   (1)| 00:00:01 |
+```
+#highlight[```
 |* 27 |       TABLE ACCESS FULL             | ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
+```]
+```
 |* 28 |      TABLE ACCESS BY INDEX ROWID    | CELL          |     1 |    11 |       |     1   (0)| 00:00:01 |
 |* 29 |       INDEX UNIQUE SCAN             | SYS_C008883   |     1 |       |       |     0   (0)| 00:00:01 |
 |* 30 |     INDEX UNIQUE SCAN               | SYS_C008855   |     1 |       |       |     0   (0)| 00:00:01 |
@@ -159,7 +171,11 @@ Plan hash value: 3564657038
 |   2 |   NESTED LOOPS                                   |                              |     1 |    78 |       |  9735   (2)| 00:00:01 |
 |   3 |    NESTED LOOPS                                  |                              |     1 |    78 |       |  9735   (2)| 00:00:01 |
 |   4 |     NESTED LOOPS                                 |                              |     1 |    71 |       |  9734   (2)| 00:00:01 |
+```
+#highlight[```
 |   5 |      NESTED LOOPS                                |                              |     1 |    60 |       |  9733   (2)| 00:00:01 |
+```]
+```
 |*  6 |       HASH JOIN                                  |                              |     1 |    34 |       |  7717   (2)| 00:00:01 |
 |   7 |        JOIN FILTER CREATE                        | :BF0000                      |     1 |    29 |       |  2021   (1)| 00:00:01 |
 |   8 |         NESTED LOOPS                             |                              |     1 |    29 |       |  2021   (1)| 00:00:01 |
@@ -168,8 +184,12 @@ Plan hash value: 3564657038
 |* 11 |            FILTER                                |                              |       |       |       |            |          |
 |  12 |             SORT GROUP BY                        |                              |     1 |    89 |       |  2020   (1)| 00:00:01 |
 |* 13 |              HASH JOIN                           |                              |  9590 |   833K|       |  2019   (1)| 00:00:01 |
+```
+#highlight[```
 |* 14 |               TABLE ACCESS BY INDEX ROWID BATCHED| SENTENCE                     |  9590 |   674K|       |  1372   (1)| 00:00:01 |
 |* 15 |                INDEX RANGE SCAN                  | SENTENCE_START_DATE_IDX      |  4259 |       |       |    14   (0)| 00:00:01 |
+```]
+```
 |  16 |               TABLE ACCESS FULL                  | PRISONER                     |   299K|  4980K|       |   645   (1)| 00:00:01 |
 |* 17 |           INDEX UNIQUE SCAN                      | SYS_C008848                  |     1 |       |       |     0   (0)| 00:00:01 |
 |* 18 |          TABLE ACCESS BY INDEX ROWID             | PRISONER                     |     1 |    24 |       |     1   (0)| 00:00:01 |
@@ -182,8 +202,12 @@ Plan hash value: 3564657038
 |* 25 |             HASH JOIN OUTER                      |                              |   468K|    12M|  8496K|  2937   (1)| 00:00:01 |
 |  26 |              TABLE ACCESS FULL                   | PRISONER                     |   299K|  4980K|       |   645   (1)| 00:00:01 |
 |  27 |              TABLE ACCESS FULL                   | SENTENCE                     |   473K|  4620K|       |  1379   (1)| 00:00:01 |
+```
+#highlight[```
 |* 28 |       TABLE ACCESS BY INDEX ROWID BATCHED        | ACCOMMODATION                |     1 |    26 |       |  2016   (1)| 00:00:01 |
 |* 29 |        INDEX RANGE SCAN                          | ACCOMMODATION_START_DATE_IDX | 13437 |       |       |    37   (0)| 00:00:01 |
+```]
+```
 |* 30 |      TABLE ACCESS BY INDEX ROWID                 | CELL                         |     1 |    11 |       |     1   (0)| 00:00:01 |
 |* 31 |       INDEX UNIQUE SCAN                          | SYS_C008883                  |     1 |       |       |     0   (0)| 00:00:01 |
 |* 32 |     INDEX UNIQUE SCAN                            | SYS_C008855                  |     1 |       |       |     0   (0)| 00:00:01 |
@@ -251,7 +275,11 @@ Plan hash value: 171928505
 |* 15 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
 |  16 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
 |* 17 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
+```
+#highlight[```
 |* 18 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
+```]
+```
 |  19 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
 |* 20 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
 |  21 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
@@ -274,7 +302,11 @@ Plan hash value: 171928505
 |* 38 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
 |  39 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
 |* 40 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
+```
+#highlight[```
 |* 41 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
+```]
+```
 |  42 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
 |* 43 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
 |  44 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
@@ -297,7 +329,11 @@ Plan hash value: 171928505
 |* 61 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
 |  62 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
 |* 63 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
+```
+#highlight[```
 |* 64 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
+```]
+```
 |  65 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
 |* 66 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
 |  67 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
@@ -320,7 +356,11 @@ Plan hash value: 171928505
 |* 84 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
 |  85 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
 |* 86 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
+```
+#highlight[```
 |* 87 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
+```]
+```
 |  88 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
 |* 89 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
 |  90 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
@@ -343,7 +383,11 @@ Plan hash value: 171928505
 |*107 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
 | 108 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
 |*109 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
+```
+#highlight[```
 |*110 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
+```]
+```
 | 111 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
 |*112 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
 | 113 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
@@ -455,8 +499,12 @@ Plan hash value: 3517137373
 |* 15 |              HASH JOIN                            |                              | 10513 |   420K|       |  2372   (1)| 00:00:01 |
 |  16 |               TABLE ACCESS FULL                   | PRISON_BLOCK                 |   100 |   700 |       |     2   (0)| 00:00:01 |
 |* 17 |               HASH JOIN                           |                              | 10513 |   349K|       |  2369   (1)| 00:00:01 |
+```
+#highlight[```
 |* 18 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                | 10513 |   266K|       |  2016   (1)| 00:00:01 |
 |* 19 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 13437 |       |       |    38   (0)| 00:00:01 |
+```]
+```
 |  20 |                TABLE ACCESS FULL                  | CELL                         |   251K|  1966K|       |   351   (1)| 00:00:01 |
 |* 21 |          SORT JOIN                                |                              |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
 |  22 |           TABLE ACCESS FULL                       | REPRIMAND                    |   422K|  4122K|       |  1394   (1)| 00:00:01 |
@@ -479,8 +527,12 @@ Plan hash value: 3517137373
 |* 39 |              HASH JOIN                            |                              | 10513 |   420K|       |  2372   (1)| 00:00:01 |
 |  40 |               TABLE ACCESS FULL                   | PRISON_BLOCK                 |   100 |   700 |       |     2   (0)| 00:00:01 |
 |* 41 |               HASH JOIN                           |                              | 10513 |   349K|       |  2369   (1)| 00:00:01 |
+```
+#highlight[```
 |* 42 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                | 10513 |   266K|       |  2016   (1)| 00:00:01 |
 |* 43 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 13437 |       |       |    38   (0)| 00:00:01 |
+```]
+```
 |  44 |                TABLE ACCESS FULL                  | CELL                         |   251K|  1966K|       |   351   (1)| 00:00:01 |
 |* 45 |          SORT JOIN                                |                              |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
 |  46 |           TABLE ACCESS FULL                       | REPRIMAND                    |   422K|  4122K|       |  1394   (1)| 00:00:01 |
@@ -503,8 +555,12 @@ Plan hash value: 3517137373
 |* 63 |              HASH JOIN                            |                              | 10513 |   420K|       |  2372   (1)| 00:00:01 |
 |  64 |               TABLE ACCESS FULL                   | PRISON_BLOCK                 |   100 |   700 |       |     2   (0)| 00:00:01 |
 |* 65 |               HASH JOIN                           |                              | 10513 |   349K|       |  2369   (1)| 00:00:01 |
+```
+#highlight[```
 |* 66 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                | 10513 |   266K|       |  2016   (1)| 00:00:01 |
 |* 67 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 13437 |       |       |    38   (0)| 00:00:01 |
+```]
+```
 |  68 |                TABLE ACCESS FULL                  | CELL                         |   251K|  1966K|       |   351   (1)| 00:00:01 |
 |* 69 |          SORT JOIN                                |                              |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
 |  70 |           TABLE ACCESS FULL                       | REPRIMAND                    |   422K|  4122K|       |  1394   (1)| 00:00:01 |
@@ -527,8 +583,12 @@ Plan hash value: 3517137373
 |* 87 |              HASH JOIN                            |                              | 10513 |   420K|       |  2372   (1)| 00:00:01 |
 |  88 |               TABLE ACCESS FULL                   | PRISON_BLOCK                 |   100 |   700 |       |     2   (0)| 00:00:01 |
 |* 89 |               HASH JOIN                           |                              | 10513 |   349K|       |  2369   (1)| 00:00:01 |
+```
+#highlight[```
 |* 90 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                | 10513 |   266K|       |  2016   (1)| 00:00:01 |
 |* 91 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 13437 |       |       |    38   (0)| 00:00:01 |
+```]
+```
 |  92 |                TABLE ACCESS FULL                  | CELL                         |   251K|  1966K|       |   351   (1)| 00:00:01 |
 |* 93 |          SORT JOIN                                |                              |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
 |  94 |           TABLE ACCESS FULL                       | REPRIMAND                    |   422K|  4122K|       |  1394   (1)| 00:00:01 |
@@ -551,8 +611,12 @@ Plan hash value: 3517137373
 |*111 |              HASH JOIN                            |                              | 10513 |   420K|       |  2372   (1)| 00:00:01 |
 | 112 |               TABLE ACCESS FULL                   | PRISON_BLOCK                 |   100 |   700 |       |     2   (0)| 00:00:01 |
 |*113 |               HASH JOIN                           |                              | 10513 |   349K|       |  2369   (1)| 00:00:01 |
+```
+#highlight[```
 |*114 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                | 10513 |   266K|       |  2016   (1)| 00:00:01 |
 |*115 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 13437 |       |       |    38   (0)| 00:00:01 |
+```]
+```
 | 116 |                TABLE ACCESS FULL                  | CELL                         |   251K|  1966K|       |   351   (1)| 00:00:01 |
 |*117 |          SORT JOIN                                |                              |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
 | 118 |           TABLE ACCESS FULL                       | REPRIMAND                    |   422K|  4122K|       |  1394   (1)| 00:00:01 |
@@ -670,10 +734,14 @@ Plan hash value: 2939466326
 |   4 |     VIEW                            |               |     1 |    26 |  2449   (4)| 00:00:01 |
 |   5 |      COUNT                          |               |       |       |            |          |
 |*  6 |       HASH JOIN ANTI                |               |     1 |    31 |  2449   (4)| 00:00:01 |
+```
+#highlight[```
 |   7 |        NESTED LOOPS                 |               |    55 |   990 |   354   (2)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID | PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
 |*  9 |          INDEX UNIQUE SCAN          | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
 |* 10 |         TABLE ACCESS FULL           | CELL          |    55 |   605 |   353   (2)| 00:00:01 |
+```]
+```
 |  11 |        VIEW                         | VW_NSO_1      | 10659 |   135K|  2095   (5)| 00:00:01 |
 |  12 |         SORT GROUP BY               |               | 10659 |   218K|  2095   (5)| 00:00:01 |
 |* 13 |          TABLE ACCESS FULL          | ACCOMMODATION | 10850 |   222K|  2093   (4)| 00:00:01 |
@@ -717,12 +785,16 @@ Plan hash value: 221405392
 |   4 |     VIEW                                   |                      |     1 |    26 |  2383   (4)| 00:00:01 |
 |   5 |      COUNT                                 |                      |       |       |            |          |
 |*  6 |       HASH JOIN ANTI                       |                      |     1 |    31 |  2383   (4)| 00:00:01 |
+```
+#highlight[```
 |*  7 |        HASH JOIN                           |                      |    55 |   990 |   288   (0)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK         |     1 |     7 |     1   (0)| 00:00:01 |
 |*  9 |          INDEX UNIQUE SCAN                 | SYS_C008856          |     1 |       |     0   (0)| 00:00:01 |
 |  10 |         TABLE ACCESS BY INDEX ROWID BATCHED| CELL                 |  4979 | 54769 |   287   (0)| 00:00:01 |
 |  11 |          BITMAP CONVERSION TO ROWIDS       |                      |       |       |            |          |
 |* 12 |           BITMAP INDEX SINGLE VALUE        | CELL_IS_SOLITARY_IDX |       |       |            |          |
+```]
+```
 |  13 |        VIEW                                | VW_NSO_1             | 10659 |   135K|  2095   (5)| 00:00:01 |
 |  14 |         SORT GROUP BY                      |                      | 10659 |   218K|  2095   (5)| 00:00:01 |
 |* 15 |          TABLE ACCESS FULL                 | ACCOMMODATION        | 10850 |   222K|  2093   (4)| 00:00:01 |
@@ -812,13 +884,21 @@ Plan hash value: 220023471
 |   2 |   NESTED LOOPS                       |               |     1 |  2200 |       | 11117   (2)| 00:00:01 |
 |   3 |    NESTED LOOPS                      |               |     1 |  2177 |       | 11116   (2)| 00:00:01 |
 |   4 |     NESTED LOOPS                     |               |     1 |  2170 |       | 11115   (2)| 00:00:01 |
+```
+#highlight[```
 |*  5 |      HASH JOIN                       |               |     1 |  2159 |       | 11114   (2)| 00:00:01 |
+```]
+```
 |*  6 |       HASH JOIN                      |               |     1 |  2133 |       |  9021   (2)| 00:00:01 |
 |*  7 |        HASH JOIN                     |               |     1 |   118 |       |  6793   (2)| 00:00:01 |
 |   8 |         JOIN FILTER CREATE           | :BF0000       |   103 | 10815 |       |  1504   (1)| 00:00:01 |
 |   9 |          NESTED LOOPS                |               |   103 | 10815 |       |  1504   (1)| 00:00:01 |
 |  10 |           NESTED LOOPS               |               |   103 | 10815 |       |  1504   (1)| 00:00:01 |
+```
+#highlight[```
 |* 11 |            TABLE ACCESS FULL         | REPRIMAND     |   103 |  8446 |       |  1401   (2)| 00:00:01 |
+```]
+```
 |* 12 |            INDEX UNIQUE SCAN         | SYS_C008848   |     1 |       |       |     0   (0)| 00:00:01 |
 |  13 |           TABLE ACCESS BY INDEX ROWID| PRISONER      |     1 |    23 |       |     1   (0)| 00:00:01 |
 |  14 |         VIEW                         |               |  1063 | 13819 |       |  5288   (2)| 00:00:01 |
@@ -835,9 +915,17 @@ Plan hash value: 220023471
 |  25 |         SORT GROUP BY                |               |  9870 |   751K|   872K|  2228   (2)| 00:00:01 |
 |* 26 |          FILTER                      |               |       |       |       |            |          |
 |* 27 |           HASH JOIN                  |               |  9870 |   751K|       |  2046   (2)| 00:00:01 |
+```
+#highlight[```
 |* 28 |            TABLE ACCESS FULL         | SENTENCE      |  9870 |   587K|       |  1399   (3)| 00:00:01 |
+```]
+```
 |  29 |            TABLE ACCESS FULL         | PRISONER      |   299K|  4980K|       |   645   (1)| 00:00:01 |
+```
+#highlight[```
 |* 30 |       TABLE ACCESS FULL              | ACCOMMODATION | 10850 |   275K|       |  2093   (4)| 00:00:01 |
+```]
+```
 |* 31 |      TABLE ACCESS BY INDEX ROWID     | CELL          |     1 |    11 |       |     1   (0)| 00:00:01 |
 |* 32 |       INDEX UNIQUE SCAN              | SYS_C008883   |     1 |       |       |     0   (0)| 00:00:01 |
 |* 33 |     TABLE ACCESS BY INDEX ROWID      | PRISON_BLOCK  |     1 |     7 |       |     1   (0)| 00:00:01 |
@@ -890,14 +978,22 @@ Plan hash value: 1547962004
 |   2 |   NESTED LOOPS                                |                                      |     1 |  2205 |       | 11014   (1)| 00:00:01 |
 |   3 |    NESTED LOOPS                               |                                      |     1 |  2182 |       | 11013   (1)| 00:00:01 |
 |   4 |     NESTED LOOPS                              |                                      |     1 |  2175 |       | 11012   (1)| 00:00:01 |
+```
+#highlight[```
 |   5 |      NESTED LOOPS                             |                                      |     1 |  2164 |       | 11011   (1)| 00:00:01 |
+```]
+```
 |*  6 |       HASH JOIN                               |                                      |     1 |  2133 |       |  8996   (2)| 00:00:01 |
 |*  7 |        HASH JOIN                              |                                      |     1 |   118 |       |  6780   (2)| 00:00:01 |
 |   8 |         JOIN FILTER CREATE                    | :BF0000                              |   103 | 10815 |       |  1489   (1)| 00:00:01 |
 |   9 |          NESTED LOOPS                         |                                      |   103 | 10815 |       |  1489   (1)| 00:00:01 |
 |  10 |           NESTED LOOPS                        |                                      |   103 | 10815 |       |  1489   (1)| 00:00:01 |
+```
+#highlight[```
 |* 11 |            TABLE ACCESS BY INDEX ROWID BATCHED| REPRIMAND                            |   103 |  8446 |       |  1386   (1)| 00:00:01 |
 |* 12 |             INDEX RANGE SCAN                  | REPRIMAND_ISSUE_DATE_TO_CHAR_IDX     |  1900 |       |       |     8   (0)| 00:00:01 |
+```]
+```
 |* 13 |            INDEX UNIQUE SCAN                  | SYS_C008848                          |     1 |       |       |     0   (0)| 00:00:01 |
 |  14 |           TABLE ACCESS BY INDEX ROWID         | PRISONER                             |     1 |    23 |       |     1   (0)| 00:00:01 |
 |  15 |         VIEW                                  |                                      |  1063 | 13819 |       |  5291   (2)| 00:00:01 |
@@ -914,11 +1010,19 @@ Plan hash value: 1547962004
 |  26 |         SORT GROUP BY                         |                                      |  9870 |   809K|   912K|  2215   (1)| 00:00:01 |
 |* 27 |          FILTER                               |                                      |       |       |       |            |          |
 |* 28 |           HASH JOIN                           |                                      |  9870 |   809K|       |  2019   (1)| 00:00:01 |
+```
+#highlight[```
 |* 29 |            TABLE ACCESS BY INDEX ROWID BATCHED| SENTENCE                             |  9870 |   645K|       |  1372   (1)| 00:00:01 |
 |* 30 |             INDEX RANGE SCAN                  | SENTENCE_START_DATE_TO_CHAR_IDX      |  4259 |       |       |    16   (0)| 00:00:01 |
+```]
+```
 |  31 |            TABLE ACCESS FULL                  | PRISONER                             |   299K|  4980K|       |   645   (1)| 00:00:01 |
+```
+#highlight[```
 |* 32 |       TABLE ACCESS BY INDEX ROWID BATCHED     | ACCOMMODATION                        |     1 |    31 |       |  2016   (1)| 00:00:01 |
 |* 33 |        INDEX RANGE SCAN                       | ACCOMMODATION_START_DATE_TO_CHAR_IDX | 13437 |       |       |    43   (0)| 00:00:01 |
+```]
+```
 |* 34 |      TABLE ACCESS BY INDEX ROWID              | CELL                                 |     1 |    11 |       |     1   (0)| 00:00:01 |
 |* 35 |       INDEX UNIQUE SCAN                       | SYS_C008883                          |     1 |       |       |     0   (0)| 00:00:01 |
 |* 36 |     TABLE ACCESS BY INDEX ROWID               | PRISON_BLOCK                         |     1 |     7 |       |     1   (0)| 00:00:01 |
@@ -961,418 +1065,6 @@ Note
    ```]
 )
 
-*`query4`:*
-#plan(
-   [```
-Plan hash value: 171928505
- 
----------------------------------------------------------------------------------------------------------
-| Id  | Operation                       | Name          | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
----------------------------------------------------------------------------------------------------------
-|   0 | SELECT STATEMENT                |               |     5 |    65 |       | 98504   (2)| 00:00:04 |
-|   1 |  HASH UNIQUE                    |               |     5 |    65 |       | 98504   (2)| 00:00:04 |
-|   2 |   UNION-ALL                     |               |       |       |       |            |          |
-|   3 |    SORT AGGREGATE               |               |     1 |    13 |       | 19701   (2)| 00:00:01 |
-|   4 |     VIEW                        |               |   157K|  1999K|       | 18944   (2)| 00:00:01 |
-|   5 |      HASH GROUP BY              |               |   157K|  8612K|       | 18944   (2)| 00:00:01 |
-|   6 |       MERGE JOIN OUTER          |               |  2487K|   132M|       | 18944   (2)| 00:00:01 |
-|   7 |        MERGE JOIN OUTER         |               |  1592K|    69M|       | 15652   (2)| 00:00:01 |
-|   8 |         MERGE JOIN OUTER        |               |   323K|    10M|       |  7035   (2)| 00:00:01 |
-|*  9 |          FILTER                 |               |       |       |       |            |          |
-|  10 |           MERGE JOIN OUTER      |               |   157K|  3845K|       |  3939   (3)| 00:00:01 |
-|  11 |            SORT JOIN            |               |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
-|* 12 |             TABLE ACCESS FULL   | PRISONER      |   157K|  2460K|       |   650   (2)| 00:00:01 |
-|* 13 |            SORT JOIN            |               | 10513 | 94617 |       |  2445   (4)| 00:00:01 |
-|  14 |             VIEW                |               | 10513 | 94617 |       |  2444   (4)| 00:00:01 |
-|* 15 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
-|  16 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
-|* 17 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
-|* 18 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
-|  19 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
-|* 20 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
-|  21 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
-|* 22 |         SORT JOIN               |               |  1493K|    15M|    57M|  8617   (2)| 00:00:01 |
-|  23 |          TABLE ACCESS FULL      | ACCOMMODATION |  1493K|    15M|       |  2032   (2)| 00:00:01 |
-|* 24 |        SORT JOIN                |               |   473K|  4620K|    18M|  3285   (2)| 00:00:01 |
-|  25 |         TABLE ACCESS FULL       | SENTENCE      |   473K|  4620K|       |  1379   (1)| 00:00:01 |
-|  26 |    SORT AGGREGATE               |               |     1 |    13 |       | 19701   (2)| 00:00:01 |
-|  27 |     VIEW                        |               |   157K|  1999K|       | 18944   (2)| 00:00:01 |
-|  28 |      HASH GROUP BY              |               |   157K|  8612K|       | 18944   (2)| 00:00:01 |
-|  29 |       MERGE JOIN OUTER          |               |  2487K|   132M|       | 18944   (2)| 00:00:01 |
-|  30 |        MERGE JOIN OUTER         |               |  1592K|    69M|       | 15652   (2)| 00:00:01 |
-|  31 |         MERGE JOIN OUTER        |               |   323K|    10M|       |  7035   (2)| 00:00:01 |
-|* 32 |          FILTER                 |               |       |       |       |            |          |
-|  33 |           MERGE JOIN OUTER      |               |   157K|  3845K|       |  3939   (3)| 00:00:01 |
-|  34 |            SORT JOIN            |               |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
-|* 35 |             TABLE ACCESS FULL   | PRISONER      |   157K|  2460K|       |   650   (2)| 00:00:01 |
-|* 36 |            SORT JOIN            |               | 10513 | 94617 |       |  2445   (4)| 00:00:01 |
-|  37 |             VIEW                |               | 10513 | 94617 |       |  2444   (4)| 00:00:01 |
-|* 38 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
-|  39 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
-|* 40 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
-|* 41 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
-|  42 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
-|* 43 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
-|  44 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
-|* 45 |         SORT JOIN               |               |  1493K|    15M|    57M|  8617   (2)| 00:00:01 |
-|  46 |          TABLE ACCESS FULL      | ACCOMMODATION |  1493K|    15M|       |  2032   (2)| 00:00:01 |
-|* 47 |        SORT JOIN                |               |   473K|  4620K|    18M|  3285   (2)| 00:00:01 |
-|  48 |         TABLE ACCESS FULL       | SENTENCE      |   473K|  4620K|       |  1379   (1)| 00:00:01 |
-|  49 |    SORT AGGREGATE               |               |     1 |    13 |       | 19701   (2)| 00:00:01 |
-|  50 |     VIEW                        |               |   157K|  1999K|       | 18944   (2)| 00:00:01 |
-|  51 |      HASH GROUP BY              |               |   157K|  8612K|       | 18944   (2)| 00:00:01 |
-|  52 |       MERGE JOIN OUTER          |               |  2487K|   132M|       | 18944   (2)| 00:00:01 |
-|  53 |        MERGE JOIN OUTER         |               |  1592K|    69M|       | 15652   (2)| 00:00:01 |
-|  54 |         MERGE JOIN OUTER        |               |   323K|    10M|       |  7035   (2)| 00:00:01 |
-|* 55 |          FILTER                 |               |       |       |       |            |          |
-|  56 |           MERGE JOIN OUTER      |               |   157K|  3845K|       |  3939   (3)| 00:00:01 |
-|  57 |            SORT JOIN            |               |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
-|* 58 |             TABLE ACCESS FULL   | PRISONER      |   157K|  2460K|       |   650   (2)| 00:00:01 |
-|* 59 |            SORT JOIN            |               | 10513 | 94617 |       |  2445   (4)| 00:00:01 |
-|  60 |             VIEW                |               | 10513 | 94617 |       |  2444   (4)| 00:00:01 |
-|* 61 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
-|  62 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
-|* 63 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
-|* 64 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
-|  65 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
-|* 66 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
-|  67 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
-|* 68 |         SORT JOIN               |               |  1493K|    15M|    57M|  8617   (2)| 00:00:01 |
-|  69 |          TABLE ACCESS FULL      | ACCOMMODATION |  1493K|    15M|       |  2032   (2)| 00:00:01 |
-|* 70 |        SORT JOIN                |               |   473K|  4620K|    18M|  3285   (2)| 00:00:01 |
-|  71 |         TABLE ACCESS FULL       | SENTENCE      |   473K|  4620K|       |  1379   (1)| 00:00:01 |
-|  72 |    SORT AGGREGATE               |               |     1 |    13 |       | 19701   (2)| 00:00:01 |
-|  73 |     VIEW                        |               |   157K|  1999K|       | 18944   (2)| 00:00:01 |
-|  74 |      HASH GROUP BY              |               |   157K|  8612K|       | 18944   (2)| 00:00:01 |
-|  75 |       MERGE JOIN OUTER          |               |  2487K|   132M|       | 18944   (2)| 00:00:01 |
-|  76 |        MERGE JOIN OUTER         |               |  1592K|    69M|       | 15652   (2)| 00:00:01 |
-|  77 |         MERGE JOIN OUTER        |               |   323K|    10M|       |  7035   (2)| 00:00:01 |
-|* 78 |          FILTER                 |               |       |       |       |            |          |
-|  79 |           MERGE JOIN OUTER      |               |   157K|  3845K|       |  3939   (3)| 00:00:01 |
-|  80 |            SORT JOIN            |               |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
-|* 81 |             TABLE ACCESS FULL   | PRISONER      |   157K|  2460K|       |   650   (2)| 00:00:01 |
-|* 82 |            SORT JOIN            |               | 10513 | 94617 |       |  2445   (4)| 00:00:01 |
-|  83 |             VIEW                |               | 10513 | 94617 |       |  2444   (4)| 00:00:01 |
-|* 84 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
-|  85 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
-|* 86 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
-|* 87 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
-|  88 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
-|* 89 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
-|  90 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
-|* 91 |         SORT JOIN               |               |  1493K|    15M|    57M|  8617   (2)| 00:00:01 |
-|  92 |          TABLE ACCESS FULL      | ACCOMMODATION |  1493K|    15M|       |  2032   (2)| 00:00:01 |
-|* 93 |        SORT JOIN                |               |   473K|  4620K|    18M|  3285   (2)| 00:00:01 |
-|  94 |         TABLE ACCESS FULL       | SENTENCE      |   473K|  4620K|       |  1379   (1)| 00:00:01 |
-|  95 |    SORT AGGREGATE               |               |     1 |    13 |       | 19701   (2)| 00:00:01 |
-|  96 |     VIEW                        |               |   157K|  1999K|       | 18944   (2)| 00:00:01 |
-|  97 |      HASH GROUP BY              |               |   157K|  8612K|       | 18944   (2)| 00:00:01 |
-|  98 |       MERGE JOIN OUTER          |               |  2487K|   132M|       | 18944   (2)| 00:00:01 |
-|  99 |        MERGE JOIN OUTER         |               |  1592K|    69M|       | 15652   (2)| 00:00:01 |
-| 100 |         MERGE JOIN OUTER        |               |   323K|    10M|       |  7035   (2)| 00:00:01 |
-|*101 |          FILTER                 |               |       |       |       |            |          |
-| 102 |           MERGE JOIN OUTER      |               |   157K|  3845K|       |  3939   (3)| 00:00:01 |
-| 103 |            SORT JOIN            |               |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
-|*104 |             TABLE ACCESS FULL   | PRISONER      |   157K|  2460K|       |   650   (2)| 00:00:01 |
-|*105 |            SORT JOIN            |               | 10513 | 94617 |       |  2445   (4)| 00:00:01 |
-| 106 |             VIEW                |               | 10513 | 94617 |       |  2444   (4)| 00:00:01 |
-|*107 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
-| 108 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
-|*109 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
-|*110 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
-| 111 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
-|*112 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
-| 113 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
-|*114 |         SORT JOIN               |               |  1493K|    15M|    57M|  8617   (2)| 00:00:01 |
-| 115 |          TABLE ACCESS FULL      | ACCOMMODATION |  1493K|    15M|       |  2032   (2)| 00:00:01 |
-|*116 |        SORT JOIN                |               |   473K|  4620K|    18M|  3285   (2)| 00:00:01 |
-| 117 |         TABLE ACCESS FULL       | SENTENCE      |   473K|  4620K|       |  1379   (1)| 00:00:01 |
----------------------------------------------------------------------------------------------------------
- 
-Predicate Information (identified by operation id):
----------------------------------------------------
- 
-   9 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
-  12 - filter("P"."SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
-  13 - access("P"."ID"="PB"."ID"(+))
-       filter("P"."ID"="PB"."ID"(+))
-  15 - access("PB"."ID"="C"."FK_BLOCK")
-  17 - access("C"."ID"="A"."FK_CELL")
-  18 - filter("A"."START_DATE"<=TO_DATE(:NOW,'YYYY-MM-DD') AND ("A"."END_DATE" IS NULL OR 
-              "A"."END_DATE">=TO_DATE(:NOW,'YYYY-MM-DD')))
-  20 - access("P"."ID"="R"."FK_PRISONER"(+))
-       filter("P"."ID"="R"."FK_PRISONER"(+))
-  22 - access("P"."ID"="A"."FK_PRISONER"(+))
-       filter("P"."ID"="A"."FK_PRISONER"(+))
-  24 - access("P"."ID"="S"."FK_PRISONER"(+))
-       filter("P"."ID"="S"."FK_PRISONER"(+))
-  32 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
-  35 - filter("P"."SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
-  36 - access("P"."ID"="PB"."ID"(+))
-       filter("P"."ID"="PB"."ID"(+))
-  38 - access("PB"."ID"="C"."FK_BLOCK")
-  40 - access("C"."ID"="A"."FK_CELL")
-  41 - filter("A"."START_DATE"<=TO_DATE(:NOW,'YYYY-MM-DD') AND ("A"."END_DATE" IS NULL OR 
-              "A"."END_DATE">=TO_DATE(:NOW,'YYYY-MM-DD')))
-  43 - access("P"."ID"="R"."FK_PRISONER"(+))
-       filter("P"."ID"="R"."FK_PRISONER"(+))
-  45 - access("P"."ID"="A"."FK_PRISONER"(+))
-       filter("P"."ID"="A"."FK_PRISONER"(+))
-  47 - access("P"."ID"="S"."FK_PRISONER"(+))
-       filter("P"."ID"="S"."FK_PRISONER"(+))
-  55 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
-  58 - filter("P"."SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
-  59 - access("P"."ID"="PB"."ID"(+))
-       filter("P"."ID"="PB"."ID"(+))
-  61 - access("PB"."ID"="C"."FK_BLOCK")
-  63 - access("C"."ID"="A"."FK_CELL")
-  64 - filter("A"."START_DATE"<=TO_DATE(:NOW,'YYYY-MM-DD') AND ("A"."END_DATE" IS NULL OR 
-              "A"."END_DATE">=TO_DATE(:NOW,'YYYY-MM-DD')))
-  66 - access("P"."ID"="R"."FK_PRISONER"(+))
-       filter("P"."ID"="R"."FK_PRISONER"(+))
-  68 - access("P"."ID"="A"."FK_PRISONER"(+))
-       filter("P"."ID"="A"."FK_PRISONER"(+))
-  70 - access("P"."ID"="S"."FK_PRISONER"(+))
-       filter("P"."ID"="S"."FK_PRISONER"(+))
-  78 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
-  81 - filter("P"."SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
-  82 - access("P"."ID"="PB"."ID"(+))
-       filter("P"."ID"="PB"."ID"(+))
-  84 - access("PB"."ID"="C"."FK_BLOCK")
-  86 - access("C"."ID"="A"."FK_CELL")
-  87 - filter("A"."START_DATE"<=TO_DATE(:NOW,'YYYY-MM-DD') AND ("A"."END_DATE" IS NULL OR 
-              "A"."END_DATE">=TO_DATE(:NOW,'YYYY-MM-DD')))
-  89 - access("P"."ID"="R"."FK_PRISONER"(+))
-       filter("P"."ID"="R"."FK_PRISONER"(+))
-  91 - access("P"."ID"="A"."FK_PRISONER"(+))
-       filter("P"."ID"="A"."FK_PRISONER"(+))
-  93 - access("P"."ID"="S"."FK_PRISONER"(+))
-       filter("P"."ID"="S"."FK_PRISONER"(+))
- 101 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
- 104 - filter("P"."SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
- 105 - access("P"."ID"="PB"."ID"(+))
-       filter("P"."ID"="PB"."ID"(+))
- 107 - access("PB"."ID"="C"."FK_BLOCK")
- 109 - access("C"."ID"="A"."FK_CELL")
- 110 - filter("A"."START_DATE"<=TO_DATE(:NOW,'YYYY-MM-DD') AND ("A"."END_DATE" IS NULL OR 
-              "A"."END_DATE">=TO_DATE(:NOW,'YYYY-MM-DD')))
- 112 - access("P"."ID"="R"."FK_PRISONER"(+))
-       filter("P"."ID"="R"."FK_PRISONER"(+))
- 114 - access("P"."ID"="A"."FK_PRISONER"(+))
-       filter("P"."ID"="A"."FK_PRISONER"(+))
- 116 - access("P"."ID"="S"."FK_PRISONER"(+))
-       filter("P"."ID"="S"."FK_PRISONER"(+))
- 
-Note
------
-   - this is an adaptive plan
-   ```],
-   [```
-Plan hash value: 171928505
- 
----------------------------------------------------------------------------------------------------------
-| Id  | Operation                       | Name          | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
----------------------------------------------------------------------------------------------------------
-|   0 | SELECT STATEMENT                |               |     5 |    65 |       | 98530   (2)| 00:00:04 |
-|   1 |  HASH UNIQUE                    |               |     5 |    65 |       | 98530   (2)| 00:00:04 |
-|   2 |   UNION-ALL                     |               |       |       |       |            |          |
-|   3 |    SORT AGGREGATE               |               |     1 |    13 |       | 19707   (2)| 00:00:01 |
-|   4 |     VIEW                        |               |   157K|  1999K|       | 18950   (2)| 00:00:01 |
-|   5 |      HASH GROUP BY              |               |   157K|  8612K|       | 18950   (2)| 00:00:01 |
-|   6 |       MERGE JOIN OUTER          |               |  2487K|   132M|       | 18950   (2)| 00:00:01 |
-|   7 |        MERGE JOIN OUTER         |               |  1592K|    69M|       | 15656   (2)| 00:00:01 |
-|   8 |         MERGE JOIN OUTER        |               |   323K|    10M|       |  7035   (2)| 00:00:01 |
-|*  9 |          FILTER                 |               |       |       |       |            |          |
-|  10 |           MERGE JOIN OUTER      |               |   157K|  3845K|       |  3939   (3)| 00:00:01 |
-|  11 |            SORT JOIN            |               |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
-|* 12 |             TABLE ACCESS FULL   | PRISONER      |   157K|  2460K|       |   650   (2)| 00:00:01 |
-|* 13 |            SORT JOIN            |               | 10513 | 94617 |       |  2445   (4)| 00:00:01 |
-|  14 |             VIEW                |               | 10513 | 94617 |       |  2444   (4)| 00:00:01 |
-|* 15 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
-|  16 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
-|* 17 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
-|* 18 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
-|  19 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
-|* 20 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
-|  21 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
-|* 22 |         SORT JOIN               |               |  1493K|    15M|    57M|  8621   (2)| 00:00:01 |
-|  23 |          TABLE ACCESS FULL      | ACCOMMODATION |  1493K|    15M|       |  2036   (2)| 00:00:01 |
-|* 24 |        SORT JOIN                |               |   473K|  4620K|    18M|  3288   (2)| 00:00:01 |
-|  25 |         TABLE ACCESS FULL       | SENTENCE      |   473K|  4620K|       |  1381   (1)| 00:00:01 |
-|  26 |    SORT AGGREGATE               |               |     1 |    13 |       | 19707   (2)| 00:00:01 |
-|  27 |     VIEW                        |               |   157K|  1999K|       | 18950   (2)| 00:00:01 |
-|  28 |      HASH GROUP BY              |               |   157K|  8612K|       | 18950   (2)| 00:00:01 |
-|  29 |       MERGE JOIN OUTER          |               |  2487K|   132M|       | 18950   (2)| 00:00:01 |
-|  30 |        MERGE JOIN OUTER         |               |  1592K|    69M|       | 15656   (2)| 00:00:01 |
-|  31 |         MERGE JOIN OUTER        |               |   323K|    10M|       |  7035   (2)| 00:00:01 |
-|* 32 |          FILTER                 |               |       |       |       |            |          |
-|  33 |           MERGE JOIN OUTER      |               |   157K|  3845K|       |  3939   (3)| 00:00:01 |
-|  34 |            SORT JOIN            |               |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
-|* 35 |             TABLE ACCESS FULL   | PRISONER      |   157K|  2460K|       |   650   (2)| 00:00:01 |
-|* 36 |            SORT JOIN            |               | 10513 | 94617 |       |  2445   (4)| 00:00:01 |
-|  37 |             VIEW                |               | 10513 | 94617 |       |  2444   (4)| 00:00:01 |
-|* 38 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
-|  39 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
-|* 40 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
-|* 41 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
-|  42 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
-|* 43 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
-|  44 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
-|* 45 |         SORT JOIN               |               |  1493K|    15M|    57M|  8621   (2)| 00:00:01 |
-|  46 |          TABLE ACCESS FULL      | ACCOMMODATION |  1493K|    15M|       |  2036   (2)| 00:00:01 |
-|* 47 |        SORT JOIN                |               |   473K|  4620K|    18M|  3288   (2)| 00:00:01 |
-|  48 |         TABLE ACCESS FULL       | SENTENCE      |   473K|  4620K|       |  1381   (1)| 00:00:01 |
-|  49 |    SORT AGGREGATE               |               |     1 |    13 |       | 19707   (2)| 00:00:01 |
-|  50 |     VIEW                        |               |   157K|  1999K|       | 18950   (2)| 00:00:01 |
-|  51 |      HASH GROUP BY              |               |   157K|  8612K|       | 18950   (2)| 00:00:01 |
-|  52 |       MERGE JOIN OUTER          |               |  2487K|   132M|       | 18950   (2)| 00:00:01 |
-|  53 |        MERGE JOIN OUTER         |               |  1592K|    69M|       | 15656   (2)| 00:00:01 |
-|  54 |         MERGE JOIN OUTER        |               |   323K|    10M|       |  7035   (2)| 00:00:01 |
-|* 55 |          FILTER                 |               |       |       |       |            |          |
-|  56 |           MERGE JOIN OUTER      |               |   157K|  3845K|       |  3939   (3)| 00:00:01 |
-|  57 |            SORT JOIN            |               |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
-|* 58 |             TABLE ACCESS FULL   | PRISONER      |   157K|  2460K|       |   650   (2)| 00:00:01 |
-|* 59 |            SORT JOIN            |               | 10513 | 94617 |       |  2445   (4)| 00:00:01 |
-|  60 |             VIEW                |               | 10513 | 94617 |       |  2444   (4)| 00:00:01 |
-|* 61 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
-|  62 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
-|* 63 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
-|* 64 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
-|  65 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
-|* 66 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
-|  67 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
-|* 68 |         SORT JOIN               |               |  1493K|    15M|    57M|  8621   (2)| 00:00:01 |
-|  69 |          TABLE ACCESS FULL      | ACCOMMODATION |  1493K|    15M|       |  2036   (2)| 00:00:01 |
-|* 70 |        SORT JOIN                |               |   473K|  4620K|    18M|  3288   (2)| 00:00:01 |
-|  71 |         TABLE ACCESS FULL       | SENTENCE      |   473K|  4620K|       |  1381   (1)| 00:00:01 |
-|  72 |    SORT AGGREGATE               |               |     1 |    13 |       | 19707   (2)| 00:00:01 |
-|  73 |     VIEW                        |               |   157K|  1999K|       | 18950   (2)| 00:00:01 |
-|  74 |      HASH GROUP BY              |               |   157K|  8612K|       | 18950   (2)| 00:00:01 |
-|  75 |       MERGE JOIN OUTER          |               |  2487K|   132M|       | 18950   (2)| 00:00:01 |
-|  76 |        MERGE JOIN OUTER         |               |  1592K|    69M|       | 15656   (2)| 00:00:01 |
-|  77 |         MERGE JOIN OUTER        |               |   323K|    10M|       |  7035   (2)| 00:00:01 |
-|* 78 |          FILTER                 |               |       |       |       |            |          |
-|  79 |           MERGE JOIN OUTER      |               |   157K|  3845K|       |  3939   (3)| 00:00:01 |
-|  80 |            SORT JOIN            |               |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
-|* 81 |             TABLE ACCESS FULL   | PRISONER      |   157K|  2460K|       |   650   (2)| 00:00:01 |
-|* 82 |            SORT JOIN            |               | 10513 | 94617 |       |  2445   (4)| 00:00:01 |
-|  83 |             VIEW                |               | 10513 | 94617 |       |  2444   (4)| 00:00:01 |
-|* 84 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
-|  85 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
-|* 86 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
-|* 87 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
-|  88 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
-|* 89 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
-|  90 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
-|* 91 |         SORT JOIN               |               |  1493K|    15M|    57M|  8621   (2)| 00:00:01 |
-|  92 |          TABLE ACCESS FULL      | ACCOMMODATION |  1493K|    15M|       |  2036   (2)| 00:00:01 |
-|* 93 |        SORT JOIN                |               |   473K|  4620K|    18M|  3288   (2)| 00:00:01 |
-|  94 |         TABLE ACCESS FULL       | SENTENCE      |   473K|  4620K|       |  1381   (1)| 00:00:01 |
-|  95 |    SORT AGGREGATE               |               |     1 |    13 |       | 19701   (2)| 00:00:01 |
-|  96 |     VIEW                        |               |   157K|  1999K|       | 18944   (2)| 00:00:01 |
-|  97 |      HASH GROUP BY              |               |   157K|  8612K|       | 18944   (2)| 00:00:01 |
-|  98 |       MERGE JOIN OUTER          |               |  2487K|   132M|       | 18944   (2)| 00:00:01 |
-|  99 |        MERGE JOIN OUTER         |               |  1592K|    69M|       | 15652   (2)| 00:00:01 |
-| 100 |         MERGE JOIN OUTER        |               |   323K|    10M|       |  7035   (2)| 00:00:01 |
-|*101 |          FILTER                 |               |       |       |       |            |          |
-| 102 |           MERGE JOIN OUTER      |               |   157K|  3845K|       |  3939   (3)| 00:00:01 |
-| 103 |            SORT JOIN            |               |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
-|*104 |             TABLE ACCESS FULL   | PRISONER      |   157K|  2460K|       |   650   (2)| 00:00:01 |
-|*105 |            SORT JOIN            |               | 10513 | 94617 |       |  2445   (4)| 00:00:01 |
-| 106 |             VIEW                |               | 10513 | 94617 |       |  2444   (4)| 00:00:01 |
-|*107 |              HASH JOIN          |               | 10513 |   420K|       |  2444   (4)| 00:00:01 |
-| 108 |               TABLE ACCESS FULL | PRISON_BLOCK  |   100 |   700 |       |     2   (0)| 00:00:01 |
-|*109 |               HASH JOIN         |               | 10513 |   349K|       |  2442   (4)| 00:00:01 |
-|*110 |                TABLE ACCESS FULL| ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
-| 111 |                TABLE ACCESS FULL| CELL          |   251K|  1966K|       |   351   (1)| 00:00:01 |
-|*112 |          SORT JOIN              |               |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
-| 113 |           TABLE ACCESS FULL     | REPRIMAND     |   422K|  4122K|       |  1394   (1)| 00:00:01 |
-|*114 |         SORT JOIN               |               |  1493K|    15M|    57M|  8617   (2)| 00:00:01 |
-| 115 |          TABLE ACCESS FULL      | ACCOMMODATION |  1493K|    15M|       |  2032   (2)| 00:00:01 |
-|*116 |        SORT JOIN                |               |   473K|  4620K|    18M|  3285   (2)| 00:00:01 |
-| 117 |         TABLE ACCESS FULL       | SENTENCE      |   473K|  4620K|       |  1379   (1)| 00:00:01 |
----------------------------------------------------------------------------------------------------------
- 
-Predicate Information (identified by operation id):
----------------------------------------------------
- 
-   9 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
-  12 - filter("P"."SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
-  13 - access("P"."ID"="PB"."ID"(+))
-       filter("P"."ID"="PB"."ID"(+))
-  15 - access("PB"."ID"="C"."FK_BLOCK")
-  17 - access("C"."ID"="A"."FK_CELL")
-  18 - filter("A"."START_DATE"<=TO_DATE(:NOW,'YYYY-MM-DD') AND ("A"."END_DATE" IS NULL OR 
-              "A"."END_DATE">=TO_DATE(:NOW,'YYYY-MM-DD')))
-  20 - access("P"."ID"="R"."FK_PRISONER"(+))
-       filter("P"."ID"="R"."FK_PRISONER"(+))
-  22 - access("P"."ID"="A"."FK_PRISONER"(+))
-       filter("P"."ID"="A"."FK_PRISONER"(+))
-  24 - access("P"."ID"="S"."FK_PRISONER"(+))
-       filter("P"."ID"="S"."FK_PRISONER"(+))
-  32 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
-  35 - filter("P"."SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
-  36 - access("P"."ID"="PB"."ID"(+))
-       filter("P"."ID"="PB"."ID"(+))
-  38 - access("PB"."ID"="C"."FK_BLOCK")
-  40 - access("C"."ID"="A"."FK_CELL")
-  41 - filter("A"."START_DATE"<=TO_DATE(:NOW,'YYYY-MM-DD') AND ("A"."END_DATE" IS NULL OR 
-              "A"."END_DATE">=TO_DATE(:NOW,'YYYY-MM-DD')))
-  43 - access("P"."ID"="R"."FK_PRISONER"(+))
-       filter("P"."ID"="R"."FK_PRISONER"(+))
-  45 - access("P"."ID"="A"."FK_PRISONER"(+))
-       filter("P"."ID"="A"."FK_PRISONER"(+))
-  47 - access("P"."ID"="S"."FK_PRISONER"(+))
-       filter("P"."ID"="S"."FK_PRISONER"(+))
-  55 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
-  58 - filter("P"."SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
-  59 - access("P"."ID"="PB"."ID"(+))
-       filter("P"."ID"="PB"."ID"(+))
-  61 - access("PB"."ID"="C"."FK_BLOCK")
-  63 - access("C"."ID"="A"."FK_CELL")
-  64 - filter("A"."START_DATE"<=TO_DATE(:NOW,'YYYY-MM-DD') AND ("A"."END_DATE" IS NULL OR 
-              "A"."END_DATE">=TO_DATE(:NOW,'YYYY-MM-DD')))
-  66 - access("P"."ID"="R"."FK_PRISONER"(+))
-       filter("P"."ID"="R"."FK_PRISONER"(+))
-  68 - access("P"."ID"="A"."FK_PRISONER"(+))
-       filter("P"."ID"="A"."FK_PRISONER"(+))
-  70 - access("P"."ID"="S"."FK_PRISONER"(+))
-       filter("P"."ID"="S"."FK_PRISONER"(+))
-  78 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
-  81 - filter("P"."SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
-  82 - access("P"."ID"="PB"."ID"(+))
-       filter("P"."ID"="PB"."ID"(+))
-  84 - access("PB"."ID"="C"."FK_BLOCK")
-  86 - access("C"."ID"="A"."FK_CELL")
-  87 - filter("A"."START_DATE"<=TO_DATE(:NOW,'YYYY-MM-DD') AND ("A"."END_DATE" IS NULL OR 
-              "A"."END_DATE">=TO_DATE(:NOW,'YYYY-MM-DD')))
-  89 - access("P"."ID"="R"."FK_PRISONER"(+))
-       filter("P"."ID"="R"."FK_PRISONER"(+))
-  91 - access("P"."ID"="A"."FK_PRISONER"(+))
-       filter("P"."ID"="A"."FK_PRISONER"(+))
-  93 - access("P"."ID"="S"."FK_PRISONER"(+))
-       filter("P"."ID"="S"."FK_PRISONER"(+))
- 101 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
- 104 - filter("P"."SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
- 105 - access("P"."ID"="PB"."ID"(+))
-       filter("P"."ID"="PB"."ID"(+))
- 107 - access("PB"."ID"="C"."FK_BLOCK")
- 109 - access("C"."ID"="A"."FK_CELL")
- 110 - filter("A"."START_DATE"<=TO_DATE(:NOW,'YYYY-MM-DD') AND ("A"."END_DATE" IS NULL OR 
-              "A"."END_DATE">=TO_DATE(:NOW,'YYYY-MM-DD')))
- 112 - access("P"."ID"="R"."FK_PRISONER"(+))
-       filter("P"."ID"="R"."FK_PRISONER"(+))
- 114 - access("P"."ID"="A"."FK_PRISONER"(+))
-       filter("P"."ID"="A"."FK_PRISONER"(+))
- 116 - access("P"."ID"="S"."FK_PRISONER"(+))
-       filter("P"."ID"="S"."FK_PRISONER"(+))
- 
-Note
------
-   - this is an adaptive plan
-   ```]
-)
-
 *`change1`:*
 #plan(
    [```
@@ -1392,7 +1084,11 @@ Plan hash value: 3371688238
 |   8 |        SORT GROUP BY                 |                             | 14217 |   360K|   121M| 28700   (2)| 00:00:02 |
 |   9 |         NESTED LOOPS                 |                             |  3506K|    86M|       | 19319   (1)| 00:00:01 |
 |  10 |          NESTED LOOPS                |                             |  3507K|    86M|       | 19319   (1)| 00:00:01 |
+```
+#highlight[```
 |* 11 |           TABLE ACCESS FULL          | PATROL_SLOT                 |  1370 | 21920 |       |    34   (3)| 00:00:01 |
+```]
+```
 |* 12 |           INDEX RANGE SCAN           | PATROL_FK_PATROL_SLOT_INDEX |  2560 |       |       |     5   (0)| 00:00:01 |
 |  13 |          TABLE ACCESS BY INDEX ROWID | PATROL                      |  2560 | 25600 |       |    14   (0)| 00:00:01 |
 |* 14 |       INDEX UNIQUE SCAN              | SYS_C008868                 |     1 |    23 |       |     0   (0)| 00:00:01 |
@@ -1406,7 +1102,11 @@ Plan hash value: 3371688238
 |  22 |          NESTED LOOPS                |                             |    68 |  2312 |       |    35   (3)| 00:00:01 |
 |  23 |           TABLE ACCESS BY INDEX ROWID| PRISON_BLOCK                |     1 |     7 |       |     1   (0)| 00:00:01 |
 |* 24 |            INDEX UNIQUE SCAN         | SYS_C008856                 |     1 |       |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |* 25 |           TABLE ACCESS FULL          | PATROL_SLOT                 |    68 |  1836 |       |    34   (3)| 00:00:01 |
+```]
+```
 |* 26 |          INDEX RANGE SCAN            | PATROL_FK_PATROL_SLOT_INDEX |  2560 |       |       |     5   (0)| 00:00:01 |
 |* 27 |         TABLE ACCESS BY INDEX ROWID  | PATROL                      |     1 |    13 |       |    14   (0)| 00:00:01 |
 ----------------------------------------------------------------------------------------------------------------------------
@@ -1444,8 +1144,12 @@ Plan hash value: 1080582287
 |   8 |        SORT GROUP BY                         |                                    | 14217 |   360K|   121M| 28671   (2)| 00:00:02 |
 |   9 |         NESTED LOOPS                         |                                    |  3506K|    86M|       | 19290   (1)| 00:00:01 |
 |  10 |          NESTED LOOPS                        |                                    |  3507K|    86M|       | 19290   (1)| 00:00:01 |
+```
+#highlight[```
 |  11 |           TABLE ACCESS BY INDEX ROWID BATCHED| PATROL_SLOT                        |  1370 | 21920 |       |     5   (0)| 00:00:01 |
 |* 12 |            INDEX RANGE SCAN                  | PATROL_SLOT_START_TIME_TO_CHAR_IDX |   247 |       |       |     3   (0)| 00:00:01 |
+```]
+```
 |* 13 |           INDEX RANGE SCAN                   | PATROL_FK_PATROL_SLOT_INDEX        |  2560 |       |       |     5   (0)| 00:00:01 |
 |  14 |          TABLE ACCESS BY INDEX ROWID         | PATROL                             |  2560 | 25600 |       |    14   (0)| 00:00:01 |
 |* 15 |       INDEX UNIQUE SCAN                      | SYS_C008868                        |     1 |    23 |       |     0   (0)| 00:00:01 |
@@ -1459,8 +1163,12 @@ Plan hash value: 1080582287
 |  23 |          NESTED LOOPS                        |                                    |    68 |  2312 |       |     5   (0)| 00:00:01 |
 |  24 |           TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK                       |     1 |     7 |       |     1   (0)| 00:00:01 |
 |* 25 |            INDEX UNIQUE SCAN                 | SYS_C008856                        |     1 |       |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |* 26 |           TABLE ACCESS BY INDEX ROWID BATCHED| PATROL_SLOT                        |    68 |  1836 |       |     4   (0)| 00:00:01 |
 |* 27 |            INDEX RANGE SCAN                  | PATROL_SLOT_END_TIME_TO_CHAR_IDX   |   247 |       |       |     2   (0)| 00:00:01 |
+```]
+```
 |* 28 |          INDEX RANGE SCAN                    | PATROL_FK_PATROL_SLOT_INDEX        |  2560 |       |       |     5   (0)| 00:00:01 |
 |* 29 |         TABLE ACCESS BY INDEX ROWID          | PATROL                             |     1 |    13 |       |    14   (0)| 00:00:01 |
 -------------------------------------------------------------------------------------------------------------------------------------------
@@ -1530,14 +1238,22 @@ Plan hash value: 3371688238
 |* 17 |      INDEX UNIQUE SCAN               | SYS_C008868                 |     1 |    23 |       |     1   (0)| 00:00:01 |
 |  18 |      VIEW                            | VW_GBF_56                   |     1 |    13 |       |   993   (1)| 00:00:01 |
 |  19 |       SORT GROUP BY                  |                             |     1 |    47 |       |   993   (1)| 00:00:01 |
+```
+#highlight[```
 |  20 |        NESTED LOOPS                  |                             |     1 |    47 |       |   993   (1)| 00:00:01 |
 |  21 |         NESTED LOOPS                 |                             |   174K|    47 |       |   993   (1)| 00:00:01 |
 |  22 |          NESTED LOOPS                |                             |    68 |  2312 |       |    35   (3)| 00:00:01 |
+```]
+```
 |  23 |           TABLE ACCESS BY INDEX ROWID| PRISON_BLOCK                |     1 |     7 |       |     1   (0)| 00:00:01 |
 |* 24 |            INDEX UNIQUE SCAN         | SYS_C008856                 |     1 |       |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |* 25 |           TABLE ACCESS FULL          | PATROL_SLOT                 |    68 |  1836 |       |    34   (3)| 00:00:01 |
 |* 26 |          INDEX RANGE SCAN            | PATROL_FK_PATROL_SLOT_INDEX |  2560 |       |       |     5   (0)| 00:00:01 |
 |* 27 |         TABLE ACCESS BY INDEX ROWID  | PATROL                      |     1 |    13 |       |    14   (0)| 00:00:01 |
+```]
+```
 ----------------------------------------------------------------------------------------------------------------------------
  
 Predicate Information (identified by operation id):
@@ -1582,13 +1298,21 @@ Plan hash value: 459225027
 |* 17 |      INDEX UNIQUE SCAN                      | SYS_C008868                  |     1 |    23 |       |     1   (0)| 00:00:01 |
 |  18 |      VIEW                                   | VW_GBF_56                    |     1 |    13 |       |    94   (3)| 00:00:01 |
 |  19 |       SORT GROUP BY                         |                              |     1 |    47 |       |    94   (3)| 00:00:01 |
+```
+#highlight[```
 |* 20 |        HASH JOIN SEMI                       |                              |     1 |    47 |       |    94   (3)| 00:00:01 |
 |  21 |         NESTED LOOPS                        |                              |    55 |  1100 |       |    59   (0)| 00:00:01 |
+```]
+```
 |  22 |          TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK                 |     1 |     7 |       |     1   (0)| 00:00:01 |
 |* 23 |           INDEX UNIQUE SCAN                 | SYS_C008856                  |     1 |       |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |  24 |          TABLE ACCESS BY INDEX ROWID BATCHED| PATROL                       |    55 |   715 |       |    58   (0)| 00:00:01 |
 |* 25 |           INDEX RANGE SCAN                  | PATROL_FK_GUARD_FK_BLOCK_IDX |    55 |       |       |     2   (0)| 00:00:01 |
 |* 26 |         TABLE ACCESS FULL                   | PATROL_SLOT                  |    68 |  1836 |       |    34   (3)| 00:00:01 |
+```]
+```
 ------------------------------------------------------------------------------------------------------------------------------------
  
 Predicate Information (identified by operation id):
@@ -1627,7 +1351,11 @@ Plan hash value: 2939466326
 |   7 |        NESTED LOOPS                 |               |    55 |   990 |   354   (2)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID | PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
 |*  9 |          INDEX UNIQUE SCAN          | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |* 10 |         TABLE ACCESS FULL           | CELL          |    55 |   605 |   353   (2)| 00:00:01 |
+```]
+```
 |  11 |        VIEW                         | VW_NSO_1      | 10659 |   135K|  2095   (5)| 00:00:01 |
 |  12 |         SORT GROUP BY               |               | 10659 |   218K|  2095   (5)| 00:00:01 |
 |* 13 |          TABLE ACCESS FULL          | ACCOMMODATION | 10850 |   222K|  2093   (4)| 00:00:01 |
@@ -1674,8 +1402,12 @@ Plan hash value: 4016608909
 |   7 |        NESTED LOOPS                        |                               |    55 |   990 |     9   (0)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK                  |     1 |     7 |     1   (0)| 00:00:01 |
 |*  9 |          INDEX UNIQUE SCAN                 | SYS_C008856                   |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |  10 |         TABLE ACCESS BY INDEX ROWID BATCHED| CELL                          |    55 |   605 |     8   (0)| 00:00:01 |
 |* 11 |          INDEX RANGE SCAN                  | CELL_FK_BLOCK_IS_SOLITARY_IDX |    55 |       |     7   (0)| 00:00:01 |
+```]
+```
 |  12 |        VIEW                                | VW_NSO_1                      | 10659 |   135K|  2095   (5)| 00:00:01 |
 |  13 |         SORT GROUP BY                      |                               | 10659 |   218K|  2095   (5)| 00:00:01 |
 |* 14 |          TABLE ACCESS FULL                 | ACCOMMODATION                 | 10850 |   222K|  2093   (4)| 00:00:01 |
@@ -1722,7 +1454,11 @@ Plan hash value: 87624460
 |   4 |     NESTED LOOPS                |               |  2742 | 49356 |   354   (2)| 00:00:01 |
 |   5 |      TABLE ACCESS BY INDEX ROWID| PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
 |*  6 |       INDEX UNIQUE SCAN         | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |*  7 |      TABLE ACCESS FULL          | CELL          |  2742 | 30162 |   353   (2)| 00:00:01 |
+```]
+```
 |*  8 |     TABLE ACCESS FULL           | ACCOMMODATION | 10850 |   275K|  2119   (6)| 00:00:01 |
 -------------------------------------------------------------------------------------------------
  
@@ -1749,8 +1485,12 @@ Plan hash value: 3842168537
 |   4 |     NESTED LOOPS                        |                               |  2742 | 49356 |    22   (0)| 00:00:01 |
 |   5 |      TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK                  |     1 |     7 |     1   (0)| 00:00:01 |
 |*  6 |       INDEX UNIQUE SCAN                 | SYS_C008856                   |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |   7 |      TABLE ACCESS BY INDEX ROWID BATCHED| CELL                          |  2742 | 30162 |    21   (0)| 00:00:01 |
 |*  8 |       INDEX RANGE SCAN                  | CELL_FK_BLOCK_IS_SOLITARY_IDX |  2742 |       |     7   (0)| 00:00:01 |
+```]
+```
 |*  9 |     TABLE ACCESS FULL                   | ACCOMMODATION                 | 10850 |   275K|  2119   (6)| 00:00:01 |
 -------------------------------------------------------------------------------------------------------------------------
  
@@ -1819,7 +1559,11 @@ Plan hash value: 3600760484
 |   2 |   NESTED LOOPS                      |               |     1 |    78 |       |  9833   (3)| 00:00:01 |
 |   3 |    NESTED LOOPS                     |               |     1 |    78 |       |  9833   (3)| 00:00:01 |
 |   4 |     NESTED LOOPS                    |               |     1 |    71 |       |  9832   (3)| 00:00:01 |
+```
+#highlight[```
 |*  5 |      HASH JOIN                      |               |     1 |    60 |       |  9831   (3)| 00:00:01 |
+```]
+```
 |*  6 |       HASH JOIN                     |               |     1 |    34 |       |  7742   (2)| 00:00:01 |
 |   7 |        JOIN FILTER CREATE           | :BF0000       |     1 |    29 |       |  2046   (2)| 00:00:01 |
 |   8 |         NESTED LOOPS                |               |     1 |    29 |       |  2046   (2)| 00:00:01 |
@@ -1841,7 +1585,11 @@ Plan hash value: 3600760484
 |* 24 |             HASH JOIN OUTER         |               |   468K|    12M|  8496K|  2937   (1)| 00:00:01 |
 |  25 |              TABLE ACCESS FULL      | PRISONER      |   299K|  4980K|       |   645   (1)| 00:00:01 |
 |  26 |              TABLE ACCESS FULL      | SENTENCE      |   473K|  4620K|       |  1379   (1)| 00:00:01 |
+```
+#highlight[```
 |* 27 |       TABLE ACCESS FULL             | ACCOMMODATION | 10513 |   266K|       |  2088   (4)| 00:00:01 |
+```]
+```
 |* 28 |      TABLE ACCESS BY INDEX ROWID    | CELL          |     1 |    11 |       |     1   (0)| 00:00:01 |
 |* 29 |       INDEX UNIQUE SCAN             | SYS_C008883   |     1 |       |       |     0   (0)| 00:00:01 |
 |* 30 |     INDEX UNIQUE SCAN               | SYS_C008855   |     1 |       |       |     0   (0)| 00:00:01 |
@@ -1898,7 +1646,11 @@ Plan hash value: 1822899948
 |   2 |   NESTED LOOPS                           |                               |     1 |    78 |       |  7747   (2)| 00:00:01 |
 |   3 |    NESTED LOOPS                          |                               |     1 |    78 |       |  7747   (2)| 00:00:01 |
 |   4 |     NESTED LOOPS                         |                               |     1 |    71 |       |  7746   (2)| 00:00:01 |
+```
+#highlight[```
 |   5 |      NESTED LOOPS                        |                               |     1 |    60 |       |  7745   (2)| 00:00:01 |
+```]
+```
 |*  6 |       HASH JOIN                          |                               |     1 |    34 |       |  7742   (2)| 00:00:01 |
 |   7 |        JOIN FILTER CREATE                | :BF0000                       |     1 |    29 |       |  2046   (2)| 00:00:01 |
 |   8 |         NESTED LOOPS                     |                               |     1 |    29 |       |  2046   (2)| 00:00:01 |
@@ -1920,8 +1672,12 @@ Plan hash value: 1822899948
 |* 24 |             HASH JOIN OUTER              |                               |   468K|    12M|  8496K|  2937   (1)| 00:00:01 |
 |  25 |              TABLE ACCESS FULL           | PRISONER                      |   299K|  4980K|       |   645   (1)| 00:00:01 |
 |  26 |              TABLE ACCESS FULL           | SENTENCE                      |   473K|  4620K|       |  1379   (1)| 00:00:01 |
+```
+#highlight[```
 |* 27 |       TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                 |     1 |    26 |       |     3   (0)| 00:00:01 |
 |* 28 |        INDEX RANGE SCAN                  | ACCOMMODATION_FK_PRISONER_IDX |     5 |       |       |     2   (0)| 00:00:01 |
+```]
+```
 |* 29 |      TABLE ACCESS BY INDEX ROWID         | CELL                          |     1 |    11 |       |     1   (0)| 00:00:01 |
 |* 30 |       INDEX UNIQUE SCAN                  | SYS_C008883                   |     1 |       |       |     0   (0)| 00:00:01 |
 |* 31 |     INDEX UNIQUE SCAN                    | SYS_C008855                   |     1 |       |       |     0   (0)| 00:00:01 |
@@ -1977,9 +1733,15 @@ Plan hash value: 220023471
 |   2 |   NESTED LOOPS                       |               |     1 |  2200 |       | 11117   (2)| 00:00:01 |
 |   3 |    NESTED LOOPS                      |               |     1 |  2177 |       | 11116   (2)| 00:00:01 |
 |   4 |     NESTED LOOPS                     |               |     1 |  2170 |       | 11115   (2)| 00:00:01 |
+```
+#highlight[```
 |*  5 |      HASH JOIN                       |               |     1 |  2159 |       | 11114   (2)| 00:00:01 |
+```]
+```
 |*  6 |       HASH JOIN                      |               |     1 |  2133 |       |  9021   (2)| 00:00:01 |
 |*  7 |        HASH JOIN                     |               |     1 |   118 |       |  6793   (2)| 00:00:01 |
+```
+#highlight[```
 |   8 |         JOIN FILTER CREATE           | :BF0000       |   103 | 10815 |       |  1504   (1)| 00:00:01 |
 |   9 |          NESTED LOOPS                |               |   103 | 10815 |       |  1504   (1)| 00:00:01 |
 |  10 |           NESTED LOOPS               |               |   103 | 10815 |       |  1504   (1)| 00:00:01 |
@@ -2009,6 +1771,8 @@ Plan hash value: 220023471
 |* 34 |      INDEX UNIQUE SCAN               | SYS_C008855   |     1 |       |       |     0   (0)| 00:00:01 |
 |* 35 |    INDEX UNIQUE SCAN                 | SYS_C008868   |     1 |       |       |     0   (0)| 00:00:01 |
 |  36 |   TABLE ACCESS BY INDEX ROWID        | GUARD         |     1 |    23 |       |     1   (0)| 00:00:01 |
+```]
+```
 --------------------------------------------------------------------------------------------------------------
  
 Predicate Information (identified by operation id):
@@ -2055,9 +1819,15 @@ Plan hash value: 3851442093
 |   2 |   NESTED LOOPS                           |                               |     1 |  2193 |       |  6042   (2)| 00:00:01 |
 |   3 |    NESTED LOOPS                          |                               |     1 |  2182 |       |  6041   (2)| 00:00:01 |
 |   4 |     NESTED LOOPS                         |                               |     1 |  2159 |       |  6040   (2)| 00:00:01 |
+```
+#highlight[```
 |   5 |      NESTED LOOPS                        |                               |     1 |  2133 |       |  6037   (2)| 00:00:01 |
+```]
+```
 |*  6 |       HASH JOIN                          |                               |    35 | 71785 |       |  5943   (2)| 00:00:01 |
 |*  7 |        HASH JOIN                         |                               |  1063 | 38268 |       |  3714   (3)| 00:00:01 |
+```
+#highlight[```
 |   8 |         VIEW                             |                               |  1063 | 13819 |       |  3067   (3)| 00:00:01 |
 |*  9 |          FILTER                          |                               |       |       |       |            |          |
 |  10 |           HASH GROUP BY                  |                               |  1063 | 28701 |       |  3067   (3)| 00:00:01 |
@@ -2084,6 +1854,8 @@ Plan hash value: 3851442093
 |* 31 |     INDEX UNIQUE SCAN                    | SYS_C008883                   |     1 |       |       |     0   (0)| 00:00:01 |
 |* 32 |   TABLE ACCESS BY INDEX ROWID            | PRISON_BLOCK                  |     1 |     7 |       |     1   (0)| 00:00:01 |
 |* 33 |    INDEX UNIQUE SCAN                     | SYS_C008855                   |     1 |       |       |     0   (0)| 00:00:01 |
+```]
+```
 ----------------------------------------------------------------------------------------------------------------------------------
  
 Predicate Information (identified by operation id):
@@ -2138,7 +1910,11 @@ Plan hash value: 2939466326
 |   7 |        NESTED LOOPS                 |               |    55 |   990 |   354   (2)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID | PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
 |*  9 |          INDEX UNIQUE SCAN          | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |* 10 |         TABLE ACCESS FULL           | CELL          |    55 |   605 |   353   (2)| 00:00:01 |
+```]
+```
 |  11 |        VIEW                         | VW_NSO_1      | 10659 |   135K|  2095   (5)| 00:00:01 |
 |  12 |         SORT GROUP BY               |               | 10659 |   218K|  2095   (5)| 00:00:01 |
 |* 13 |          TABLE ACCESS FULL          | ACCOMMODATION | 10850 |   222K|  2093   (4)| 00:00:01 |
@@ -2185,8 +1961,12 @@ Plan hash value: 1909057338
 |   7 |        NESTED LOOPS                        |                   |    55 |   990 |    21   (0)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK      |     1 |     7 |     1   (0)| 00:00:01 |
 |*  9 |          INDEX UNIQUE SCAN                 | SYS_C008856       |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |* 10 |         TABLE ACCESS BY INDEX ROWID BATCHED| CELL              |    55 |   605 |    20   (0)| 00:00:01 |
 |* 11 |          INDEX RANGE SCAN                  | CELL_FK_BLOCK_IDX |  2797 |       |     5   (0)| 00:00:01 |
+```]
+```
 |  12 |        VIEW                                | VW_NSO_1          | 10659 |   135K|  2095   (5)| 00:00:01 |
 |  13 |         SORT GROUP BY                      |                   | 10659 |   218K|  2095   (5)| 00:00:01 |
 |* 14 |          TABLE ACCESS FULL                 | ACCOMMODATION     | 10850 |   222K|  2093   (4)| 00:00:01 |
@@ -2234,7 +2014,11 @@ Plan hash value: 87624460
 |   4 |     NESTED LOOPS                |               |  2742 | 49356 |   354   (2)| 00:00:01 |
 |   5 |      TABLE ACCESS BY INDEX ROWID| PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
 |*  6 |       INDEX UNIQUE SCAN         | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |*  7 |      TABLE ACCESS FULL          | CELL          |  2742 | 30162 |   353   (2)| 00:00:01 |
+```]
+```
 |*  8 |     TABLE ACCESS FULL           | ACCOMMODATION | 10850 |   275K|  2119   (6)| 00:00:01 |
 -------------------------------------------------------------------------------------------------
  
@@ -2261,8 +2045,12 @@ Plan hash value: 2769465380
 |   4 |     NESTED LOOPS                        |                   |  2742 | 49356 |    21   (0)| 00:00:01 |
 |   5 |      TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK      |     1 |     7 |     1   (0)| 00:00:01 |
 |*  6 |       INDEX UNIQUE SCAN                 | SYS_C008856       |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |*  7 |      TABLE ACCESS BY INDEX ROWID BATCHED| CELL              |  2742 | 30162 |    20   (0)| 00:00:01 |
 |*  8 |       INDEX RANGE SCAN                  | CELL_FK_BLOCK_IDX |  2797 |       |     5   (0)| 00:00:01 |
+```]
+```
 |*  9 |     TABLE ACCESS FULL                   | ACCOMMODATION     | 10850 |   275K|  2119   (6)| 00:00:01 |
 -------------------------------------------------------------------------------------------------------------
  
@@ -2316,7 +2104,11 @@ Plan hash value: 2939466326
 |   7 |        NESTED LOOPS                 |               |    55 |   990 |   354   (2)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID | PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
 |*  9 |          INDEX UNIQUE SCAN          | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |* 10 |         TABLE ACCESS FULL           | CELL          |    55 |   605 |   353   (2)| 00:00:01 |
+```]
+```
 |  11 |        VIEW                         | VW_NSO_1      | 10659 |   135K|  2095   (5)| 00:00:01 |
 |  12 |         SORT GROUP BY               |               | 10659 |   218K|  2095   (5)| 00:00:01 |
 |* 13 |          TABLE ACCESS FULL          | ACCOMMODATION | 10850 |   222K|  2093   (4)| 00:00:01 |
@@ -2363,8 +2155,12 @@ Plan hash value: 212087080
 |   7 |        NESTED LOOPS                        |                            |    55 |   990 |    37   (0)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK               |     1 |     7 |     1   (0)| 00:00:01 |
 |*  9 |          INDEX UNIQUE SCAN                 | SYS_C008856                |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |* 10 |         TABLE ACCESS BY INDEX ROWID BATCHED| CELL                       |    55 |   605 |    36   (0)| 00:00:01 |
 |* 11 |          INDEX RANGE SCAN                  | CELL_IS_SOLITARY_BTREE_IDX |  4979 |       |    10   (0)| 00:00:01 |
+```]
+```
 |  12 |        VIEW                                | VW_NSO_1                   | 10659 |   135K|  2095   (5)| 00:00:01 |
 |  13 |         SORT GROUP BY                      |                            | 10659 |   218K|  2095   (5)| 00:00:01 |
 |* 14 |          TABLE ACCESS FULL                 | ACCOMMODATION              | 10850 |   222K|  2093   (4)| 00:00:01 |
@@ -2426,7 +2222,11 @@ Plan hash value: 2939466326
 |   7 |        NESTED LOOPS                 |               |    55 |   990 |   354   (2)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID | PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
 |*  9 |          INDEX UNIQUE SCAN          | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |* 10 |         TABLE ACCESS FULL           | CELL          |    55 |   605 |   353   (2)| 00:00:01 |
+```]
+```
 |  11 |        VIEW                         | VW_NSO_1      | 10659 |   135K|  2095   (5)| 00:00:01 |
 |  12 |         SORT GROUP BY               |               | 10659 |   218K|  2095   (5)| 00:00:01 |
 |* 13 |          TABLE ACCESS FULL          | ACCOMMODATION | 10850 |   222K|  2093   (4)| 00:00:01 |
@@ -2473,9 +2273,13 @@ Plan hash value: 3959622293
 |*  7 |        HASH JOIN                           |                             |    55 |   990 |   288   (0)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK                |     1 |     7 |     1   (0)| 00:00:01 |
 |*  9 |          INDEX UNIQUE SCAN                 | SYS_C008856                 |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |  10 |         TABLE ACCESS BY INDEX ROWID BATCHED| CELL                        |  4979 | 54769 |   287   (0)| 00:00:01 |
 |  11 |          BITMAP CONVERSION TO ROWIDS       |                             |       |       |            |          |
 |* 12 |           BITMAP INDEX SINGLE VALUE        | CELL_IS_SOLITARY_BITMAP_IDX |       |       |            |          |
+```]
+```
 |  13 |        VIEW                                | VW_NSO_1                    | 10659 |   135K|  2095   (5)| 00:00:01 |
 |  14 |         SORT GROUP BY                      |                             | 10659 |   218K|  2095   (5)| 00:00:01 |
 |* 15 |          TABLE ACCESS FULL                 | ACCOMMODATION               | 10850 |   222K|  2093   (4)| 00:00:01 |
@@ -2539,7 +2343,11 @@ Plan hash value: 2939466326
 |   7 |        NESTED LOOPS                 |               |    55 |   990 |   354   (2)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID | PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
 |*  9 |          INDEX UNIQUE SCAN          | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |* 10 |         TABLE ACCESS FULL           | CELL          |    55 |   605 |   353   (2)| 00:00:01 |
+```]
+```
 |  11 |        VIEW                         | VW_NSO_1      | 10659 |   135K|  2095   (5)| 00:00:01 |
 |  12 |         SORT GROUP BY               |               | 10659 |   218K|  2095   (5)| 00:00:01 |
 |* 13 |          TABLE ACCESS FULL          | ACCOMMODATION | 10850 |   222K|  2093   (4)| 00:00:01 |
@@ -2586,8 +2394,12 @@ Plan hash value: 2756498725
 |   7 |        NESTED LOOPS                        |                                |    55 |   990 |     9   (0)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK                   |     1 |     7 |     1   (0)| 00:00:01 |
 |*  9 |          INDEX UNIQUE SCAN                 | SYS_C008856                    |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |  10 |         TABLE ACCESS BY INDEX ROWID BATCHED| CELL                           |    55 |   605 |     8   (0)| 00:00:01 |
 |* 11 |          INDEX RANGE SCAN                  | CELL_IS_SOLITARY_COMPOSITE_IDX |    55 |       |     7   (0)| 00:00:01 |
+```]
+```
 |  12 |        VIEW                                | VW_NSO_1                       | 10659 |   135K|  2095   (5)| 00:00:01 |
 |  13 |         SORT GROUP BY                      |                                | 10659 |   218K|  2095   (5)| 00:00:01 |
 |* 14 |          TABLE ACCESS FULL                 | ACCOMMODATION                  | 10850 |   222K|  2093   (4)| 00:00:01 |
@@ -2634,7 +2446,11 @@ Plan hash value: 87624460
 |   4 |     NESTED LOOPS                |               |  2742 | 49356 |   354   (2)| 00:00:01 |
 |   5 |      TABLE ACCESS BY INDEX ROWID| PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
 |*  6 |       INDEX UNIQUE SCAN         | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |*  7 |      TABLE ACCESS FULL          | CELL          |  2742 | 30162 |   353   (2)| 00:00:01 |
+```]
+```
 |*  8 |     TABLE ACCESS FULL           | ACCOMMODATION | 10850 |   275K|  2119   (6)| 00:00:01 |
 -------------------------------------------------------------------------------------------------
  
@@ -2661,8 +2477,12 @@ Plan hash value: 2246849140
 |   4 |     NESTED LOOPS                        |                                |  2742 | 49356 |    22   (0)| 00:00:01 |
 |   5 |      TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK                   |     1 |     7 |     1   (0)| 00:00:01 |
 |*  6 |       INDEX UNIQUE SCAN                 | SYS_C008856                    |     1 |       |     0   (0)| 00:00:01 |
+```
+#highlight[```
 |   7 |      TABLE ACCESS BY INDEX ROWID BATCHED| CELL                           |  2742 | 30162 |    21   (0)| 00:00:01 |
 |*  8 |       INDEX RANGE SCAN                  | CELL_IS_SOLITARY_COMPOSITE_IDX |  2742 |       |     7   (0)| 00:00:01 |
+```]
+```
 |*  9 |     TABLE ACCESS FULL                   | ACCOMMODATION                  | 10850 |   275K|  2119   (6)| 00:00:01 |
 --------------------------------------------------------------------------------------------------------------------------
  
