@@ -30,7 +30,7 @@
 
 = Zadanie 8 - Indeksy (część II)
 
-Dla wszystkich indeksó i eksperymentów, aby uzyskać średnią workload był wykonany każdorazowo *10 razy*.
+Dla wszystkich indeksów i eksperymentów, aby uzyskać średnią workload był wykonany każdorazowo *10 razy*.
 
 == Indeksy
 
@@ -248,6 +248,8 @@ Note
    - this is an adaptive plan
    ```]
 )
+
+Można zauważyć, że w przypadku zapytania `query2` zmienił się sposób odczytania danych z tabeli `SENTENCE` i `ACCOMODATION`. Bez indeksów następuje `TABLE ACCESS FULL`, który został zamieniony na `TABLE ACCESS BY INDEX ROWID BATCHED` po dodaniu indeksów, co świadczy o pomyślnym wykorzystaniu indeksów w tym zapytaniu. Dodatkowo zmienił się 5 krok planu z `HASH JOIN` na `NESTED LOOPS`, czego nie potrafimy wytłumaczyć.
 
 *`query4`:*
 #plan(
@@ -706,6 +708,8 @@ Note
    ```]
 )
 
+W zapytaniu `query4` również można zaobserwować pomyślne użycie indeksu w zapytaniu, ponieważ obserwujemy kilkukrotną zamianę `TABLE ACCESS FULL` na `TABLE ACCESS BY INDEX ROWID BATCHED` dla tabeli `ACCOMMODATION`. 
+
 === Indeks bitmapowy dla rodzaju celi
 
 #sql[
@@ -826,6 +830,8 @@ Predicate Information (identified by operation id):
   23 - access("P"."ID"="R"."FK_PRISONER")
    ```]
 )
+
+Zastosowanie indeksu bitmapowego dla rodzaju celi zmniejszyło koszt zapytania `change3`, w jego planie wykonania można zaobserwować, że `TABLE ACCESS FULL` na tabeli `CELL` zmienił się na `TABLE ACCESS BY INDEX ROWID BATCHED`, po czym nastąpiła konwersja bitmapy na id wierszy, co świadczy o pomyślnym wykorzystaniu stworzonego indeksu.
 
 === Indeksy funkcyjne dla danych czasowych
 
@@ -1065,6 +1071,8 @@ Note
    ```]
 )
 
+Zastosowanie indeksów funkcyjnych dla danych czasowych w zapytaniu `query3` spowodowało zmniejszenie kosztu zapytania, w planie wykonania można zaobserwować, że `TABLE ACCESS FULL` zamienił się na `TABLE ACCESS BY INDEX ROWID BATCHED` dla tabel `REPRIMAND` , `SENTENCE` oraz `ACCOMMODATION`, co świadczy o pomyślnym wykorzystaniu stworzonych indeksów, jednakże rezultat pomiaru czasu jest zaskakujący, ponieważ czas wykonywania zapytania zwiększył się z TODO do TODO, co jest aż TODO% wzrostem.
+
 *`change1`:*
 #plan(
    [```
@@ -1190,6 +1198,10 @@ Predicate Information (identified by operation id):
   29 - filter("PATROL"."FK_GUARD"="ID" AND "PATROL"."FK_BLOCK"="PRISON_BLOCK"."ID")
    ```]
 )
+
+W zapytaniu `change1` również można zaobserwować użycie indeksów. Dla tabeli `PATROL_SLOT` zamiast `TABLE ACCESS FULL` został użyty `TABLE ACCESS BY INDEX ROWID BATCHED`.
+
+Ponadto dodanie tych indeksów spowodowało zwiększenie się kosztów zapytania `query2` oraz `query4`, chociaż analiza ich planów zapytania nie wykazała żadnych zmian (poza kosztami).
 
 === Indeksy złożone (b-drzewo) dla odwołań do wielu kolumn
 
@@ -1333,6 +1345,9 @@ Predicate Information (identified by operation id):
    ```]
 )
 
+W zapytaniu `change1` można zaobserwować _zmianę_ użycia indeksów. Jest to spowodowane naszym omyłkowym i nieświadomym używaniem bazy danych ze stworzonym przez nas indeksem w etapie 3, w którym to zapełnialiśmy bazę danych naszymi danymi. Żeby utrzymać spójność bazy danych proces ten wymagał od nas również sporadycznego odczytywania dużych ilości konkretnych danych, więc stworzyliśmy wtedy indeks dla klucza obcego w tabeli `PATROL` co znacznie przyśpieszyło ten proces. Jednakże w wyniku błędu nigdy nie usunęliśmy tego indeksu i wszystkie nasze badania planów wykorzystywały go, co zauważyliśmy dopiero w tym etapie.
+Usunięcie tego indeksu powoduje zmianę kosztu z  29k na ponad 120k, więc żeby nie przekreślać zebranych przez nas wyników w poprzednich etapach zdecydowaliśmy się na pozostawienie tego indeksu w bazie danych. Dodanie nowego indeksu złożonego spowodowało zmianę wykorzystywania indeksu oraz zamianę kolejności odczytywania danych, przed jego dodaniem najpierw odczytywano tabelę `PATROL_SLOT` a dopiero potem `PATROL`, a po dodaniu indeksu najpierw odczytywano `PATROL` a potem `PATROL_SLOT`. Nastąpiła też zmiana 3 zagnieżdżonych po sobię pętli na użycie `HASH JOIN SEMI` i jednej zagnieżdżonej pętli.
+
 *`change3`:*
 #plan(
    [```
@@ -1439,6 +1454,8 @@ Predicate Information (identified by operation id):
    ```]
 )
 
+W zapytaniu `change3` można zaobserwować zmianę w planie zapytania. Dla tabeli `CELL` zamiast `TABLE ACCESS FULL` został użyty `TABLE ACCESS BY INDEX ROWID BATCHED`, co jest związane z dodaniem indeksu złożonego.
+
 *`change4`:*
 #plan(
    [```
@@ -1504,6 +1521,8 @@ Predicate Information (identified by operation id):
               ("A"."END_DATE" IS NULL OR INTERNAL_FUNCTION("A"."END_DATE")>=TO_TIMESTAMP(:EVENT_TIME,'YYYY-MM-DD HH24:MI:SS')))
    ```]
 )
+
+W zapytaniu `change4` również można zaobserwować zmianę w planie zapytania. Dla tabeli `CELL` zamiast `TABLE ACCESS FULL` został użyty `TABLE ACCESS BY INDEX ROWID BATCHED`, co Świadczy o użyciu stworzonego indeksu.
 
 === Dodanie indeksów na kluczach obcych
 
@@ -1720,6 +1739,8 @@ Note
    ```]
 )
 
+Zastosowanie indeksów b-tree na kluczach spowodowało w zapytaniu `query2` zmianę w planie zapytania. Dla tabeli `ACCOMMODATION` zamiast `TABLE ACCESS FULL` został użyty `TABLE ACCESS BY INDEX ROWID BATCHED`, co jest dowodem na użycie stworzonego indeksu.
+
 *`query3`:*
 #plan(
    [```
@@ -1892,6 +1913,8 @@ Note
    ```]
 )
 
+Można zaobserwować, że zastosowanie indeksów na kluczach obcych dramatycznie zmieniło plan zapytania `query3`. Widać wielokrotne użycie indeksów, między innymi `SENTENCE_FK_PRISONER_IDX` oraz `REPRIMAND_FK_PRISONER_IDX`.
+
 *`change3`:*
 #plan(
    [```
@@ -1999,6 +2022,8 @@ Predicate Information (identified by operation id):
    ```]
 )
 
+Zastosowanie indeksów na kluczach obcych spowodowało zamianę `TABLE ACCESS FULL` na `TABLE ACCESS BY INDEX ROWID BATCHED` dla tabeli `CELL` w zapytaniu `query3`, co jest dowodem użycia indeksu.
+
 *`change4`:*
 #plan(
    [```
@@ -2067,9 +2092,13 @@ Predicate Information (identified by operation id):
    ```]
 )
 
+W zapytaniu `change4` również można zaobserwować zmianę `TABLE ACCESS FULL` na `TABLE ACCESS BY INDEX ROWID BATCHED` dla tabeli `CELL`, co jest dowodem użycia indeksu dla klucza obcego.
+
 === Nałożenie wszystkich proponowanych indeksów jednocześnie
 
 #align(center, include("./test-app/out/all/table.typ"))
+
+Zastosowanie wszystkich opisanych powyżej indeksów na raz spowodowało zmniejszenie się kosztów wszystkich naszych zapytań w mniejszym bądź większym stopniu, a także TODO(zmniejszenie się czasów wykonywania z wyjątkiem `query3`, który w wyniku dodania indeksów funkcyjnych dla danych czasowych tak bardzo zwiększył swój czas wykonywania, że poprawy wydajności poprzez dodanie innych indeksów nie były w stanie tego zniwelować).
 
 == Eksperymenty
 
@@ -2499,7 +2528,7 @@ Predicate Information (identified by operation id):
 
 ==== Wnioski
 
-TODO
+W wyniku eksperymetnu porównaliśmy efektywność indeksowania `is_solitary` w tabeli `cell` o bardzo małej zmienności danych, ponieważ kolumna ta zawiera tylko i wyłącznie `0` i `1`. Zastosowanie indeksu b-tree w tym przypadku przyniosło większe zmniejszenie kosztu niż indeks bitmapowy w zapytaniu `change3`, co przeczy naszym oczekiwaniom, ponieważ indeks bitmapowy stosuje się w przypadku kolumn o małej zmienności danych. Najlepszy okazał się indeks złożony z kluczem obcym `fk_block`, który pozwolił na jeszcze większe zmniejszenie kosztu zapytania, wpłynął także na zmniejszenie się kosztu zapytania `change4`.
 
 === Eksperyment 2 -- dodawanie indeksów w `MATERIALIZED VIEW`
 
