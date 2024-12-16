@@ -2532,7 +2532,7 @@ W wyniku eksperymetnu porównaliśmy efektywność indeksowania `is_solitary` w 
 
 === Eksperyment 2 -- dodawanie indeksów w `MATERIALIZED VIEW`
 
-Zapytanie `query4` wykorzystuje jedno podzapytanie 4 razy, które się nie zmienia, jednakże silnik bazy danych nie potrafi tego zcache'ować. 
+Zapytanie `query4` wykorzystuje jedno podzapytanie 5 razy, które się nie zmienia, jednakże silnik bazy danych nie potrafi tego zcache'ować. 
 
 Możliwe jest jednak wyciągnięcie warunków tak, aby wewnętrzne podzapytanie korzystało tylko z parametru `:now`:, który ma oznaczać obecną datę. Można zatem utworzyć z tego podzapytania `VIEW` w celu sprawdzenia, czy to przyniesie korzyści i czy silnik bazy danych będzie w stanie zoptymalizować to zapytanie. Porównanie planów zapytania `query4` z podzapytaniem i z widokiem, znajdujące się poniżej, pokazuje że widok nie przyniósł żadnych korzyści, a wręcz przeciwnie, zwiększył koszt zapytania, ponieważ widok ten musiał być trochę bardziej ogólny i zbierać więcej danych, które dopiero w zapytaniu są filtrowane. Zatem zdecydowaliśmy się utworzyć z tego podzapytania `MATERIALIZED VIEW`, który byłby odświeżany codziennie (`REFRESH COMPLETE ON DEMAND`). Wtedy, zamiast wykonywać to podzapytanie czterokrotnie przy każdym wywołaniu kwerendy, obliczymy jego wartość raz na dobę.
 
@@ -2914,6 +2914,19 @@ Predicate Information (identified by operation id):
    ```]
 )
 
+Porównanie czasów wykonania zapytań `query4` z podzapytaniem i z widokiem zmaterializowanym:
+#let r(n) = text(fill: rgb("#880000"), n)
+#let g(n) = text(fill: rgb("#008800"), n)
+#table(
+  columns: 7,
+  align: right + horizon,
+  fill: (x, y) => if y in (0, 1, 9) { rgb("#cce") } else if calc.rem(y, 2) == 0 { rgb("#f0f0ff") },
+  table.cell(rowspan: 2, colspan: 1)[*Nazwa*], table.cell(rowspan: 1, colspan: 3)[*Średni czas [ms]*], table.cell(rowspan: 1, colspan: 3)[*Koszt*], [*Stary*], [*Nowy*], [*Zmiana*], [*Stary*],
+  [*Nowy*], [*Zmiana*], [*`query4`*], [TODO], [371.17], [#g("-TODO")], [98 504],
+  [1 801], [#g("-96703")],
+  
+)
+
 
 Porówanie planów wykonania zapytań `query4` z podzapytaniem i z widokiem zmaterializowanym:
 #plan(
@@ -3162,7 +3175,148 @@ Note
    ```]
 )
 
+Następnym krokiem ekperymentu było dodanie indeksów na stworzonym `MATERIALIZED VIEW` na kolumnach według których następuje filtrowanie w zapytaniu `query4`:
+
+#sql[
+```
+create index query4_mv_block_number_idx on
+   query4_mv (
+      block_number
+   );
+
+create index query4_mv_sex_idx on
+   query4_mv (
+      sex
+   );
+```]
+
+A także użyliśmy takiego _hinta_ w zapytaniu: `/*+ INDEX(query4_mv query4_mv_block_number_idx) INDEX(query4_mv query4_mv_sex_idx) */`, aby upewnić się, że silnik bazy danych skorzysta z naszych indeksów.
+
+Porównanie czasów wykonania zapytań `query4` z widokiem zmaterializowanym i z widokiem zmaterializowanym z indeksami:
+#let r(n) = text(fill: rgb("#880000"), n)
+#let g(n) = text(fill: rgb("#008800"), n)
+#table(
+  columns: 7,
+  align: right + horizon,
+  fill: (x, y) => if y in (0, 1, 9) { rgb("#cce") } else if calc.rem(y, 2) == 0 { rgb("#f0f0ff") },
+  table.cell(rowspan: 2, colspan: 1)[*Nazwa*], table.cell(rowspan: 1, colspan: 3)[*Średni czas [ms]*], table.cell(rowspan: 1, colspan: 3)[*Koszt*], [*Stary*], [*Nowy*], [*Zmiana*], [*Stary*],
+  [*Nowy*], [*Zmiana*], [*`query4`*], [371.17], [952.30], [#r("+581,13")], [1 801],
+  [3 769], [#r("+1968")],
+  
+)
+
+
+Porówanie planów wykonania zapytań `query4` z widokiem zmaterializowanym i z widokiem zmaterializowanym z indeksami:
+#plan(
+   [```
+Plan hash value: 1298516637
+ 
+-------------------------------------------------------------------------------------
+| Id  | Operation               | Name      | Rows  | Bytes | Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT        |           |     5 |   150 |  1801   (3)| 00:00:01 |
+|   1 |  HASH UNIQUE            |           |     5 |   150 |  1801   (3)| 00:00:01 |
+|   2 |   UNION-ALL             |           |       |       |            |          |
+|   3 |    SORT AGGREGATE       |           |     1 |    30 |   360   (3)| 00:00:01 |
+|*  4 |     MAT_VIEW ACCESS FULL| QUERY4_MV |  1299 | 38970 |   359   (2)| 00:00:01 |
+|   5 |    SORT AGGREGATE       |           |     1 |    30 |   360   (3)| 00:00:01 |
+|*  6 |     MAT_VIEW ACCESS FULL| QUERY4_MV |  1299 | 38970 |   359   (2)| 00:00:01 |
+|   7 |    SORT AGGREGATE       |           |     1 |    30 |   360   (3)| 00:00:01 |
+|*  8 |     MAT_VIEW ACCESS FULL| QUERY4_MV |  1299 | 38970 |   359   (2)| 00:00:01 |
+|   9 |    SORT AGGREGATE       |           |     1 |    30 |   360   (3)| 00:00:01 |
+|* 10 |     MAT_VIEW ACCESS FULL| QUERY4_MV |  1299 | 38970 |   359   (2)| 00:00:01 |
+|  11 |    SORT AGGREGATE       |           |     1 |    30 |   360   (3)| 00:00:01 |
+|* 12 |     MAT_VIEW ACCESS FULL| QUERY4_MV |  1299 | 38970 |   359   (2)| 00:00:01 |
+-------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   4 - filter((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND 
+              (:SEX IS NULL OR "SEX"=TO_NUMBER(:SEX)))
+   6 - filter((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND 
+              (:SEX IS NULL OR "SEX"=TO_NUMBER(:SEX)))
+   8 - filter((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND 
+              (:SEX IS NULL OR "SEX"=TO_NUMBER(:SEX)))
+  10 - filter((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND 
+              (:SEX IS NULL OR "SEX"=TO_NUMBER(:SEX)))
+  12 - filter((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND 
+              (:SEX IS NULL OR "SEX"=TO_NUMBER(:SEX)))
+ 
+Note
+-----
+   - dynamic statistics used: dynamic sampling (level=2)
+   ```],
+   [```
+Plan hash value: 848339698
+ 
+---------------------------------------------------------------------------------------------------------------
+| Id  | Operation                                 | Name              | Rows  | Bytes | Cost (%CPU)| Time     |
+---------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                          |                   |     5 |   150 |  3769   (2)| 00:00:01 |
+|   1 |  HASH UNIQUE                              |                   |     5 |   150 |  3769   (2)| 00:00:01 |
+|   2 |   UNION-ALL                               |                   |       |       |            |          |
+|   3 |    SORT AGGREGATE                         |                   |     1 |    30 |   754   (2)| 00:00:01 |
+|*  4 |     MAT_VIEW ACCESS BY INDEX ROWID BATCHED| QUERY4_MV         |  1299 | 38970 |   753   (2)| 00:00:01 |
+|*  5 |      INDEX FULL SCAN                      | QUERY4_MV_SEX_IDX | 21832 |       |   598   (2)| 00:00:01 |
+|   6 |    SORT AGGREGATE                         |                   |     1 |    30 |   754   (2)| 00:00:01 |
+|*  7 |     MAT_VIEW ACCESS BY INDEX ROWID BATCHED| QUERY4_MV         |  1299 | 38970 |   753   (2)| 00:00:01 |
+|*  8 |      INDEX FULL SCAN                      | QUERY4_MV_SEX_IDX | 21832 |       |   598   (2)| 00:00:01 |
+|   9 |    SORT AGGREGATE                         |                   |     1 |    30 |   754   (2)| 00:00:01 |
+|* 10 |     MAT_VIEW ACCESS BY INDEX ROWID BATCHED| QUERY4_MV         |  1299 | 38970 |   753   (2)| 00:00:01 |
+|* 11 |      INDEX FULL SCAN                      | QUERY4_MV_SEX_IDX | 21832 |       |   598   (2)| 00:00:01 |
+|  12 |    SORT AGGREGATE                         |                   |     1 |    30 |   754   (2)| 00:00:01 |
+|* 13 |     MAT_VIEW ACCESS BY INDEX ROWID BATCHED| QUERY4_MV         |  1299 | 38970 |   753   (2)| 00:00:01 |
+|* 14 |      INDEX FULL SCAN                      | QUERY4_MV_SEX_IDX | 21832 |       |   598   (2)| 00:00:01 |
+|  15 |    SORT AGGREGATE                         |                   |     1 |    30 |   754   (2)| 00:00:01 |
+|* 16 |     MAT_VIEW ACCESS BY INDEX ROWID BATCHED| QUERY4_MV         |  1299 | 38970 |   753   (2)| 00:00:01 |
+|* 17 |      INDEX FULL SCAN                      | QUERY4_MV_SEX_IDX | 21832 |       |   598   (2)| 00:00:01 |
+---------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   4 - filter(:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER)
+   5 - filter(:SEX IS NULL OR "SEX"=TO_NUMBER(:SEX))
+   7 - filter(:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER)
+   8 - filter(:SEX IS NULL OR "SEX"=TO_NUMBER(:SEX))
+  10 - filter(:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER)
+  11 - filter(:SEX IS NULL OR "SEX"=TO_NUMBER(:SEX))
+  13 - filter(:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER)
+  14 - filter(:SEX IS NULL OR "SEX"=TO_NUMBER(:SEX))
+  16 - filter(:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER)
+  17 - filter(:SEX IS NULL OR "SEX"=TO_NUMBER(:SEX))
+ 
+Hint Report (identified by operation id / Query Block Name / Object Alias):
+Total hints for statement: 5 (U - Unused (5))
+---------------------------------------------------------------------------
+ 
+   4 -  SEL$F5BB74E1 / "QUERY4_MV"@"SEL$2"
+         U -  INDEX(query4_mv query4_mv_block_number_idx)
+ 
+   7 -  SEL$07BDC5B4 / "QUERY4_MV"@"SEL$4"
+         U -  INDEX(query4_mv query4_mv_block_number_idx)
+ 
+  10 -  SEL$ABDE6DFF / "QUERY4_MV"@"SEL$6"
+         U -  INDEX(query4_mv query4_mv_block_number_idx)
+ 
+  13 -  SEL$8A3193DA / "QUERY4_MV"@"SEL$8"
+         U -  INDEX(query4_mv query4_mv_block_number_idx)
+ 
+  16 -  SEL$0EE6DB63 / "QUERY4_MV"@"SEL$10"
+         U -  INDEX(query4_mv query4_mv_block_number_idx)
+ 
+Note
+-----
+   - dynamic statistics used: dynamic sampling (level=2)
+
+   ```]
+)
+
+Dodanie indeksów do widoku zmaterializowanego spowodowało znaczący wzrost czasu wykonania i kosztu zapytania `query4` z widokiem zmaterializowanym.
+
 Wnioski:
+W naszym szczególnym przypadku zastosowanie widoku zmaterializowanego przyniosło bardzo dużo korzyści w postaci znacznego skrócenia czasu wykonania zapytania oraz obniżenia kosztów, ponieważ silnik bazy danych nie potrafił zoptymalizować zapytania z powtarzającym się podzapytaniem. Jednakże dodanie indeksów do widoku zmaterializowanego spowodowało pogorszenie się czasu wykonania zapytania oraz wzrost kosztów, co pokazuje, że nie zawsze dodanie indeksów jest korzystne.
 
 
 

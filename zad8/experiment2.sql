@@ -42,3 +42,18 @@ disable query rewrite as
    );
 
 drop materialized view query4_mv;
+
+-- Indeksy na materialized view:
+
+create index query4_mv_block_number_idx on
+   query4_mv (
+      block_number
+   );
+
+create index query4_mv_sex_idx on
+   query4_mv (
+      sex
+   );
+
+drop index query4_mv_block_number_idx;
+drop index query4_mv_sex_idx;

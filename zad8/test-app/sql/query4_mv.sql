@@ -14,7 +14,7 @@ select 'Height' as "Name",
           2
        ) as "Variance"
   from (
-   select height
+   select /*+ INDEX(query4_mv query4_mv_block_number_idx) INDEX(query4_mv query4_mv_sex_idx) */ height
      from query4_mv
     where ( :block_number is null
        or block_number = :block_number )
@@ -38,7 +38,7 @@ select 'Weight' as "Name",
           2
        ) as "Variance"
   from (
-   select weight
+   select /*+ INDEX(query4_mv query4_mv_block_number_idx) INDEX(query4_mv query4_mv_sex_idx) */ weight
      from query4_mv
     where ( :block_number is null
        or block_number = :block_number )
@@ -62,7 +62,7 @@ select 'Sentences' as "Name",
           2
        ) as "Variance"
   from (
-   select sentencenumber
+   select /*+ INDEX(query4_mv query4_mv_block_number_idx) INDEX(query4_mv query4_mv_sex_idx) */ sentencenumber
      from query4_mv
     where ( :block_number is null
        or block_number = :block_number )
@@ -86,7 +86,7 @@ select 'Reprimands' as "Name",
           2
        ) as "Variance"
   from (
-   select reprimandnumber
+   select /*+ INDEX(query4_mv query4_mv_block_number_idx) INDEX(query4_mv query4_mv_sex_idx) */ reprimandnumber
      from query4_mv
     where ( :block_number is null
        or block_number = :block_number )
@@ -110,7 +110,7 @@ select 'Accomodations' as "Name",
           2
        ) as "Variance"
   from (
-   select accommodationnumber
+   select /*+ INDEX(query4_mv query4_mv_block_number_idx) INDEX(query4_mv query4_mv_sex_idx) */ accommodationnumber
      from query4_mv
     where ( :block_number is null
        or block_number = :block_number )
