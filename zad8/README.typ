@@ -10,7 +10,7 @@
 ]
 #let plan(..children) = [
   #show raw: it => [
-    #set text(font: "Liberation Mono", size: if children.pos().len() == 1 { 8pt } else { 4.25pt })
+    #set text(font: "Liberation Mono", size: if children.pos().len() == 1 { 8pt } else { 4pt })
     #it
   ]
   #grid(
@@ -3321,5 +3321,429 @@ W naszym szczególnym przypadku zastosowanie widoku zmaterializowanego przynios�
 
 
 === Eksperyment 3 -- porównanie efektywności indeksowania i partycjonowania dla kolumny `issue_date` w tabeli `reprimand`
+
+Partycjonowanie jest często stosowane w przypadku dużych tabel, szczególnie gdy zapytania operują na ograniczonych zakresach danych, np. wybranych przedziałach czasowych. W naszej bazie danych potencjalnym kandydatem do zastosowania tej techniki jest tabela `reprimand`, która zawiera \~500 tysięcy rekordów, z informacją o karach dla więźniów oraz ich dacie wystawienia (`issue_date`).
+
+Postanowiliśmy porównać czasy i koszty następujacych wariantów:
+- *podstawowy* (stan na etap 6),
+- *partycjonowanie* tabeli `reprimand` względem kolumny `issue_date`.
+- *partycjonowanie* tabeli `reprimand` względem kolumny `issue_date` *+ indeks b-drzewo* lokalny na kolumnie `issue_date`.
+
+Stworzyliśmy nową tablę `reprimand_clone`, która ma taką samą strukturę co `reprimand`, jednakże zawiera partycje (po jednej partycji na rok). Następnie przekopiowalismy do niej wszystkie dane z tabeli oryginalnej:
+
+#sql[```
+create table reprimand_clone (
+   id          integer,
+   fk_guard    integer not null,
+   fk_prisoner integer not null,
+   reason      varchar(2000) not null,
+   issue_date  date not null,
+   primary key ( id ),
+   foreign key ( fk_guard )
+      references guard ( id ),
+   foreign key ( fk_prisoner )
+      references prisoner ( id ),
+   check ( reason <> '' )
+)
+   partition by range (
+      issue_date
+   )
+   ( partition p2000
+      values less than ( to_date('2001-01-01','YYYY-MM-DD') ),
+   partition p2001
+      values less than ( to_date('2002-01-01','YYYY-MM-DD') ),
+   partition p2002
+      values less than ( to_date('2003-01-01','YYYY-MM-DD') ),
+   partition p2003
+      values less than ( to_date('2004-01-01','YYYY-MM-DD') ),
+   partition p2004
+      values less than ( to_date('2005-01-01','YYYY-MM-DD') ),
+   partition p2005
+      values less than ( to_date('2006-01-01','YYYY-MM-DD') ),
+   partition p2006
+      values less than ( to_date('2007-01-01','YYYY-MM-DD') ),
+   partition p2007
+      values less than ( to_date('2008-01-01','YYYY-MM-DD') ),
+   partition p2008
+      values less than ( to_date('2009-01-01','YYYY-MM-DD') ),
+   partition p2009
+      values less than ( to_date('2010-01-01','YYYY-MM-DD') ),
+   partition p2010
+      values less than ( to_date('2011-01-01','YYYY-MM-DD') ),
+   partition p2011
+      values less than ( to_date('2012-01-01','YYYY-MM-DD') ),
+   partition p2012
+      values less than ( to_date('2013-01-01','YYYY-MM-DD') ),
+   partition p2013
+      values less than ( to_date('2014-01-01','YYYY-MM-DD') ),
+   partition p2014
+      values less than ( to_date('2015-01-01','YYYY-MM-DD') ),
+   partition p2015
+      values less than ( to_date('2016-01-01','YYYY-MM-DD') ),
+   partition p2016
+      values less than ( to_date('2017-01-01','YYYY-MM-DD') ),
+   partition p2017
+      values less than ( to_date('2018-01-01','YYYY-MM-DD') ),
+   partition p2018
+      values less than ( to_date('2019-01-01','YYYY-MM-DD') ),
+   partition p2019
+      values less than ( to_date('2020-01-01','YYYY-MM-DD') ),
+   partition p2020
+      values less than ( to_date('2021-01-01','YYYY-MM-DD') ),
+   partition p2021
+      values less than ( to_date('2022-01-01','YYYY-MM-DD') ),
+   partition p2022
+      values less than ( to_date('2023-01-01','YYYY-MM-DD') ),
+   partition p2023
+      values less than ( to_date('2024-01-01','YYYY-MM-DD') ),
+   partition p2024
+      values less than ( to_date('2025-01-01','YYYY-MM-DD') )
+   );
+
+insert into reprimand_clone
+   select *
+     from reprimand;
+```]
+
+Poniżej przedstawiono porównanie wariantu 2 względem 1, a następnie 3 względem 1:
+
+==== Partycjonowanie bez indeksu
+
+#align(center, include("./test-app/out/e31/table.typ"))
+
+TODO: dać dane z planu do tabelki
+
+#plan(
+   [```
+Plan hash value: 220023471
+ 
+--------------------------------------------------------------------------------------------------------------
+| Id  | Operation                            | Name          | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
+--------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                     |               |     1 |  2200 |       | 11117   (2)| 00:00:01 |
+|   1 |  NESTED LOOPS                        |               |     1 |  2200 |       | 11117   (2)| 00:00:01 |
+|   2 |   NESTED LOOPS                       |               |     1 |  2200 |       | 11117   (2)| 00:00:01 |
+|   3 |    NESTED LOOPS                      |               |     1 |  2177 |       | 11116   (2)| 00:00:01 |
+|   4 |     NESTED LOOPS                     |               |     1 |  2170 |       | 11115   (2)| 00:00:01 |
+|*  5 |      HASH JOIN                       |               |     1 |  2159 |       | 11114   (2)| 00:00:01 |
+|*  6 |       HASH JOIN                      |               |     1 |  2133 |       |  9021   (2)| 00:00:01 |
+|*  7 |        HASH JOIN                     |               |     1 |   118 |       |  6793   (2)| 00:00:01 |
+|   8 |         JOIN FILTER CREATE           | :BF0000       |   103 | 10815 |       |  1504   (1)| 00:00:01 |
+|   9 |          NESTED LOOPS                |               |   103 | 10815 |       |  1504   (1)| 00:00:01 |
+|  10 |           NESTED LOOPS               |               |   103 | 10815 |       |  1504   (1)| 00:00:01 |
+|* 11 |            TABLE ACCESS FULL         | REPRIMAND     |   103 |  8446 |       |  1401   (2)| 00:00:01 |
+|* 12 |            INDEX UNIQUE SCAN         | SYS_C008848   |     1 |       |       |     0   (0)| 00:00:01 |
+|  13 |           TABLE ACCESS BY INDEX ROWID| PRISONER      |     1 |    23 |       |     1   (0)| 00:00:01 |
+|  14 |         VIEW                         |               |  1063 | 13819 |       |  5288   (2)| 00:00:01 |
+|* 15 |          FILTER                      |               |       |       |       |            |          |
+|  16 |           JOIN FILTER USE            | :BF0000       |  1063 | 28701 |       |  5288   (2)| 00:00:01 |
+|  17 |            HASH GROUP BY             |               |  1063 | 28701 |       |  5288   (2)| 00:00:01 |
+|* 18 |             FILTER                   |               |       |       |       |            |          |
+|* 19 |              HASH JOIN               |               |   659K|    16M|  7856K|  5249   (1)| 00:00:01 |
+|  20 |               TABLE ACCESS FULL      | SENTENCE      |   473K|  2310K|       |  1379   (1)| 00:00:01 |
+|* 21 |               HASH JOIN              |               |   422K|  9069K|  7016K|  2799   (1)| 00:00:01 |
+|  22 |                TABLE ACCESS FULL     | REPRIMAND     |   422K|  2061K|       |  1394   (1)| 00:00:01 |
+|  23 |                TABLE ACCESS FULL     | PRISONER      |   299K|  4980K|       |   645   (1)| 00:00:01 |
+|* 24 |        VIEW                          |               |  9870 |    18M|       |  2228   (2)| 00:00:01 |
+|  25 |         SORT GROUP BY                |               |  9870 |   751K|   872K|  2228   (2)| 00:00:01 |
+|* 26 |          FILTER                      |               |       |       |       |            |          |
+|* 27 |           HASH JOIN                  |               |  9870 |   751K|       |  2046   (2)| 00:00:01 |
+|* 28 |            TABLE ACCESS FULL         | SENTENCE      |  9870 |   587K|       |  1399   (3)| 00:00:01 |
+|  29 |            TABLE ACCESS FULL         | PRISONER      |   299K|  4980K|       |   645   (1)| 00:00:01 |
+|* 30 |       TABLE ACCESS FULL              | ACCOMMODATION | 10850 |   275K|       |  2093   (4)| 00:00:01 |
+|* 31 |      TABLE ACCESS BY INDEX ROWID     | CELL          |     1 |    11 |       |     1   (0)| 00:00:01 |
+|* 32 |       INDEX UNIQUE SCAN              | SYS_C008883   |     1 |       |       |     0   (0)| 00:00:01 |
+|* 33 |     TABLE ACCESS BY INDEX ROWID      | PRISON_BLOCK  |     1 |     7 |       |     1   (0)| 00:00:01 |
+|* 34 |      INDEX UNIQUE SCAN               | SYS_C008855   |     1 |       |       |     0   (0)| 00:00:01 |
+|* 35 |    INDEX UNIQUE SCAN                 | SYS_C008868   |     1 |       |       |     0   (0)| 00:00:01 |
+|  36 |   TABLE ACCESS BY INDEX ROWID        | GUARD         |     1 |    23 |       |     1   (0)| 00:00:01 |
+--------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   5 - access("P"."ID"="A"."FK_PRISONER")
+   6 - access("P"."ID"="PS"."ID")
+   7 - access("P"."ID"="PC"."ID")
+  11 - filter((:EVENT_TYPE IS NULL OR INSTR("R"."REASON",:EVENT_TYPE)>0) AND 
+              TO_CHAR(INTERNAL_FUNCTION("R"."ISSUE_DATE"),'YYYY-MM-DD')>=:START_DATE AND 
+              TO_CHAR(INTERNAL_FUNCTION("R"."ISSUE_DATE"),'YYYY-MM-DD')<=:END_DATE)
+  12 - access("R"."FK_PRISONER"="P"."ID")
+  15 - filter((:SENTENCE_COUNT IS NULL OR COUNT(*)=TO_NUMBER(:SENTENCE_COUNT)) AND (:REPRIMAND_COUNT 
+              IS NULL OR COUNT(*)=TO_NUMBER(:REPRIMAND_COUNT)))
+  18 - filter(:END_DATE>=:START_DATE)
+  19 - access("P"."ID"="S"."FK_PRISONER")
+  21 - access("P"."ID"="R"."FK_PRISONER")
+  24 - filter(:CRIME IS NULL OR INSTR("PS"."CRIME",:CRIME)>0)
+  26 - filter(:END_DATE>=:START_DATE)
+  27 - access("P"."ID"="S"."FK_PRISONER")
+  28 - filter(TO_CHAR(INTERNAL_FUNCTION("S"."START_DATE"),'YYYY-MM-DD')<=:START_DATE AND 
+              ("S"."REAL_END_DATE" IS NULL OR TO_CHAR(INTERNAL_FUNCTION("S"."REAL_END_DATE"),'YYYY-MM-DD')>=:END_DAT
+              E))
+  30 - filter(TO_CHAR(INTERNAL_FUNCTION("A"."START_DATE"),'YYYY-MM-DD')<=:START_DATE AND 
+              ("A"."END_DATE" IS NULL OR TO_CHAR(INTERNAL_FUNCTION("A"."END_DATE"),'YYYY-MM-DD')>=:END_DATE))
+  31 - filter("C"."IS_SOLITARY"=TO_NUMBER(:IS_IN_SOLITARY) OR :IS_IN_SOLITARY IS NULL)
+  32 - access("C"."ID"="A"."FK_CELL")
+  33 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
+  34 - access("PB"."ID"="C"."FK_BLOCK")
+  35 - access("R"."FK_GUARD"="G"."ID")
+ 
+Note
+-----
+   - this is an adaptive plan
+   ```],
+   [```
+Plan hash value: 2070514248
+ 
+--------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                            | Name            | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     | Pstart| Pstop |
+--------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                     |                 |     1 |  3168 |       | 11412   (2)| 00:00:01 |       |       |
+|   1 |  NESTED LOOPS                        |                 |     1 |  3168 |       | 11412   (2)| 00:00:01 |       |       |
+|   2 |   NESTED LOOPS                       |                 |     1 |  3168 |       | 11412   (2)| 00:00:01 |       |       |
+|   3 |    NESTED LOOPS                      |                 |     1 |  3145 |       | 11411   (2)| 00:00:01 |       |       |
+|   4 |     NESTED LOOPS                     |                 |     1 |  3138 |       | 11410   (2)| 00:00:01 |       |       |
+|*  5 |      HASH JOIN                       |                 |     1 |  3127 |       | 11409   (2)| 00:00:01 |       |       |
+|*  6 |       HASH JOIN                      |                 |     1 |  3101 |       |  9316   (2)| 00:00:01 |       |       |
+|   7 |        JOIN FILTER CREATE            | :BF0000         |     4 | 12352 |       |  3752   (2)| 00:00:01 |       |       |
+|*  8 |         HASH JOIN                    |                 |     4 | 12352 |       |  3752   (2)| 00:00:01 |       |       |
+|   9 |          NESTED LOOPS                |                 |   108 |   113K|       |  1524   (2)| 00:00:01 |       |       |
+|  10 |           NESTED LOOPS               |                 |   108 |   113K|       |  1524   (2)| 00:00:01 |       |       |
+|  11 |            PARTITION RANGE ITERATOR  |                 |   108 |   110K|       |  1415   (2)| 00:00:01 |   KEY |   KEY |
+|* 12 |             TABLE ACCESS FULL        | REPRIMAND_CLONE |   108 |   110K|       |  1415   (2)| 00:00:01 |   KEY |   KEY |
+|* 13 |            INDEX UNIQUE SCAN         | SYS_C008848     |     1 |       |       |     0   (0)| 00:00:01 |       |       |
+|  14 |           TABLE ACCESS BY INDEX ROWID| PRISONER        |     1 |    23 |       |     1   (0)| 00:00:01 |       |       |
+|* 15 |          VIEW                        |                 |  9870 |    18M|       |  2228   (2)| 00:00:01 |       |       |
+|  16 |           SORT GROUP BY              |                 |  9870 |   751K|   872K|  2228   (2)| 00:00:01 |       |       |
+|* 17 |            HASH JOIN                 |                 |  9870 |   751K|       |  2046   (2)| 00:00:01 |       |       |
+|* 18 |             TABLE ACCESS FULL        | SENTENCE        |  9870 |   587K|       |  1399   (3)| 00:00:01 |       |       |
+|  19 |             TABLE ACCESS FULL        | PRISONER        |   299K|  4980K|       |   645   (1)| 00:00:01 |       |       |
+|  20 |        VIEW                          |                 |  1063 | 13819 |       |  5564   (2)| 00:00:01 |       |       |
+|* 21 |         FILTER                       |                 |       |       |       |            |          |       |       |
+|  22 |          JOIN FILTER USE             | :BF0000         |  1063 | 37205 |       |  5564   (2)| 00:00:01 |       |       |
+|  23 |           HASH GROUP BY              |                 |  1063 | 37205 |       |  5564   (2)| 00:00:01 |       |       |
+|* 24 |            FILTER                    |                 |       |       |       |            |          |       |       |
+|* 25 |             HASH JOIN                |                 |   689K|    23M|    10M|  5523   (1)| 00:00:01 |       |       |
+|  26 |              PARTITION RANGE ALL     |                 |   441K|  5608K|       |  1408   (1)| 00:00:01 |     1 |    25 |
+|  27 |               TABLE ACCESS FULL      | REPRIMAND_CLONE |   441K|  5608K|       |  1408   (1)| 00:00:01 |     1 |    25 |
+|* 28 |              HASH JOIN               |                 |   468K|     9M|  7856K|  2826   (1)| 00:00:01 |       |       |
+|  29 |               TABLE ACCESS FULL      | SENTENCE        |   473K|  2310K|       |  1379   (1)| 00:00:01 |       |       |
+|  30 |               TABLE ACCESS FULL      | PRISONER        |   299K|  4980K|       |   645   (1)| 00:00:01 |       |       |
+|* 31 |       TABLE ACCESS FULL              | ACCOMMODATION   | 10850 |   275K|       |  2093   (4)| 00:00:01 |       |       |
+|* 32 |      TABLE ACCESS BY INDEX ROWID     | CELL            |     1 |    11 |       |     1   (0)| 00:00:01 |       |       |
+|* 33 |       INDEX UNIQUE SCAN              | SYS_C008883     |     1 |       |       |     0   (0)| 00:00:01 |       |       |
+|* 34 |     TABLE ACCESS BY INDEX ROWID      | PRISON_BLOCK    |     1 |     7 |       |     1   (0)| 00:00:01 |       |       |
+|* 35 |      INDEX UNIQUE SCAN               | SYS_C008855     |     1 |       |       |     0   (0)| 00:00:01 |       |       |
+|* 36 |    INDEX UNIQUE SCAN                 | SYS_C008868     |     1 |       |       |     0   (0)| 00:00:01 |       |       |
+|  37 |   TABLE ACCESS BY INDEX ROWID        | GUARD           |     1 |    23 |       |     1   (0)| 00:00:01 |       |       |
+--------------------------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   5 - access("P"."ID"="A"."FK_PRISONER")
+   6 - access("P"."ID"="PC"."ID")
+   8 - access("P"."ID"="PS"."ID")
+  12 - filter((:EVENT_TYPE IS NULL OR INSTR("R"."REASON",:EVENT_TYPE)>0) AND 
+              "R"."ISSUE_DATE">=TO_DATE(:START_DATE,'YYYY-MM-DD') AND "R"."ISSUE_DATE"<=TO_DATE(:END_DATE,'YYYY-MM-DD'))
+  13 - access("R"."FK_PRISONER"="P"."ID")
+  15 - filter(:CRIME IS NULL OR INSTR("PS"."CRIME",:CRIME)>0)
+  17 - access("P"."ID"="S"."FK_PRISONER")
+  18 - filter(TO_CHAR(INTERNAL_FUNCTION("S"."START_DATE"),'YYYY-MM-DD')<=:START_DATE AND ("S"."REAL_END_DATE" IS NULL 
+              OR TO_CHAR(INTERNAL_FUNCTION("S"."REAL_END_DATE"),'YYYY-MM-DD')>=:END_DATE))
+  21 - filter((:SENTENCE_COUNT IS NULL OR COUNT(*)=TO_NUMBER(:SENTENCE_COUNT)) AND (:REPRIMAND_COUNT IS NULL OR 
+              COUNT(*)=TO_NUMBER(:REPRIMAND_COUNT)))
+  24 - filter(TO_DATE(:END_DATE,'YYYY-MM-DD')>=TO_DATE(:START_DATE,'YYYY-MM-DD'))
+  25 - access("P"."ID"="R"."FK_PRISONER")
+  28 - access("P"."ID"="S"."FK_PRISONER")
+  31 - filter(TO_CHAR(INTERNAL_FUNCTION("A"."START_DATE"),'YYYY-MM-DD')<=:START_DATE AND ("A"."END_DATE" IS NULL OR 
+              TO_CHAR(INTERNAL_FUNCTION("A"."END_DATE"),'YYYY-MM-DD')>=:END_DATE))
+  32 - filter("C"."IS_SOLITARY"=TO_NUMBER(:IS_IN_SOLITARY) OR :IS_IN_SOLITARY IS NULL)
+  33 - access("C"."ID"="A"."FK_CELL")
+  34 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
+  35 - access("PB"."ID"="C"."FK_BLOCK")
+  36 - access("R"."FK_GUARD"="G"."ID")
+ 
+Note
+-----
+   - dynamic statistics used: dynamic sampling (level=2)
+   - this is an adaptive plan
+   ```]
+)
+
+==== Partycjonowanie z indeksem
+
+#sql[```
+create index reprimand_clone_issue_date_idx on
+   reprimand_clone (
+      issue_date
+   )
+         local
+         parallel;
+```]
+
+#align(center, include("./test-app/out/e32/table.typ"))
+
+TODO: dać dane z planu do tabelki
+
+#plan(
+   [```
+Plan hash value: 220023471
+ 
+--------------------------------------------------------------------------------------------------------------
+| Id  | Operation                            | Name          | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
+--------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                     |               |     1 |  2200 |       | 11117   (2)| 00:00:01 |
+|   1 |  NESTED LOOPS                        |               |     1 |  2200 |       | 11117   (2)| 00:00:01 |
+|   2 |   NESTED LOOPS                       |               |     1 |  2200 |       | 11117   (2)| 00:00:01 |
+|   3 |    NESTED LOOPS                      |               |     1 |  2177 |       | 11116   (2)| 00:00:01 |
+|   4 |     NESTED LOOPS                     |               |     1 |  2170 |       | 11115   (2)| 00:00:01 |
+|*  5 |      HASH JOIN                       |               |     1 |  2159 |       | 11114   (2)| 00:00:01 |
+|*  6 |       HASH JOIN                      |               |     1 |  2133 |       |  9021   (2)| 00:00:01 |
+|*  7 |        HASH JOIN                     |               |     1 |   118 |       |  6793   (2)| 00:00:01 |
+|   8 |         JOIN FILTER CREATE           | :BF0000       |   103 | 10815 |       |  1504   (1)| 00:00:01 |
+|   9 |          NESTED LOOPS                |               |   103 | 10815 |       |  1504   (1)| 00:00:01 |
+|  10 |           NESTED LOOPS               |               |   103 | 10815 |       |  1504   (1)| 00:00:01 |
+|* 11 |            TABLE ACCESS FULL         | REPRIMAND     |   103 |  8446 |       |  1401   (2)| 00:00:01 |
+|* 12 |            INDEX UNIQUE SCAN         | SYS_C008848   |     1 |       |       |     0   (0)| 00:00:01 |
+|  13 |           TABLE ACCESS BY INDEX ROWID| PRISONER      |     1 |    23 |       |     1   (0)| 00:00:01 |
+|  14 |         VIEW                         |               |  1063 | 13819 |       |  5288   (2)| 00:00:01 |
+|* 15 |          FILTER                      |               |       |       |       |            |          |
+|  16 |           JOIN FILTER USE            | :BF0000       |  1063 | 28701 |       |  5288   (2)| 00:00:01 |
+|  17 |            HASH GROUP BY             |               |  1063 | 28701 |       |  5288   (2)| 00:00:01 |
+|* 18 |             FILTER                   |               |       |       |       |            |          |
+|* 19 |              HASH JOIN               |               |   659K|    16M|  7856K|  5249   (1)| 00:00:01 |
+|  20 |               TABLE ACCESS FULL      | SENTENCE      |   473K|  2310K|       |  1379   (1)| 00:00:01 |
+|* 21 |               HASH JOIN              |               |   422K|  9069K|  7016K|  2799   (1)| 00:00:01 |
+|  22 |                TABLE ACCESS FULL     | REPRIMAND     |   422K|  2061K|       |  1394   (1)| 00:00:01 |
+|  23 |                TABLE ACCESS FULL     | PRISONER      |   299K|  4980K|       |   645   (1)| 00:00:01 |
+|* 24 |        VIEW                          |               |  9870 |    18M|       |  2228   (2)| 00:00:01 |
+|  25 |         SORT GROUP BY                |               |  9870 |   751K|   872K|  2228   (2)| 00:00:01 |
+|* 26 |          FILTER                      |               |       |       |       |            |          |
+|* 27 |           HASH JOIN                  |               |  9870 |   751K|       |  2046   (2)| 00:00:01 |
+|* 28 |            TABLE ACCESS FULL         | SENTENCE      |  9870 |   587K|       |  1399   (3)| 00:00:01 |
+|  29 |            TABLE ACCESS FULL         | PRISONER      |   299K|  4980K|       |   645   (1)| 00:00:01 |
+|* 30 |       TABLE ACCESS FULL              | ACCOMMODATION | 10850 |   275K|       |  2093   (4)| 00:00:01 |
+|* 31 |      TABLE ACCESS BY INDEX ROWID     | CELL          |     1 |    11 |       |     1   (0)| 00:00:01 |
+|* 32 |       INDEX UNIQUE SCAN              | SYS_C008883   |     1 |       |       |     0   (0)| 00:00:01 |
+|* 33 |     TABLE ACCESS BY INDEX ROWID      | PRISON_BLOCK  |     1 |     7 |       |     1   (0)| 00:00:01 |
+|* 34 |      INDEX UNIQUE SCAN               | SYS_C008855   |     1 |       |       |     0   (0)| 00:00:01 |
+|* 35 |    INDEX UNIQUE SCAN                 | SYS_C008868   |     1 |       |       |     0   (0)| 00:00:01 |
+|  36 |   TABLE ACCESS BY INDEX ROWID        | GUARD         |     1 |    23 |       |     1   (0)| 00:00:01 |
+--------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   5 - access("P"."ID"="A"."FK_PRISONER")
+   6 - access("P"."ID"="PS"."ID")
+   7 - access("P"."ID"="PC"."ID")
+  11 - filter((:EVENT_TYPE IS NULL OR INSTR("R"."REASON",:EVENT_TYPE)>0) AND 
+              TO_CHAR(INTERNAL_FUNCTION("R"."ISSUE_DATE"),'YYYY-MM-DD')>=:START_DATE AND 
+              TO_CHAR(INTERNAL_FUNCTION("R"."ISSUE_DATE"),'YYYY-MM-DD')<=:END_DATE)
+  12 - access("R"."FK_PRISONER"="P"."ID")
+  15 - filter((:SENTENCE_COUNT IS NULL OR COUNT(*)=TO_NUMBER(:SENTENCE_COUNT)) AND (:REPRIMAND_COUNT 
+              IS NULL OR COUNT(*)=TO_NUMBER(:REPRIMAND_COUNT)))
+  18 - filter(:END_DATE>=:START_DATE)
+  19 - access("P"."ID"="S"."FK_PRISONER")
+  21 - access("P"."ID"="R"."FK_PRISONER")
+  24 - filter(:CRIME IS NULL OR INSTR("PS"."CRIME",:CRIME)>0)
+  26 - filter(:END_DATE>=:START_DATE)
+  27 - access("P"."ID"="S"."FK_PRISONER")
+  28 - filter(TO_CHAR(INTERNAL_FUNCTION("S"."START_DATE"),'YYYY-MM-DD')<=:START_DATE AND 
+              ("S"."REAL_END_DATE" IS NULL OR TO_CHAR(INTERNAL_FUNCTION("S"."REAL_END_DATE"),'YYYY-MM-DD')>=:END_DAT
+              E))
+  30 - filter(TO_CHAR(INTERNAL_FUNCTION("A"."START_DATE"),'YYYY-MM-DD')<=:START_DATE AND 
+              ("A"."END_DATE" IS NULL OR TO_CHAR(INTERNAL_FUNCTION("A"."END_DATE"),'YYYY-MM-DD')>=:END_DATE))
+  31 - filter("C"."IS_SOLITARY"=TO_NUMBER(:IS_IN_SOLITARY) OR :IS_IN_SOLITARY IS NULL)
+  32 - access("C"."ID"="A"."FK_CELL")
+  33 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
+  34 - access("PB"."ID"="C"."FK_BLOCK")
+  35 - access("R"."FK_GUARD"="G"."ID")
+ 
+Note
+-----
+   - this is an adaptive plan
+   ```],
+   [```
+Plan hash value: 2539870365
+ 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                                            | Name                           | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     | Pstart| Pstop |
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                                     |                                |     1 |  3168 |       | 11396   (2)| 00:00:01 |       |       |
+|   1 |  NESTED LOOPS                                        |                                |     1 |  3168 |       | 11396   (2)| 00:00:01 |       |       |
+|   2 |   NESTED LOOPS                                       |                                |     1 |  3161 |       | 11395   (2)| 00:00:01 |       |       |
+|*  3 |    HASH JOIN                                         |                                |     1 |  3150 |       | 11394   (2)| 00:00:01 |       |       |
+|   4 |     NESTED LOOPS                                     |                                |     1 |  3124 |       |  9301   (2)| 00:00:01 |       |       |
+|   5 |      NESTED LOOPS                                    |                                |     1 |  3124 |       |  9301   (2)| 00:00:01 |       |       |
+|*  6 |       HASH JOIN                                      |                                |     1 |  3101 |       |  9300   (2)| 00:00:01 |       |       |
+|   7 |        JOIN FILTER CREATE                            | :BF0000                        |     4 | 12352 |       |  3736   (1)| 00:00:01 |       |       |
+|*  8 |         HASH JOIN                                    |                                |     4 | 12352 |       |  3736   (1)| 00:00:01 |       |       |
+|   9 |          NESTED LOOPS                                |                                |   108 |   113K|       |  1508   (1)| 00:00:01 |       |       |
+|  10 |           NESTED LOOPS                               |                                |   108 |   113K|       |  1508   (1)| 00:00:01 |       |       |
+|  11 |            PARTITION RANGE ITERATOR                  |                                |   108 |   110K|       |  1400   (1)| 00:00:01 |   KEY |   KEY |
+|* 12 |             TABLE ACCESS BY LOCAL INDEX ROWID BATCHED| REPRIMAND_CLONE                |   108 |   110K|       |  1400   (1)| 00:00:01 |   KEY |   KEY |
+|* 13 |              INDEX RANGE SCAN                        | REPRIMAND_CLONE_ISSUE_DATE_IDX |  1988 |       |       |     6   (0)| 00:00:01 |   KEY |   KEY |
+|* 14 |            INDEX UNIQUE SCAN                         | SYS_C008848                    |     1 |       |       |     0   (0)| 00:00:01 |       |       |
+|  15 |           TABLE ACCESS BY INDEX ROWID                | PRISONER                       |     1 |    23 |       |     1   (0)| 00:00:01 |       |       |
+|* 16 |          VIEW                                        |                                |  9870 |    18M|       |  2228   (2)| 00:00:01 |       |       |
+|  17 |           SORT GROUP BY                              |                                |  9870 |   751K|   872K|  2228   (2)| 00:00:01 |       |       |
+|* 18 |            HASH JOIN                                 |                                |  9870 |   751K|       |  2046   (2)| 00:00:01 |       |       |
+|* 19 |             TABLE ACCESS FULL                        | SENTENCE                       |  9870 |   587K|       |  1399   (3)| 00:00:01 |       |       |
+|  20 |             TABLE ACCESS FULL                        | PRISONER                       |   299K|  4980K|       |   645   (1)| 00:00:01 |       |       |
+|  21 |        VIEW                                          |                                |  1063 | 13819 |       |  5564   (2)| 00:00:01 |       |       |
+|* 22 |         FILTER                                       |                                |       |       |       |            |          |       |       |
+|  23 |          JOIN FILTER USE                             | :BF0000                        |  1063 | 37205 |       |  5564   (2)| 00:00:01 |       |       |
+|  24 |           HASH GROUP BY                              |                                |  1063 | 37205 |       |  5564   (2)| 00:00:01 |       |       |
+|* 25 |            FILTER                                    |                                |       |       |       |            |          |       |       |
+|* 26 |             HASH JOIN                                |                                |   689K|    23M|    10M|  5523   (1)| 00:00:01 |       |       |
+|  27 |              PARTITION RANGE ALL                     |                                |   441K|  5608K|       |  1408   (1)| 00:00:01 |     1 |    25 |
+|  28 |               TABLE ACCESS FULL                      | REPRIMAND_CLONE                |   441K|  5608K|       |  1408   (1)| 00:00:01 |     1 |    25 |
+|* 29 |              HASH JOIN                               |                                |   468K|     9M|  7856K|  2826   (1)| 00:00:01 |       |       |
+|  30 |               TABLE ACCESS FULL                      | SENTENCE                       |   473K|  2310K|       |  1379   (1)| 00:00:01 |       |       |
+|  31 |               TABLE ACCESS FULL                      | PRISONER                       |   299K|  4980K|       |   645   (1)| 00:00:01 |       |       |
+|* 32 |       INDEX UNIQUE SCAN                              | SYS_C008868                    |     1 |       |       |     0   (0)| 00:00:01 |       |       |
+|  33 |      TABLE ACCESS BY INDEX ROWID                     | GUARD                          |     1 |    23 |       |     1   (0)| 00:00:01 |       |       |
+|* 34 |     TABLE ACCESS FULL                                | ACCOMMODATION                  | 10850 |   275K|       |  2093   (4)| 00:00:01 |       |       |
+|* 35 |    TABLE ACCESS BY INDEX ROWID                       | CELL                           |     1 |    11 |       |     1   (0)| 00:00:01 |       |       |
+|* 36 |     INDEX UNIQUE SCAN                                | SYS_C008883                    |     1 |       |       |     0   (0)| 00:00:01 |       |       |
+|* 37 |   TABLE ACCESS BY INDEX ROWID                        | PRISON_BLOCK                   |     1 |     7 |       |     1   (0)| 00:00:01 |       |       |
+|* 38 |    INDEX UNIQUE SCAN                                 | SYS_C008855                    |     1 |       |       |     0   (0)| 00:00:01 |       |       |
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   3 - access("P"."ID"="A"."FK_PRISONER")
+   6 - access("P"."ID"="PC"."ID")
+   8 - access("P"."ID"="PS"."ID")
+  12 - filter(:EVENT_TYPE IS NULL OR INSTR("R"."REASON",:EVENT_TYPE)>0)
+  13 - access("R"."ISSUE_DATE">=TO_DATE(:START_DATE,'YYYY-MM-DD') AND "R"."ISSUE_DATE"<=TO_DATE(:END_DATE,'YYYY-MM-DD'))
+  14 - access("R"."FK_PRISONER"="P"."ID")
+  16 - filter(:CRIME IS NULL OR INSTR("PS"."CRIME",:CRIME)>0)
+  18 - access("P"."ID"="S"."FK_PRISONER")
+  19 - filter(TO_CHAR(INTERNAL_FUNCTION("S"."START_DATE"),'YYYY-MM-DD')<=:START_DATE AND ("S"."REAL_END_DATE" IS NULL OR 
+              TO_CHAR(INTERNAL_FUNCTION("S"."REAL_END_DATE"),'YYYY-MM-DD')>=:END_DATE))
+  22 - filter((:SENTENCE_COUNT IS NULL OR COUNT(*)=TO_NUMBER(:SENTENCE_COUNT)) AND (:REPRIMAND_COUNT IS NULL OR COUNT(*)=TO_NUMBER(:REPRIMAND_COUNT)))
+  25 - filter(TO_DATE(:END_DATE,'YYYY-MM-DD')>=TO_DATE(:START_DATE,'YYYY-MM-DD'))
+  26 - access("P"."ID"="R"."FK_PRISONER")
+  29 - access("P"."ID"="S"."FK_PRISONER")
+  32 - access("R"."FK_GUARD"="G"."ID")
+  34 - filter(TO_CHAR(INTERNAL_FUNCTION("A"."START_DATE"),'YYYY-MM-DD')<=:START_DATE AND ("A"."END_DATE" IS NULL OR 
+              TO_CHAR(INTERNAL_FUNCTION("A"."END_DATE"),'YYYY-MM-DD')>=:END_DATE))
+  35 - filter("C"."IS_SOLITARY"=TO_NUMBER(:IS_IN_SOLITARY) OR :IS_IN_SOLITARY IS NULL)
+  36 - access("C"."ID"="A"."FK_CELL")
+  37 - filter(:BLOCK_NUMBER IS NULL OR "PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
+  38 - access("PB"."ID"="C"."FK_BLOCK")
+ 
+Note
+-----
+   - dynamic statistics used: dynamic sampling (level=2)
+   - this is an adaptive plan
+   ```]
+)
+
+==== Wnioski
 
 TODO
