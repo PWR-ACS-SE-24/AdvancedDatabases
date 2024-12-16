@@ -1522,7 +1522,7 @@ Predicate Information (identified by operation id):
    ```]
 )
 
-W zapytaniu `change4` również można zaobserwować zmianę w planie zapytania. Dla tabeli `CELL` zamiast `TABLE ACCESS FULL` został użyty `TABLE ACCESS BY INDEX ROWID BATCHED`, co Świadczy o użyciu stworzonego indeksu.
+W zapytaniu `change4` również można zaobserwować zmianę w planie zapytania. Dla tabeli `CELL` zamiast `TABLE ACCESS FULL` został użyty `TABLE ACCESS BY INDEX ROWID BATCHED`, co świadczy o użyciu stworzonego indeksu.
 
 === Dodanie indeksów na kluczach obcych
 
@@ -2528,7 +2528,7 @@ Predicate Information (identified by operation id):
 
 ==== Wnioski
 
-W wyniku eksperymetnu porównaliśmy efektywność indeksowania `is_solitary` w tabeli `cell` o bardzo małej zmienności danych, ponieważ kolumna ta zawiera tylko i wyłącznie `0` i `1`. Zastosowanie indeksu b-tree w tym przypadku przyniosło większe zmniejszenie kosztu niż indeks bitmapowy w zapytaniu `change3`, co przeczy naszym oczekiwaniom, ponieważ indeks bitmapowy stosuje się w przypadku kolumn o małej zmienności danych. Najlepszy okazał się indeks złożony z kluczem obcym `fk_block`, który pozwolił na jeszcze większe zmniejszenie kosztu zapytania, wpłynął także na zmniejszenie się kosztu zapytania `change4`.
+W wyniku eksperymetnu porównaliśmy efektywność indeksowania `is_solitary` w tabeli `cell` o bardzo małej zmienności danych, ponieważ kolumna ta zawiera tylko i wyłącznie `0` i `1`. Zastosowanie indeksu b-tree w tym przypadku przyniosło większe zmniejszenie kosztu niż indeks bitmapowy w zapytaniu `change3`, co przeczy naszym oczekiwaniom, ponieważ indeks bitmapowy stosuje się w przypadku kolumn o małej liczbie unikalnych wartości. Najlepszy okazał się indeks złożony z kluczem obcym `fk_block`, który pozwolił na jeszcze większe zmniejszenie kosztu zapytania, wpłynął także na zmniejszenie się kosztu zapytania `change4`.
 
 === Eksperyment 2 -- dodawanie indeksów w `MATERIALIZED VIEW`
 
