@@ -1,0 +1,25 @@
+Plan hash value: 87624460
+ 
+-------------------------------------------------------------------------------------------------
+| Id  | Operation                       | Name          | Rows  | Bytes | Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------------------------
+|   0 | INSERT STATEMENT                |               |   121 |  5324 |  2474   (5)| 00:00:01 |
+|   1 |  LOAD TABLE CONVENTIONAL        | REPRIMAND     |       |       |            |          |
+|   2 |   SEQUENCE                      | ISEQ$$_76236  |       |       |            |          |
+|*  3 |    HASH JOIN                    |               |   121 |  5324 |  2474   (5)| 00:00:01 |
+|   4 |     NESTED LOOPS                |               |  2742 | 49356 |   354   (2)| 00:00:01 |
+|   5 |      TABLE ACCESS BY INDEX ROWID| PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
+|*  6 |       INDEX UNIQUE SCAN         | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
+|*  7 |      TABLE ACCESS FULL          | CELL          |  2742 | 30162 |   353   (2)| 00:00:01 |
+|*  8 |     TABLE ACCESS FULL           | ACCOMMODATION | 10850 |   275K|  2119   (6)| 00:00:01 |
+-------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   3 - access("A"."FK_CELL"="C"."ID")
+   6 - access("PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
+   7 - filter("C"."FK_BLOCK"="PB"."ID" AND "C"."IS_SOLITARY"=0)
+   8 - filter(INTERNAL_FUNCTION("A"."START_DATE")<=TO_TIMESTAMP(:EVENT_TIME,'YYYY-MM-DD 
+              HH24:MI:SS') AND ("A"."END_DATE" IS NULL OR INTERNAL_FUNCTION("A"."END_DATE")>=TO_TIMESTA
+              MP(:EVENT_TIME,'YYYY-MM-DD HH24:MI:SS')))
