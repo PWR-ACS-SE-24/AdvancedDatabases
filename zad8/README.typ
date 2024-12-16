@@ -3315,7 +3315,7 @@ Note
 
 Dodanie indeksów do widoku zmaterializowanego spowodowało znaczący wzrost czasu wykonania i kosztu zapytania `query4` z widokiem zmaterializowanym.
 
-Wnioski:
+==== Wnioski
 W naszym szczególnym przypadku zastosowanie widoku zmaterializowanego przyniosło bardzo dużo korzyści w postaci znacznego skrócenia czasu wykonania zapytania oraz obniżenia kosztów, ponieważ silnik bazy danych nie potrafił zoptymalizować zapytania z powtarzającym się podzapytaniem. Jednakże dodanie indeksów do widoku zmaterializowanego spowodowało pogorszenie się czasu wykonania zapytania oraz wzrost kosztów, co pokazuje, że nie zawsze dodanie indeksów jest korzystne.
 
 
