@@ -2,6 +2,7 @@ import { N, workload } from "./workload.js";
 
 /** @typedef {import('./types.js').Query} Query */
 /** @typedef {import('./types.js').Stats} Stats */
+/** @typedef {import('./types.js').EditQuery} EditQuery */
 
 /** @param {oracledb.Connection} con */
 async function flushMemory(con) {
@@ -64,12 +65,17 @@ async function getCounts(con) {
   return counts.join(",");
 }
 
-/** @param {oracledb.Connection} con */
-export async function gatherMeasurements(con) {
+/**
+ * @param {oracledb.Connection} con
+ * @param {EditQuery} editQuery
+ */
+export async function gatherMeasurements(con, editQuery = {}) {
   console.log("Gathering times...");
 
+  const wl = { ...workload, ...editQuery };
+
   const results = Object.fromEntries(
-    Object.keys(workload).map((name) => [name, /** @type {number[]} */ ([])])
+    Object.keys(wl).map((name) => [name, /** @type {number[]} */ ([])])
   );
 
   const oldCounts = await getCounts(con);
@@ -77,8 +83,8 @@ export async function gatherMeasurements(con) {
   for (let i = 0; i < N; i++) {
     console.log(`\tIteration #${i + 1}/${N}...`);
     await flushMemory(con);
-    for (const name in workload) {
-      const time = await measureTime(con, workload[name]);
+    for (const name in wl) {
+      const time = await measureTime(con, wl[name]);
       results[name].push(time);
     }
     const newCounts = await getCounts(con);

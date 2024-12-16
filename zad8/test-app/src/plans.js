@@ -17,12 +17,15 @@ async function explainPlan(con, query) {
 /**
  * @param {oracledb.Connection} con
  * @param {string} set
+ * @param {EditQuery} editQuery
  */
-export async function gatherAndSavePlans(con, set) {
+export async function gatherAndSavePlans(con, set, editQuery = {}) {
+  const wl = { ...workload, ...editQuery };
+
   console.log("Gathering plans...");
   await fs.mkdir(`out/${set}/plans`, { recursive: true });
-  for (const name in workload) {
-    const plan = await explainPlan(con, workload[name]);
+  for (const name in wl) {
+    const plan = await explainPlan(con, wl[name]);
     await fs.writeFile(`out/${set}/plans/${name}.txt`, plan);
   }
   console.log("Gathered plans.");
@@ -48,13 +51,18 @@ async function calculateCost(con, query) {
   );
 }
 
-/** @param {oracledb.Connection} con */
-export async function gatherCosts(con) {
+/**
+ * @param {oracledb.Connection} con
+ * @param {EditQuery} editQuery
+ */
+export async function gatherCosts(con, editQuery = {}) {
+  const wl = { ...workload, ...editQuery };
+
   console.log("Gathering costs...");
   /** @type {Record<string, number>} */
   const results = {};
-  for (const name in workload) {
-    results[name] = await calculateCost(con, workload[name]);
+  for (const name in wl) {
+    results[name] = await calculateCost(con, wl[name]);
   }
   console.log("Gathered costs.");
   return results;

@@ -94,3 +94,8 @@ export const workload = {
     },
   },
 };
+
+export const query3partition = {
+  sql: await readSql("query3partition"),
+  params: workload.query3.params,
+};

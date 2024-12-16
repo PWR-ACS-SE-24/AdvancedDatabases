@@ -26,11 +26,16 @@ const oldCosts = await gatherCosts(con);
 for (const set in indexSets) {
   console.log(`-----\nEVALUATING SET ${set}\n-----`);
 
+  let editQuery = {};
+  for (const index of indexSets[set]) {
+    editQuery = { ...editQuery, ...index.editQuery };
+  }
+
   await createIndexes(con, indexSets[set]);
 
-  await gatherAndSavePlans(con, set);
-  const newTimes = await gatherMeasurements(con);
-  const newCosts = await gatherCosts(con);
+  await gatherAndSavePlans(con, set, editQuery);
+  const newTimes = await gatherMeasurements(con, editQuery);
+  const newCosts = await gatherCosts(con, editQuery);
 
   const table = initializeDiffTable();
   const sums = [0, 0, 0];
