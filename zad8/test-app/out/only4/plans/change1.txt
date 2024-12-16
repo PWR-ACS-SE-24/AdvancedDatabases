@@ -1,36 +1,36 @@
-Plan hash value: 269728003
+Plan hash value: 459225027
  
-----------------------------------------------------------------------------------------------------------------------------
-| Id  | Operation                                   | Name                         | Rows  | Bytes | Cost (%CPU)| Time     |
-----------------------------------------------------------------------------------------------------------------------------
-|   0 | UPDATE STATEMENT                            |                              |     1 |    35 | 20832   (1)| 00:00:01 |
-|   1 |  UPDATE                                     | GUARD                        |       |       |            |          |
-|   2 |   NESTED LOOPS SEMI                         |                              |     1 |    35 | 20832   (1)| 00:00:01 |
-|*  3 |    HASH JOIN ANTI                           |                              |     1 |    33 | 20738   (1)| 00:00:01 |
-|*  4 |     TABLE ACCESS FULL                       | GUARD                        |   119 |  2380 |    27   (0)| 00:00:01 |
-|   5 |     VIEW                                    | VW_NSO_1                     | 13140 |   166K| 20711   (1)| 00:00:01 |
-|   6 |      NESTED LOOPS SEMI                      |                              | 13140 |   461K| 20711   (1)| 00:00:01 |
-|   7 |       VIEW                                  | VW_GBF_20                    | 13140 |   166K| 20710   (1)| 00:00:01 |
-|   8 |        SORT GROUP BY                        |                              | 13140 |   333K| 20710   (1)| 00:00:01 |
-|   9 |         NESTED LOOPS                        |                              |  3243K|    80M| 20624   (1)| 00:00:01 |
-|  10 |          NESTED LOOPS                       |                              |  3244K|    80M| 20624   (1)| 00:00:01 |
-|* 11 |           TABLE ACCESS FULL                 | PATROL_SLOT                  |  1370 | 21920 |    34   (3)| 00:00:01 |
-|* 12 |           INDEX RANGE SCAN                  | PATROL_FK_PATROL_SLOT_IDX    |  2368 |       |     6   (0)| 00:00:01 |
-|  13 |          TABLE ACCESS BY INDEX ROWID        | PATROL                       |  2368 | 23680 |    15   (0)| 00:00:01 |
-|* 14 |       INDEX UNIQUE SCAN                     | SYS_C008254                  |     1 |    23 |     0   (0)| 00:00:01 |
-|  15 |    VIEW PUSHED PREDICATE                    | VW_NSO_2                     |     1 |     2 |    94   (2)| 00:00:01 |
-|  16 |     NESTED LOOPS                            |                              |     1 |    36 |    94   (2)| 00:00:01 |
-|* 17 |      INDEX UNIQUE SCAN                      | SYS_C008254                  |     1 |    23 |     1   (0)| 00:00:01 |
-|  18 |      VIEW                                   | VW_GBF_56                    |     1 |    13 |    93   (2)| 00:00:01 |
-|  19 |       SORT GROUP BY                         |                              |     1 |    47 |    93   (2)| 00:00:01 |
-|* 20 |        HASH JOIN SEMI                       |                              |     1 |    47 |    93   (2)| 00:00:01 |
-|  21 |         NESTED LOOPS                        |                              |    55 |  1100 |    59   (0)| 00:00:01 |
-|  22 |          TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK                 |     1 |     7 |     1   (0)| 00:00:01 |
-|* 23 |           INDEX UNIQUE SCAN                 | SYS_C008242                  |     1 |       |     0   (0)| 00:00:01 |
-|  24 |          TABLE ACCESS BY INDEX ROWID BATCHED| PATROL                       |    55 |   715 |    58   (0)| 00:00:01 |
-|* 25 |           INDEX RANGE SCAN                  | PATROL_FK_GUARD_FK_BLOCK_IDX |    55 |       |     2   (0)| 00:00:01 |
-|* 26 |         TABLE ACCESS FULL                   | PATROL_SLOT                  |    68 |  1836 |    34   (3)| 00:00:01 |
-----------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                                   | Name                         | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
+------------------------------------------------------------------------------------------------------------------------------------
+|   0 | UPDATE STATEMENT                            |                              |     1 |    35 |       | 28826   (2)| 00:00:02 |
+|   1 |  UPDATE                                     | GUARD                        |       |       |       |            |          |
+|   2 |   NESTED LOOPS SEMI                         |                              |     1 |    35 |       | 28826   (2)| 00:00:02 |
+|*  3 |    HASH JOIN ANTI                           |                              |     1 |    33 |       | 28731   (2)| 00:00:02 |
+|*  4 |     TABLE ACCESS FULL                       | GUARD                        |   129 |  2580 |       |    29   (0)| 00:00:01 |
+|   5 |     VIEW                                    | VW_NSO_1                     | 14217 |   180K|       | 28702   (2)| 00:00:02 |
+|   6 |      NESTED LOOPS SEMI                      |                              | 14217 |   499K|       | 28702   (2)| 00:00:02 |
+|   7 |       VIEW                                  | VW_GBF_20                    | 14217 |   180K|       | 28700   (2)| 00:00:02 |
+|   8 |        SORT GROUP BY                        |                              | 14217 |   360K|   121M| 28700   (2)| 00:00:02 |
+|   9 |         NESTED LOOPS                        |                              |  3506K|    86M|       | 19319   (1)| 00:00:01 |
+|  10 |          NESTED LOOPS                       |                              |  3507K|    86M|       | 19319   (1)| 00:00:01 |
+|* 11 |           TABLE ACCESS FULL                 | PATROL_SLOT                  |  1370 | 21920 |       |    34   (3)| 00:00:01 |
+|* 12 |           INDEX RANGE SCAN                  | PATROL_FK_PATROL_SLOT_INDEX  |  2560 |       |       |     5   (0)| 00:00:01 |
+|  13 |          TABLE ACCESS BY INDEX ROWID        | PATROL                       |  2560 | 25600 |       |    14   (0)| 00:00:01 |
+|* 14 |       INDEX UNIQUE SCAN                     | SYS_C008868                  |     1 |    23 |       |     0   (0)| 00:00:01 |
+|  15 |    VIEW PUSHED PREDICATE                    | VW_NSO_2                     |     1 |     2 |       |    95   (3)| 00:00:01 |
+|  16 |     NESTED LOOPS                            |                              |     1 |    36 |       |    95   (3)| 00:00:01 |
+|* 17 |      INDEX UNIQUE SCAN                      | SYS_C008868                  |     1 |    23 |       |     1   (0)| 00:00:01 |
+|  18 |      VIEW                                   | VW_GBF_56                    |     1 |    13 |       |    94   (3)| 00:00:01 |
+|  19 |       SORT GROUP BY                         |                              |     1 |    47 |       |    94   (3)| 00:00:01 |
+|* 20 |        HASH JOIN SEMI                       |                              |     1 |    47 |       |    94   (3)| 00:00:01 |
+|  21 |         NESTED LOOPS                        |                              |    55 |  1100 |       |    59   (0)| 00:00:01 |
+|  22 |          TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK                 |     1 |     7 |       |     1   (0)| 00:00:01 |
+|* 23 |           INDEX UNIQUE SCAN                 | SYS_C008856                  |     1 |       |       |     0   (0)| 00:00:01 |
+|  24 |          TABLE ACCESS BY INDEX ROWID BATCHED| PATROL                       |    55 |   715 |       |    58   (0)| 00:00:01 |
+|* 25 |           INDEX RANGE SCAN                  | PATROL_FK_GUARD_FK_BLOCK_IDX |    55 |       |       |     2   (0)| 00:00:01 |
+|* 26 |         TABLE ACCESS FULL                   | PATROL_SLOT                  |    68 |  1836 |       |    34   (3)| 00:00:01 |
+------------------------------------------------------------------------------------------------------------------------------------
  
 Predicate Information (identified by operation id):
 ---------------------------------------------------

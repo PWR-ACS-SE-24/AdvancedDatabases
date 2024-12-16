@@ -3,129 +3,129 @@ Plan hash value: 3517137373
 ------------------------------------------------------------------------------------------------------------------------------------------
 | Id  | Operation                                         | Name                         | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
 ------------------------------------------------------------------------------------------------------------------------------------------
-|   0 | SELECT STATEMENT                                  |                              |     5 |    65 |       | 85564   (1)| 00:00:04 |
-|   1 |  HASH UNIQUE                                      |                              |     5 |    65 |       | 85564   (1)| 00:00:04 |
+|   0 | SELECT STATEMENT                                  |                              |     5 |    65 |       | 98169   (2)| 00:00:04 |
+|   1 |  HASH UNIQUE                                      |                              |     5 |    65 |       | 98169   (2)| 00:00:04 |
 |   2 |   UNION-ALL                                       |                              |       |       |       |            |          |
-|   3 |    SORT AGGREGATE                                 |                              |     1 |    13 |       | 17113   (1)| 00:00:01 |
-|   4 |     VIEW                                          |                              |   138K|  1763K|       | 16451   (1)| 00:00:01 |
-|   5 |      HASH GROUP BY                                |                              |   138K|  7596K|       | 16451   (1)| 00:00:01 |
-|   6 |       MERGE JOIN OUTER                            |                              |  2179K|   116M|       | 16451   (1)| 00:00:01 |
-|   7 |        MERGE JOIN OUTER                           |                              |  1398K|    61M|       | 13574   (1)| 00:00:01 |
-|   8 |         MERGE JOIN OUTER                          |                              |   284K|  9724K|       |  6085   (1)| 00:00:01 |
+|   3 |    SORT AGGREGATE                                 |                              |     1 |    13 |       | 19635   (2)| 00:00:01 |
+|   4 |     VIEW                                          |                              |   157K|  1999K|       | 18878   (2)| 00:00:01 |
+|   5 |      HASH GROUP BY                                |                              |   157K|  8612K|       | 18878   (2)| 00:00:01 |
+|   6 |       MERGE JOIN OUTER                            |                              |  2487K|   132M|       | 18878   (2)| 00:00:01 |
+|   7 |        MERGE JOIN OUTER                           |                              |  1592K|    69M|       | 15584   (2)| 00:00:01 |
+|   8 |         MERGE JOIN OUTER                          |                              |   323K|    10M|       |  6963   (1)| 00:00:01 |
 |*  9 |          FILTER                                   |                              |       |       |       |            |          |
-|  10 |           MERGE JOIN OUTER                        |                              |   138K|  3391K|       |  3376   (1)| 00:00:01 |
-|  11 |            SORT JOIN                              |                              |   138K|  2170K|  7656K|  1311   (1)| 00:00:01 |
-|* 12 |             TABLE ACCESS FULL                     | PRISONER                     |   138K|  2170K|       |   569   (1)| 00:00:01 |
-|* 13 |            SORT JOIN                              |                              |  9279 | 83511 |       |  2066   (1)| 00:00:01 |
-|  14 |             VIEW                                  |                              |  9279 | 83511 |       |  2065   (1)| 00:00:01 |
-|* 15 |              HASH JOIN                            |                              |  9279 |   371K|       |  2065   (1)| 00:00:01 |
+|  10 |           MERGE JOIN OUTER                        |                              |   157K|  3845K|       |  3867   (1)| 00:00:01 |
+|  11 |            SORT JOIN                              |                              |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
+|* 12 |             TABLE ACCESS FULL                     | PRISONER                     |   157K|  2460K|       |   650   (2)| 00:00:01 |
+|* 13 |            SORT JOIN                              |                              | 10513 | 94617 |       |  2373   (1)| 00:00:01 |
+|  14 |             VIEW                                  |                              | 10513 | 94617 |       |  2372   (1)| 00:00:01 |
+|* 15 |              HASH JOIN                            |                              | 10513 |   420K|       |  2372   (1)| 00:00:01 |
 |  16 |               TABLE ACCESS FULL                   | PRISON_BLOCK                 |   100 |   700 |       |     2   (0)| 00:00:01 |
-|* 17 |               HASH JOIN                           |                              |  9279 |   308K|       |  2063   (1)| 00:00:01 |
-|* 18 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                |  9279 |   235K|       |  1738   (1)| 00:00:01 |
-|* 19 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 11827 |       |       |    34   (0)| 00:00:01 |
-|  20 |                TABLE ACCESS FULL                  | CELL                         |   233K|  1821K|       |   324   (1)| 00:00:01 |
-|* 21 |          SORT JOIN                                |                              |   371K|  3630K|    14M|  2709   (1)| 00:00:01 |
-|  22 |           TABLE ACCESS FULL                       | REPRIMAND                    |   371K|  3630K|       |  1223   (1)| 00:00:01 |
-|* 23 |         SORT JOIN                                 |                              |  1314K|    13M|    50M|  7489   (1)| 00:00:01 |
-|  24 |          TABLE ACCESS FULL                        | ACCOMMODATION                |  1314K|    13M|       |  1745   (1)| 00:00:01 |
-|* 25 |        SORT JOIN                                  |                              |   416K|  4070K|    15M|  2875   (1)| 00:00:01 |
-|  26 |         TABLE ACCESS FULL                         | SENTENCE                     |   416K|  4070K|       |  1210   (1)| 00:00:01 |
-|  27 |    SORT AGGREGATE                                 |                              |     1 |    13 |       | 17113   (1)| 00:00:01 |
-|  28 |     VIEW                                          |                              |   138K|  1763K|       | 16451   (1)| 00:00:01 |
-|  29 |      HASH GROUP BY                                |                              |   138K|  7596K|       | 16451   (1)| 00:00:01 |
-|  30 |       MERGE JOIN OUTER                            |                              |  2179K|   116M|       | 16451   (1)| 00:00:01 |
-|  31 |        MERGE JOIN OUTER                           |                              |  1398K|    61M|       | 13574   (1)| 00:00:01 |
-|  32 |         MERGE JOIN OUTER                          |                              |   284K|  9724K|       |  6085   (1)| 00:00:01 |
+|* 17 |               HASH JOIN                           |                              | 10513 |   349K|       |  2369   (1)| 00:00:01 |
+|* 18 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                | 10513 |   266K|       |  2016   (1)| 00:00:01 |
+|* 19 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 13437 |       |       |    38   (0)| 00:00:01 |
+|  20 |                TABLE ACCESS FULL                  | CELL                         |   251K|  1966K|       |   351   (1)| 00:00:01 |
+|* 21 |          SORT JOIN                                |                              |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
+|  22 |           TABLE ACCESS FULL                       | REPRIMAND                    |   422K|  4122K|       |  1394   (1)| 00:00:01 |
+|* 23 |         SORT JOIN                                 |                              |  1493K|    15M|    57M|  8621   (2)| 00:00:01 |
+|  24 |          TABLE ACCESS FULL                        | ACCOMMODATION                |  1493K|    15M|       |  2036   (2)| 00:00:01 |
+|* 25 |        SORT JOIN                                  |                              |   473K|  4620K|    18M|  3288   (2)| 00:00:01 |
+|  26 |         TABLE ACCESS FULL                         | SENTENCE                     |   473K|  4620K|       |  1381   (1)| 00:00:01 |
+|  27 |    SORT AGGREGATE                                 |                              |     1 |    13 |       | 19635   (2)| 00:00:01 |
+|  28 |     VIEW                                          |                              |   157K|  1999K|       | 18878   (2)| 00:00:01 |
+|  29 |      HASH GROUP BY                                |                              |   157K|  8612K|       | 18878   (2)| 00:00:01 |
+|  30 |       MERGE JOIN OUTER                            |                              |  2487K|   132M|       | 18878   (2)| 00:00:01 |
+|  31 |        MERGE JOIN OUTER                           |                              |  1592K|    69M|       | 15584   (2)| 00:00:01 |
+|  32 |         MERGE JOIN OUTER                          |                              |   323K|    10M|       |  6963   (1)| 00:00:01 |
 |* 33 |          FILTER                                   |                              |       |       |       |            |          |
-|  34 |           MERGE JOIN OUTER                        |                              |   138K|  3391K|       |  3376   (1)| 00:00:01 |
-|  35 |            SORT JOIN                              |                              |   138K|  2170K|  7656K|  1311   (1)| 00:00:01 |
-|* 36 |             TABLE ACCESS FULL                     | PRISONER                     |   138K|  2170K|       |   569   (1)| 00:00:01 |
-|* 37 |            SORT JOIN                              |                              |  9279 | 83511 |       |  2066   (1)| 00:00:01 |
-|  38 |             VIEW                                  |                              |  9279 | 83511 |       |  2065   (1)| 00:00:01 |
-|* 39 |              HASH JOIN                            |                              |  9279 |   371K|       |  2065   (1)| 00:00:01 |
+|  34 |           MERGE JOIN OUTER                        |                              |   157K|  3845K|       |  3867   (1)| 00:00:01 |
+|  35 |            SORT JOIN                              |                              |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
+|* 36 |             TABLE ACCESS FULL                     | PRISONER                     |   157K|  2460K|       |   650   (2)| 00:00:01 |
+|* 37 |            SORT JOIN                              |                              | 10513 | 94617 |       |  2373   (1)| 00:00:01 |
+|  38 |             VIEW                                  |                              | 10513 | 94617 |       |  2372   (1)| 00:00:01 |
+|* 39 |              HASH JOIN                            |                              | 10513 |   420K|       |  2372   (1)| 00:00:01 |
 |  40 |               TABLE ACCESS FULL                   | PRISON_BLOCK                 |   100 |   700 |       |     2   (0)| 00:00:01 |
-|* 41 |               HASH JOIN                           |                              |  9279 |   308K|       |  2063   (1)| 00:00:01 |
-|* 42 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                |  9279 |   235K|       |  1738   (1)| 00:00:01 |
-|* 43 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 11827 |       |       |    34   (0)| 00:00:01 |
-|  44 |                TABLE ACCESS FULL                  | CELL                         |   233K|  1821K|       |   324   (1)| 00:00:01 |
-|* 45 |          SORT JOIN                                |                              |   371K|  3630K|    14M|  2709   (1)| 00:00:01 |
-|  46 |           TABLE ACCESS FULL                       | REPRIMAND                    |   371K|  3630K|       |  1223   (1)| 00:00:01 |
-|* 47 |         SORT JOIN                                 |                              |  1314K|    13M|    50M|  7489   (1)| 00:00:01 |
-|  48 |          TABLE ACCESS FULL                        | ACCOMMODATION                |  1314K|    13M|       |  1745   (1)| 00:00:01 |
-|* 49 |        SORT JOIN                                  |                              |   416K|  4070K|    15M|  2875   (1)| 00:00:01 |
-|  50 |         TABLE ACCESS FULL                         | SENTENCE                     |   416K|  4070K|       |  1210   (1)| 00:00:01 |
-|  51 |    SORT AGGREGATE                                 |                              |     1 |    13 |       | 17113   (1)| 00:00:01 |
-|  52 |     VIEW                                          |                              |   138K|  1763K|       | 16451   (1)| 00:00:01 |
-|  53 |      HASH GROUP BY                                |                              |   138K|  7596K|       | 16451   (1)| 00:00:01 |
-|  54 |       MERGE JOIN OUTER                            |                              |  2179K|   116M|       | 16451   (1)| 00:00:01 |
-|  55 |        MERGE JOIN OUTER                           |                              |  1398K|    61M|       | 13574   (1)| 00:00:01 |
-|  56 |         MERGE JOIN OUTER                          |                              |   284K|  9724K|       |  6085   (1)| 00:00:01 |
+|* 41 |               HASH JOIN                           |                              | 10513 |   349K|       |  2369   (1)| 00:00:01 |
+|* 42 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                | 10513 |   266K|       |  2016   (1)| 00:00:01 |
+|* 43 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 13437 |       |       |    38   (0)| 00:00:01 |
+|  44 |                TABLE ACCESS FULL                  | CELL                         |   251K|  1966K|       |   351   (1)| 00:00:01 |
+|* 45 |          SORT JOIN                                |                              |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
+|  46 |           TABLE ACCESS FULL                       | REPRIMAND                    |   422K|  4122K|       |  1394   (1)| 00:00:01 |
+|* 47 |         SORT JOIN                                 |                              |  1493K|    15M|    57M|  8621   (2)| 00:00:01 |
+|  48 |          TABLE ACCESS FULL                        | ACCOMMODATION                |  1493K|    15M|       |  2036   (2)| 00:00:01 |
+|* 49 |        SORT JOIN                                  |                              |   473K|  4620K|    18M|  3288   (2)| 00:00:01 |
+|  50 |         TABLE ACCESS FULL                         | SENTENCE                     |   473K|  4620K|       |  1381   (1)| 00:00:01 |
+|  51 |    SORT AGGREGATE                                 |                              |     1 |    13 |       | 19635   (2)| 00:00:01 |
+|  52 |     VIEW                                          |                              |   157K|  1999K|       | 18878   (2)| 00:00:01 |
+|  53 |      HASH GROUP BY                                |                              |   157K|  8612K|       | 18878   (2)| 00:00:01 |
+|  54 |       MERGE JOIN OUTER                            |                              |  2487K|   132M|       | 18878   (2)| 00:00:01 |
+|  55 |        MERGE JOIN OUTER                           |                              |  1592K|    69M|       | 15584   (2)| 00:00:01 |
+|  56 |         MERGE JOIN OUTER                          |                              |   323K|    10M|       |  6963   (1)| 00:00:01 |
 |* 57 |          FILTER                                   |                              |       |       |       |            |          |
-|  58 |           MERGE JOIN OUTER                        |                              |   138K|  3391K|       |  3376   (1)| 00:00:01 |
-|  59 |            SORT JOIN                              |                              |   138K|  2170K|  7656K|  1311   (1)| 00:00:01 |
-|* 60 |             TABLE ACCESS FULL                     | PRISONER                     |   138K|  2170K|       |   569   (1)| 00:00:01 |
-|* 61 |            SORT JOIN                              |                              |  9279 | 83511 |       |  2066   (1)| 00:00:01 |
-|  62 |             VIEW                                  |                              |  9279 | 83511 |       |  2065   (1)| 00:00:01 |
-|* 63 |              HASH JOIN                            |                              |  9279 |   371K|       |  2065   (1)| 00:00:01 |
+|  58 |           MERGE JOIN OUTER                        |                              |   157K|  3845K|       |  3867   (1)| 00:00:01 |
+|  59 |            SORT JOIN                              |                              |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
+|* 60 |             TABLE ACCESS FULL                     | PRISONER                     |   157K|  2460K|       |   650   (2)| 00:00:01 |
+|* 61 |            SORT JOIN                              |                              | 10513 | 94617 |       |  2373   (1)| 00:00:01 |
+|  62 |             VIEW                                  |                              | 10513 | 94617 |       |  2372   (1)| 00:00:01 |
+|* 63 |              HASH JOIN                            |                              | 10513 |   420K|       |  2372   (1)| 00:00:01 |
 |  64 |               TABLE ACCESS FULL                   | PRISON_BLOCK                 |   100 |   700 |       |     2   (0)| 00:00:01 |
-|* 65 |               HASH JOIN                           |                              |  9279 |   308K|       |  2063   (1)| 00:00:01 |
-|* 66 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                |  9279 |   235K|       |  1738   (1)| 00:00:01 |
-|* 67 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 11827 |       |       |    34   (0)| 00:00:01 |
-|  68 |                TABLE ACCESS FULL                  | CELL                         |   233K|  1821K|       |   324   (1)| 00:00:01 |
-|* 69 |          SORT JOIN                                |                              |   371K|  3630K|    14M|  2709   (1)| 00:00:01 |
-|  70 |           TABLE ACCESS FULL                       | REPRIMAND                    |   371K|  3630K|       |  1223   (1)| 00:00:01 |
-|* 71 |         SORT JOIN                                 |                              |  1314K|    13M|    50M|  7489   (1)| 00:00:01 |
-|  72 |          TABLE ACCESS FULL                        | ACCOMMODATION                |  1314K|    13M|       |  1745   (1)| 00:00:01 |
-|* 73 |        SORT JOIN                                  |                              |   416K|  4070K|    15M|  2875   (1)| 00:00:01 |
-|  74 |         TABLE ACCESS FULL                         | SENTENCE                     |   416K|  4070K|       |  1210   (1)| 00:00:01 |
-|  75 |    SORT AGGREGATE                                 |                              |     1 |    13 |       | 17113   (1)| 00:00:01 |
-|  76 |     VIEW                                          |                              |   138K|  1763K|       | 16451   (1)| 00:00:01 |
-|  77 |      HASH GROUP BY                                |                              |   138K|  7596K|       | 16451   (1)| 00:00:01 |
-|  78 |       MERGE JOIN OUTER                            |                              |  2179K|   116M|       | 16451   (1)| 00:00:01 |
-|  79 |        MERGE JOIN OUTER                           |                              |  1398K|    61M|       | 13574   (1)| 00:00:01 |
-|  80 |         MERGE JOIN OUTER                          |                              |   284K|  9724K|       |  6085   (1)| 00:00:01 |
+|* 65 |               HASH JOIN                           |                              | 10513 |   349K|       |  2369   (1)| 00:00:01 |
+|* 66 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                | 10513 |   266K|       |  2016   (1)| 00:00:01 |
+|* 67 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 13437 |       |       |    38   (0)| 00:00:01 |
+|  68 |                TABLE ACCESS FULL                  | CELL                         |   251K|  1966K|       |   351   (1)| 00:00:01 |
+|* 69 |          SORT JOIN                                |                              |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
+|  70 |           TABLE ACCESS FULL                       | REPRIMAND                    |   422K|  4122K|       |  1394   (1)| 00:00:01 |
+|* 71 |         SORT JOIN                                 |                              |  1493K|    15M|    57M|  8621   (2)| 00:00:01 |
+|  72 |          TABLE ACCESS FULL                        | ACCOMMODATION                |  1493K|    15M|       |  2036   (2)| 00:00:01 |
+|* 73 |        SORT JOIN                                  |                              |   473K|  4620K|    18M|  3288   (2)| 00:00:01 |
+|  74 |         TABLE ACCESS FULL                         | SENTENCE                     |   473K|  4620K|       |  1381   (1)| 00:00:01 |
+|  75 |    SORT AGGREGATE                                 |                              |     1 |    13 |       | 19635   (2)| 00:00:01 |
+|  76 |     VIEW                                          |                              |   157K|  1999K|       | 18878   (2)| 00:00:01 |
+|  77 |      HASH GROUP BY                                |                              |   157K|  8612K|       | 18878   (2)| 00:00:01 |
+|  78 |       MERGE JOIN OUTER                            |                              |  2487K|   132M|       | 18878   (2)| 00:00:01 |
+|  79 |        MERGE JOIN OUTER                           |                              |  1592K|    69M|       | 15584   (2)| 00:00:01 |
+|  80 |         MERGE JOIN OUTER                          |                              |   323K|    10M|       |  6963   (1)| 00:00:01 |
 |* 81 |          FILTER                                   |                              |       |       |       |            |          |
-|  82 |           MERGE JOIN OUTER                        |                              |   138K|  3391K|       |  3376   (1)| 00:00:01 |
-|  83 |            SORT JOIN                              |                              |   138K|  2170K|  7656K|  1311   (1)| 00:00:01 |
-|* 84 |             TABLE ACCESS FULL                     | PRISONER                     |   138K|  2170K|       |   569   (1)| 00:00:01 |
-|* 85 |            SORT JOIN                              |                              |  9279 | 83511 |       |  2066   (1)| 00:00:01 |
-|  86 |             VIEW                                  |                              |  9279 | 83511 |       |  2065   (1)| 00:00:01 |
-|* 87 |              HASH JOIN                            |                              |  9279 |   371K|       |  2065   (1)| 00:00:01 |
+|  82 |           MERGE JOIN OUTER                        |                              |   157K|  3845K|       |  3867   (1)| 00:00:01 |
+|  83 |            SORT JOIN                              |                              |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
+|* 84 |             TABLE ACCESS FULL                     | PRISONER                     |   157K|  2460K|       |   650   (2)| 00:00:01 |
+|* 85 |            SORT JOIN                              |                              | 10513 | 94617 |       |  2373   (1)| 00:00:01 |
+|  86 |             VIEW                                  |                              | 10513 | 94617 |       |  2372   (1)| 00:00:01 |
+|* 87 |              HASH JOIN                            |                              | 10513 |   420K|       |  2372   (1)| 00:00:01 |
 |  88 |               TABLE ACCESS FULL                   | PRISON_BLOCK                 |   100 |   700 |       |     2   (0)| 00:00:01 |
-|* 89 |               HASH JOIN                           |                              |  9279 |   308K|       |  2063   (1)| 00:00:01 |
-|* 90 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                |  9279 |   235K|       |  1738   (1)| 00:00:01 |
-|* 91 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 11827 |       |       |    34   (0)| 00:00:01 |
-|  92 |                TABLE ACCESS FULL                  | CELL                         |   233K|  1821K|       |   324   (1)| 00:00:01 |
-|* 93 |          SORT JOIN                                |                              |   371K|  3630K|    14M|  2709   (1)| 00:00:01 |
-|  94 |           TABLE ACCESS FULL                       | REPRIMAND                    |   371K|  3630K|       |  1223   (1)| 00:00:01 |
-|* 95 |         SORT JOIN                                 |                              |  1314K|    13M|    50M|  7489   (1)| 00:00:01 |
-|  96 |          TABLE ACCESS FULL                        | ACCOMMODATION                |  1314K|    13M|       |  1745   (1)| 00:00:01 |
-|* 97 |        SORT JOIN                                  |                              |   416K|  4070K|    15M|  2875   (1)| 00:00:01 |
-|  98 |         TABLE ACCESS FULL                         | SENTENCE                     |   416K|  4070K|       |  1210   (1)| 00:00:01 |
-|  99 |    SORT AGGREGATE                                 |                              |     1 |    13 |       | 17111   (1)| 00:00:01 |
-| 100 |     VIEW                                          |                              |   138K|  1763K|       | 16449   (1)| 00:00:01 |
-| 101 |      HASH GROUP BY                                |                              |   138K|  7596K|       | 16449   (1)| 00:00:01 |
-| 102 |       MERGE JOIN OUTER                            |                              |  2179K|   116M|       | 16449   (1)| 00:00:01 |
-| 103 |        MERGE JOIN OUTER                           |                              |  1398K|    61M|       | 13573   (1)| 00:00:01 |
-| 104 |         MERGE JOIN OUTER                          |                              |   284K|  9724K|       |  6085   (1)| 00:00:01 |
+|* 89 |               HASH JOIN                           |                              | 10513 |   349K|       |  2369   (1)| 00:00:01 |
+|* 90 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                | 10513 |   266K|       |  2016   (1)| 00:00:01 |
+|* 91 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 13437 |       |       |    38   (0)| 00:00:01 |
+|  92 |                TABLE ACCESS FULL                  | CELL                         |   251K|  1966K|       |   351   (1)| 00:00:01 |
+|* 93 |          SORT JOIN                                |                              |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
+|  94 |           TABLE ACCESS FULL                       | REPRIMAND                    |   422K|  4122K|       |  1394   (1)| 00:00:01 |
+|* 95 |         SORT JOIN                                 |                              |  1493K|    15M|    57M|  8621   (2)| 00:00:01 |
+|  96 |          TABLE ACCESS FULL                        | ACCOMMODATION                |  1493K|    15M|       |  2036   (2)| 00:00:01 |
+|* 97 |        SORT JOIN                                  |                              |   473K|  4620K|    18M|  3288   (2)| 00:00:01 |
+|  98 |         TABLE ACCESS FULL                         | SENTENCE                     |   473K|  4620K|       |  1381   (1)| 00:00:01 |
+|  99 |    SORT AGGREGATE                                 |                              |     1 |    13 |       | 19629   (2)| 00:00:01 |
+| 100 |     VIEW                                          |                              |   157K|  1999K|       | 18872   (2)| 00:00:01 |
+| 101 |      HASH GROUP BY                                |                              |   157K|  8612K|       | 18872   (2)| 00:00:01 |
+| 102 |       MERGE JOIN OUTER                            |                              |  2487K|   132M|       | 18872   (2)| 00:00:01 |
+| 103 |        MERGE JOIN OUTER                           |                              |  1592K|    69M|       | 15580   (2)| 00:00:01 |
+| 104 |         MERGE JOIN OUTER                          |                              |   323K|    10M|       |  6963   (1)| 00:00:01 |
 |*105 |          FILTER                                   |                              |       |       |       |            |          |
-| 106 |           MERGE JOIN OUTER                        |                              |   138K|  3391K|       |  3376   (1)| 00:00:01 |
-| 107 |            SORT JOIN                              |                              |   138K|  2170K|  7656K|  1311   (1)| 00:00:01 |
-|*108 |             TABLE ACCESS FULL                     | PRISONER                     |   138K|  2170K|       |   569   (1)| 00:00:01 |
-|*109 |            SORT JOIN                              |                              |  9279 | 83511 |       |  2066   (1)| 00:00:01 |
-| 110 |             VIEW                                  |                              |  9279 | 83511 |       |  2065   (1)| 00:00:01 |
-|*111 |              HASH JOIN                            |                              |  9279 |   371K|       |  2065   (1)| 00:00:01 |
+| 106 |           MERGE JOIN OUTER                        |                              |   157K|  3845K|       |  3867   (1)| 00:00:01 |
+| 107 |            SORT JOIN                              |                              |   157K|  2460K|  8680K|  1494   (2)| 00:00:01 |
+|*108 |             TABLE ACCESS FULL                     | PRISONER                     |   157K|  2460K|       |   650   (2)| 00:00:01 |
+|*109 |            SORT JOIN                              |                              | 10513 | 94617 |       |  2373   (1)| 00:00:01 |
+| 110 |             VIEW                                  |                              | 10513 | 94617 |       |  2372   (1)| 00:00:01 |
+|*111 |              HASH JOIN                            |                              | 10513 |   420K|       |  2372   (1)| 00:00:01 |
 | 112 |               TABLE ACCESS FULL                   | PRISON_BLOCK                 |   100 |   700 |       |     2   (0)| 00:00:01 |
-|*113 |               HASH JOIN                           |                              |  9279 |   308K|       |  2063   (1)| 00:00:01 |
-|*114 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                |  9279 |   235K|       |  1738   (1)| 00:00:01 |
-|*115 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 11827 |       |       |    34   (0)| 00:00:01 |
-| 116 |                TABLE ACCESS FULL                  | CELL                         |   233K|  1821K|       |   324   (1)| 00:00:01 |
-|*117 |          SORT JOIN                                |                              |   371K|  3630K|    14M|  2709   (1)| 00:00:01 |
-| 118 |           TABLE ACCESS FULL                       | REPRIMAND                    |   371K|  3630K|       |  1223   (1)| 00:00:01 |
-|*119 |         SORT JOIN                                 |                              |  1314K|    13M|    50M|  7487   (1)| 00:00:01 |
-| 120 |          TABLE ACCESS FULL                        | ACCOMMODATION                |  1314K|    13M|       |  1744   (1)| 00:00:01 |
-|*121 |        SORT JOIN                                  |                              |   416K|  4070K|    15M|  2874   (1)| 00:00:01 |
-| 122 |         TABLE ACCESS FULL                         | SENTENCE                     |   416K|  4070K|       |  1209   (1)| 00:00:01 |
+|*113 |               HASH JOIN                           |                              | 10513 |   349K|       |  2369   (1)| 00:00:01 |
+|*114 |                TABLE ACCESS BY INDEX ROWID BATCHED| ACCOMMODATION                | 10513 |   266K|       |  2016   (1)| 00:00:01 |
+|*115 |                 INDEX RANGE SCAN                  | ACCOMMODATION_START_DATE_IDX | 13437 |       |       |    38   (0)| 00:00:01 |
+| 116 |                TABLE ACCESS FULL                  | CELL                         |   251K|  1966K|       |   351   (1)| 00:00:01 |
+|*117 |          SORT JOIN                                |                              |   422K|  4122K|    16M|  3096   (2)| 00:00:01 |
+| 118 |           TABLE ACCESS FULL                       | REPRIMAND                    |   422K|  4122K|       |  1394   (1)| 00:00:01 |
+|*119 |         SORT JOIN                                 |                              |  1493K|    15M|    57M|  8617   (2)| 00:00:01 |
+| 120 |          TABLE ACCESS FULL                        | ACCOMMODATION                |  1493K|    15M|       |  2032   (2)| 00:00:01 |
+|*121 |        SORT JOIN                                  |                              |   473K|  4620K|    18M|  3285   (2)| 00:00:01 |
+| 122 |         TABLE ACCESS FULL                         | SENTENCE                     |   473K|  4620K|       |  1379   (1)| 00:00:01 |
 ------------------------------------------------------------------------------------------------------------------------------------------
  
 Predicate Information (identified by operation id):

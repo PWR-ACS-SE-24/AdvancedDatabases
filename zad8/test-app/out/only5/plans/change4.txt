@@ -1,18 +1,18 @@
-Plan hash value: 178376495
+Plan hash value: 2769465380
  
 -------------------------------------------------------------------------------------------------------------
 | Id  | Operation                               | Name              | Rows  | Bytes | Cost (%CPU)| Time     |
 -------------------------------------------------------------------------------------------------------------
-|   0 | INSERT STATEMENT                        |                   |   106 |  4664 |  1795   (3)| 00:00:01 |
+|   0 | INSERT STATEMENT                        |                   |   121 |  5324 |  2141   (6)| 00:00:01 |
 |   1 |  LOAD TABLE CONVENTIONAL                | REPRIMAND         |       |       |            |          |
-|   2 |   SEQUENCE                              | ISEQ$$_75815      |       |       |            |          |
-|*  3 |    HASH JOIN                            |                   |   106 |  4664 |  1795   (3)| 00:00:01 |
-|   4 |     NESTED LOOPS                        |                   |  2540 | 45720 |    20   (0)| 00:00:01 |
+|   2 |   SEQUENCE                              | ISEQ$$_76236      |       |       |            |          |
+|*  3 |    HASH JOIN                            |                   |   121 |  5324 |  2141   (6)| 00:00:01 |
+|   4 |     NESTED LOOPS                        |                   |  2742 | 49356 |    21   (0)| 00:00:01 |
 |   5 |      TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK      |     1 |     7 |     1   (0)| 00:00:01 |
-|*  6 |       INDEX UNIQUE SCAN                 | SYS_C008242       |     1 |       |     0   (0)| 00:00:01 |
-|*  7 |      TABLE ACCESS BY INDEX ROWID BATCHED| CELL              |  2540 | 27940 |    19   (0)| 00:00:01 |
-|*  8 |       INDEX RANGE SCAN                  | CELL_FK_BLOCK_IDX |  2591 |       |     5   (0)| 00:00:01 |
-|*  9 |     TABLE ACCESS FULL                   | ACCOMMODATION     |  9577 |   243K|  1775   (3)| 00:00:01 |
+|*  6 |       INDEX UNIQUE SCAN                 | SYS_C008856       |     1 |       |     0   (0)| 00:00:01 |
+|*  7 |      TABLE ACCESS BY INDEX ROWID BATCHED| CELL              |  2742 | 30162 |    20   (0)| 00:00:01 |
+|*  8 |       INDEX RANGE SCAN                  | CELL_FK_BLOCK_IDX |  2797 |       |     5   (0)| 00:00:01 |
+|*  9 |     TABLE ACCESS FULL                   | ACCOMMODATION     | 10850 |   275K|  2119   (6)| 00:00:01 |
 -------------------------------------------------------------------------------------------------------------
  
 Predicate Information (identified by operation id):

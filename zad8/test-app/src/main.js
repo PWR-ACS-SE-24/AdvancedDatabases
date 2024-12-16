@@ -13,7 +13,7 @@ import { initializeDiffTable } from "./typst.js";
 const con = await oracledb.getConnection({
   user: "system",
   password: "password",
-  connectString: "localhost:1521/XEPDB1",
+  connectString: "172.27.240.1:1521/XEPDB1",
   stmtCacheSize: 0,
 });
 

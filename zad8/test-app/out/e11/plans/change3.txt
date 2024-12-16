@@ -1,31 +1,31 @@
-Plan hash value: 770489658
+Plan hash value: 212087080
  
 -------------------------------------------------------------------------------------------------------------------------
 | Id  | Operation                                  | Name                       | Rows  | Bytes | Cost (%CPU)| Time     |
 -------------------------------------------------------------------------------------------------------------------------
-|   0 | INSERT STATEMENT                           |                            |     1 |    52 |  3119   (2)| 00:00:01 |
+|   0 | INSERT STATEMENT                           |                            |     1 |    52 |  3637   (3)| 00:00:01 |
 |   1 |  LOAD TABLE CONVENTIONAL                   | ACCOMMODATION              |       |       |            |          |
-|   2 |   SEQUENCE                                 | ISEQ$$_75806               |       |       |            |          |
-|*  3 |    HASH JOIN                               |                            |     1 |    52 |  3119   (2)| 00:00:01 |
-|   4 |     VIEW                                   |                            |     1 |    26 |  1801   (2)| 00:00:01 |
+|   2 |   SEQUENCE                                 | ISEQ$$_76227               |       |       |            |          |
+|*  3 |    HASH JOIN                               |                            |     1 |    52 |  3637   (3)| 00:00:01 |
+|   4 |     VIEW                                   |                            |     1 |    26 |  2132   (4)| 00:00:01 |
 |   5 |      COUNT                                 |                            |       |       |            |          |
-|*  6 |       HASH JOIN ANTI                       |                            |     1 |    31 |  1801   (2)| 00:00:01 |
-|   7 |        NESTED LOOPS                        |                            |    51 |   918 |    34   (0)| 00:00:01 |
+|*  6 |       HASH JOIN ANTI                       |                            |     1 |    31 |  2132   (4)| 00:00:01 |
+|   7 |        NESTED LOOPS                        |                            |    55 |   990 |    37   (0)| 00:00:01 |
 |   8 |         TABLE ACCESS BY INDEX ROWID        | PRISON_BLOCK               |     1 |     7 |     1   (0)| 00:00:01 |
-|*  9 |          INDEX UNIQUE SCAN                 | SYS_C008242                |     1 |       |     0   (0)| 00:00:01 |
-|* 10 |         TABLE ACCESS BY INDEX ROWID BATCHED| CELL                       |    51 |   561 |    33   (0)| 00:00:01 |
-|* 11 |          INDEX RANGE SCAN                  | CELL_IS_SOLITARY_BTREE_IDX |  4549 |       |     9   (0)| 00:00:01 |
-|  12 |        VIEW                                | VW_NSO_1                   |  9418 |   119K|  1767   (2)| 00:00:01 |
-|  13 |         SORT GROUP BY                      |                            |  9418 |   193K|  1767   (2)| 00:00:01 |
-|* 14 |          TABLE ACCESS FULL                 | ACCOMMODATION              |  9577 |   196K|  1766   (2)| 00:00:01 |
-|  15 |     VIEW                                   |                            |    91 |  2366 |  1317   (1)| 00:00:01 |
-|  16 |      SORT GROUP BY                         |                            |    91 |  8281 |  1317   (1)| 00:00:01 |
+|*  9 |          INDEX UNIQUE SCAN                 | SYS_C008856                |     1 |       |     0   (0)| 00:00:01 |
+|* 10 |         TABLE ACCESS BY INDEX ROWID BATCHED| CELL                       |    55 |   605 |    36   (0)| 00:00:01 |
+|* 11 |          INDEX RANGE SCAN                  | CELL_IS_SOLITARY_BTREE_IDX |  4979 |       |    10   (0)| 00:00:01 |
+|  12 |        VIEW                                | VW_NSO_1                   | 10659 |   135K|  2095   (5)| 00:00:01 |
+|  13 |         SORT GROUP BY                      |                            | 10659 |   218K|  2095   (5)| 00:00:01 |
+|* 14 |          TABLE ACCESS FULL                 | ACCOMMODATION              | 10850 |   222K|  2093   (4)| 00:00:01 |
+|  15 |     VIEW                                   |                            |   103 |  2678 |  1505   (2)| 00:00:01 |
+|  16 |      SORT GROUP BY                         |                            |   103 |  9373 |  1505   (2)| 00:00:01 |
 |  17 |       COUNT                                |                            |       |       |            |          |
 |* 18 |        FILTER                              |                            |       |       |            |          |
-|  19 |         NESTED LOOPS                       |                            |    91 |  8281 |  1316   (1)| 00:00:01 |
-|  20 |          NESTED LOOPS                      |                            |    91 |  8281 |  1316   (1)| 00:00:01 |
-|* 21 |           TABLE ACCESS FULL                | REPRIMAND                  |    91 |  6734 |  1225   (1)| 00:00:01 |
-|* 22 |           INDEX UNIQUE SCAN                | SYS_C008234                |     1 |       |     0   (0)| 00:00:01 |
+|  19 |         NESTED LOOPS                       |                            |   103 |  9373 |  1504   (1)| 00:00:01 |
+|  20 |          NESTED LOOPS                      |                            |   103 |  9373 |  1504   (1)| 00:00:01 |
+|* 21 |           TABLE ACCESS FULL                | REPRIMAND                  |   103 |  7622 |  1401   (2)| 00:00:01 |
+|* 22 |           INDEX UNIQUE SCAN                | SYS_C008848                |     1 |       |     0   (0)| 00:00:01 |
 |  23 |          TABLE ACCESS BY INDEX ROWID       | PRISONER                   |     1 |    17 |     1   (0)| 00:00:01 |
 -------------------------------------------------------------------------------------------------------------------------
  
