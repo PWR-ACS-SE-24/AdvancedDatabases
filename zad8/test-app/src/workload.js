@@ -57,9 +57,8 @@ export const workload = {
     },
   },
   query4: {
-    sql: await readSql("query4"),
+    sql: await readSql("query4_mv"),
     params: {
-      now: "2024-10-20",
       block_number: null,
       sex: null,
     },
