@@ -8,7 +8,7 @@ import {
 } from "./indexes.js";
 import { gatherMeasurements } from "./measurements.js";
 import { gatherAndSavePlans, gatherCosts } from "./plans.js";
-import { initializeDiffTable } from "./typst.js";
+import { diff, f, initializeDiffTable } from "./typst.js";
 
 const con = await oracledb.getConnection({
   user: "system",
@@ -33,16 +33,24 @@ for (const set in indexSets) {
   const newCosts = await gatherCosts(con);
 
   const table = initializeDiffTable();
+  const sums = [0, 0, 0];
   for (const name of Object.keys(newTimes)) {
     table.addCell(name, { bold: true, mono: true });
-    table.addCell(oldTimes[name].avg.toFixed(2));
-    table.addCell(newTimes[name].avg.toFixed(2));
-    const timeDiff = (newTimes[name].avg - oldTimes[name].avg).toFixed(2);
-    table.addCell(`#diff(${timeDiff})`);
-    table.addCell(oldCosts[name]);
-    table.addCell(newCosts[name]);
-    table.addCell(`#diff(${newCosts[name] - oldCosts[name]})`);
+    table.addCell(f(oldTimes[name].avg));
+    table.addCell(f(newTimes[name].avg));
+    table.addCell(diff(newTimes[name].avg - oldTimes[name].avg));
+    table.addCell(f(oldCosts[name], true));
+    table.addCell(f(newCosts[name], true));
+    table.addCell(diff(newCosts[name] - oldCosts[name], true));
+    sums[0] += oldTimes[name].avg;
+    sums[1] += newTimes[name].avg;
+    sums[2] += newTimes[name].avg - oldTimes[name].avg;
   }
+  table.addCell("Suma", { bold: true });
+  table.addCell(f(sums[0]), { bold: true });
+  table.addCell(f(sums[1]), { bold: true });
+  table.addCell(diff(sums[2]), { bold: true });
+  table.addCell("—", { colspan: 3 });
   await fs.writeFile(`out/${set}/table.typ`, table.render());
 
   await dropIndexes(con, indexSets[set]);
