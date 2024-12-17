@@ -1,6 +1,17 @@
-#let diff(n) = if n == 0 { [#n] } else if n > 0 { text(fill: rgb("#880000"))[+#n] } else { text(fill: rgb("#008800"))[-#calc.abs(n)] }
+#let r(n) = text(fill: rgb("#880000"), n)
+#let g(n) = text(fill: rgb("#008800"), n)
 #table(
   columns: 7,
   align: right + horizon,
-  table.cell(rowspan: 2, colspan: 1)[*Name*], table.cell(rowspan: 1, colspan: 3)[*Średni czas [ms]*], table.cell(rowspan: 1, colspan: 3)[*Koszt*], [*Stary*], [*Nowy*], [*Zmiana*], [*Stary*], [*Nowy*], [*Zmiana*], [*`query1`*], [1574.47], [1028.92], [#diff(-545.54)], [1746], [1746], [#diff(0)], [*`query2`*], [2310.49], [1808.61], [#diff(-501.88)], [9834], [9834], [#diff(0)], [*`query3`*], [3431.12], [2146.00], [#diff(-1285.12)], [11117], [11117], [#diff(0)], [*`query4`*], [19940.83], [13337.63], [#diff(-6603.20)], [98504], [98504], [#diff(0)], [*`change1`*], [12014.35], [7416.81], [#diff(-4597.54)], [29726], [29726], [#diff(0)], [*`change3`*], [1963.72], [1218.05], [#diff(-745.67)], [3954], [3888], [#diff(-66)], [*`change4`*], [613.72], [423.74], [#diff(-189.98)], [2474], [2474], [#diff(0)]
+  fill: (x, y) => if y in (0, 1, 9) { rgb("#cce") } else if calc.rem(y, 2) == 0 { rgb("#f0f0ff") },
+  table.cell(rowspan: 2, colspan: 1)[*Nazwa*], table.cell(rowspan: 1, colspan: 3)[*Średni czas [ms]*], table.cell(rowspan: 1, colspan: 3)[*Koszt*], [*Stary*], [*Nowy*], [*Zmiana*], [*Stary*],
+  [*Nowy*], [*Zmiana*], [*`query1`*], [1 143.58], [1 118.72], [#g("-24.86")], [1 746],
+  [1 746], [0], [*`query2`*], [1 701.09], [1 709.96], [#r("+8.87")], [9 834],
+  [9 834], [0], [*`query3`*], [2 148.41], [2 135.88], [#g("-12.53")], [11 117],
+  [11 117], [0], [*`query4`*], [13 460.99], [13 402.89], [#g("-58.10")], [98 504],
+  [98 504], [0], [*`change1`*], [7 442.11], [7 411.41], [#g("-30.70")], [29 726],
+  [29 726], [0], [*`change3`*], [1 214.87], [1 206.51], [#g("-8.36")], [3 954],
+  [3 888], [#g("-66")], [*`change4`*], [406.13], [396.00], [#g("-10.13")], [2 474],
+  [2 474], [0], [*Suma*], [*27 517.18*], [*27 381.36*], [*#g("-135.82")*], table.cell(rowspan: 1, colspan: 3)[—],
+  
 )

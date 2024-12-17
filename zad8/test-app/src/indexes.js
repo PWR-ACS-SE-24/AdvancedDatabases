@@ -38,15 +38,15 @@ const indexes = {
 
 /** @type {Record<string, IndexSet>} */
 export const indexSets = {
-  // only1: [indexes.i1],
-  // only2: [indexes.i2],
-  // only3: [indexes.i3],
-  // only4: [indexes.i4],
-  // only5: [indexes.i5],
-  // all: [indexes.i1, indexes.i2, indexes.i3, indexes.i4, indexes.i5],
-  // e11: [indexes.e11],
-  // e12: [indexes.e12],
-  // e13: [indexes.e13],
+  only1: [indexes.i1],
+  only2: [indexes.i2],
+  only3: [indexes.i3],
+  only4: [indexes.i4],
+  only5: [indexes.i5],
+  all: [indexes.i1, indexes.i2, indexes.i3, indexes.i4, indexes.i5],
+  e11: [indexes.e11],
+  e12: [indexes.e12],
+  e13: [indexes.e13],
   e31: [indexes.e31],
   e32: [indexes.e32],
 };

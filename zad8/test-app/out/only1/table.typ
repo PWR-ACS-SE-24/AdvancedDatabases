@@ -1,6 +1,17 @@
-#let diff(n) = if n == 0 { [#n] } else if n > 0 { text(fill: rgb("#880000"))[+#n] } else { text(fill: rgb("#008800"))[-#calc.abs(n)] }
+#let r(n) = text(fill: rgb("#880000"), n)
+#let g(n) = text(fill: rgb("#008800"), n)
 #table(
   columns: 7,
   align: right + horizon,
-  table.cell(rowspan: 2, colspan: 1)[*Name*], table.cell(rowspan: 1, colspan: 3)[*Średni czas [ms]*], table.cell(rowspan: 1, colspan: 3)[*Koszt*], [*Stary*], [*Nowy*], [*Zmiana*], [*Stary*], [*Nowy*], [*Zmiana*], [*`query1`*], [1574.47], [1057.64], [#diff(-516.83)], [1746], [1716], [#diff(-30)], [*`query2`*], [2310.49], [1860.99], [#diff(-449.50)], [9834], [9736], [#diff(-98)], [*`query3`*], [3431.12], [2190.37], [#diff(-1240.75)], [11117], [11117], [#diff(0)], [*`query4`*], [19940.83], [13742.80], [#diff(-6198.03)], [98504], [98143], [#diff(-361)], [*`change1`*], [12014.35], [7835.19], [#diff(-4179.16)], [29726], [29726], [#diff(0)], [*`change3`*], [1963.72], [1289.12], [#diff(-674.60)], [3954], [3954], [#diff(0)], [*`change4`*], [613.72], [449.41], [#diff(-164.30)], [2474], [2474], [#diff(0)]
+  fill: (x, y) => if y in (0, 1, 9) { rgb("#cce") } else if calc.rem(y, 2) == 0 { rgb("#f0f0ff") },
+  table.cell(rowspan: 2, colspan: 1)[*Nazwa*], table.cell(rowspan: 1, colspan: 3)[*Średni czas [ms]*], table.cell(rowspan: 1, colspan: 3)[*Koszt*], [*Stary*], [*Nowy*], [*Zmiana*], [*Stary*],
+  [*Nowy*], [*Zmiana*], [*`query1`*], [1 143.58], [1 126.87], [#g("-16.71")], [1 746],
+  [1 716], [#g("-30")], [*`query2`*], [1 701.09], [1 737.25], [#r("+36.16")], [9 834],
+  [9 736], [#g("-98")], [*`query3`*], [2 148.41], [2 131.77], [#g("-16.64")], [11 117],
+  [11 117], [0], [*`query4`*], [13 460.99], [13 612.14], [#r("+151.16")], [98 504],
+  [98 143], [#g("-361")], [*`change1`*], [7 442.11], [7 434.76], [#g("-7.36")], [29 726],
+  [29 726], [0], [*`change3`*], [1 214.87], [1 214.82], [#g("-0.05")], [3 954],
+  [3 954], [0], [*`change4`*], [406.13], [400.65], [#g("-5.49")], [2 474],
+  [2 474], [0], [*Suma*], [*27 517.18*], [*27 658.25*], [*#r("+141.07")*], table.cell(rowspan: 1, colspan: 3)[—],
+  
 )

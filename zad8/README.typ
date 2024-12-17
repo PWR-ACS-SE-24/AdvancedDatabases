@@ -1071,7 +1071,7 @@ Note
    ```]
 )
 
-Zastosowanie indeksów funkcyjnych dla danych czasowych w zapytaniu `query3` spowodowało zmniejszenie kosztu zapytania, w planie wykonania można zaobserwować, że `TABLE ACCESS FULL` zamienił się na `TABLE ACCESS BY INDEX ROWID BATCHED` dla tabel `REPRIMAND` , `SENTENCE` oraz `ACCOMMODATION`, co świadczy o pomyślnym wykorzystaniu stworzonych indeksów, jednakże rezultat pomiaru czasu jest zaskakujący, ponieważ czas wykonywania zapytania zwiększył się z TODO do TODO, co jest aż TODO% wzrostem.
+Zastosowanie indeksów funkcyjnych dla danych czasowych w zapytaniu `query3` spowodowało zmniejszenie kosztu zapytania, w planie wykonania można zaobserwować, że `TABLE ACCESS FULL` zamienił się na `TABLE ACCESS BY INDEX ROWID BATCHED` dla tabel `REPRIMAND` , `SENTENCE` oraz `ACCOMMODATION`, co świadczy o pomyślnym wykorzystaniu stworzonych indeksów, jednakże rezultat pomiaru czasu jest zaskakujący, ponieważ czas wykonywania zapytania zwiększył się *z `2.15s` do `102.1s`*, co jest aż *`4750%` wzrostem*.
 
 *`change1`:*
 #plan(
@@ -2098,7 +2098,9 @@ W zapytaniu `change4` również można zaobserwować zmianę `TABLE ACCESS FULL`
 
 #align(center, include("./test-app/out/all/table.typ"))
 
-Zastosowanie wszystkich opisanych powyżej indeksów na raz spowodowało zmniejszenie się kosztów wszystkich naszych zapytań w mniejszym bądź większym stopniu, a także TODO(zmniejszenie się czasów wykonywania z wyjątkiem `query3`, który w wyniku dodania indeksów funkcyjnych dla danych czasowych tak bardzo zwiększył swój czas wykonywania, że poprawy wydajności poprzez dodanie innych indeksów nie były w stanie tego zniwelować).
+#show link: underline
+
+Zastosowanie wszystkich opisanych powyżej indeksów na raz spowodowało zmniejszenie się kosztów wszystkich naszych zapytań w mniejszym bądź większym stopniu, a także podczas stosowania każdego indeksu osobno (z wyjątkiem anomalii w zapytaniu `query3` przy użyciu indeksów funkcyjnych dla danych czasowych) zmniejszenie się czasów wykonywania zapytań, jednakże nie zawsze w sposób znaczący. Podczas pomiaru czasu przy zastosowaniu wszystkich indeksów jednocześnie, część czasów zmieniła się w sposób nieznaczący, a część spowolniła, jednakże może to wynikać z błędów pomiarowych mimo zastosowania średniej z 10 pomiarów, a także niezależnej od nas pracy systemu operacyjnego, który podczas bezczynności użytkownika mógł wykonywać inne operacje, które mogły wpłynąć na czas wykonywania zapytań. #link("https://learn.microsoft.com/en-us/windows/win32/taskschd/task-idle-conditions")[#text(fill:blue)[Na przykład w systemie Windows niektóre zadania _Task Schedulera_ mogą zacząć się wykonywać, gdy komputer jest w stanie bezczynności.] ]
 
 == Eksperymenty
 
@@ -2922,7 +2924,7 @@ Porównanie czasów wykonania zapytań `query4` z podzapytaniem i z widokiem zma
   align: right + horizon,
   fill: (x, y) => if y in (0, 1, 9) { rgb("#cce") } else if calc.rem(y, 2) == 0 { rgb("#f0f0ff") },
   table.cell(rowspan: 2, colspan: 1)[*Nazwa*], table.cell(rowspan: 1, colspan: 3)[*Średni czas [ms]*], table.cell(rowspan: 1, colspan: 3)[*Koszt*], [*Stary*], [*Nowy*], [*Zmiana*], [*Stary*],
-  [*Nowy*], [*Zmiana*], [*`query4`*], [TODO], [371.17], [#g("-TODO")], [98 504],
+  [*Nowy*], [*Zmiana*], [*`query4`*], [13 460.99], [371.17], [#g("-13 089,82")], [98 504],
   [1 801], [#g("-96703")],
   
 )
