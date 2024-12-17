@@ -710,6 +710,8 @@ Note
 
 W zapytaniu `query4` również można zaobserwować pomyślne użycie indeksu w zapytaniu, ponieważ obserwujemy kilkukrotną zamianę `TABLE ACCESS FULL` na `TABLE ACCESS BY INDEX ROWID BATCHED` dla tabeli `ACCOMMODATION`. 
 
+#pagebreak()
+
 === Indeks bitmapowy dla rodzaju celi
 
 #sql[
@@ -874,6 +876,8 @@ create index patrol_slot_end_time_to_char_idx on
    ) );
 ```
 ]
+
+#pagebreak()
 
 #align(center, include("./test-app/out/only3/table.typ"))
 
@@ -1219,6 +1223,8 @@ create index patrol_fk_guard_fk_block_idx on
    );
 ```
 ]
+
+#pagebreak()
 
 #align(center, include("./test-app/out/only4/table.typ"))
 
@@ -2094,6 +2100,8 @@ Predicate Information (identified by operation id):
 
 W zapytaniu `change4` również można zaobserwować zmianę `TABLE ACCESS FULL` na `TABLE ACCESS BY INDEX ROWID BATCHED` dla tabeli `CELL`, co jest dowodem użycia indeksu dla klucza obcego.
 
+#pagebreak()
+
 === Nałożenie wszystkich proponowanych indeksów jednocześnie
 
 #align(center, include("./test-app/out/all/table.typ"))
@@ -2101,6 +2109,8 @@ W zapytaniu `change4` również można zaobserwować zmianę `TABLE ACCESS FULL`
 #show link: underline
 
 Zastosowanie wszystkich opisanych powyżej indeksów na raz spowodowało zmniejszenie się kosztów wszystkich naszych zapytań w mniejszym bądź większym stopniu, a także podczas stosowania każdego indeksu osobno (z wyjątkiem anomalii w zapytaniu `query3` przy użyciu indeksów funkcyjnych dla danych czasowych) zmniejszenie się czasów wykonywania zapytań, jednakże nie zawsze w sposób znaczący. Podczas pomiaru czasu przy zastosowaniu wszystkich indeksów jednocześnie, część czasów zmieniła się w sposób nieznaczący, a część spowolniła, jednakże może to wynikać z błędów pomiarowych mimo zastosowania średniej z 10 pomiarów, a także niezależnej od nas pracy systemu operacyjnego, który podczas bezczynności użytkownika mógł wykonywać inne operacje, które mogły wpłynąć na czas wykonywania zapytań. #link("https://learn.microsoft.com/en-us/windows/win32/taskschd/task-idle-conditions")[#text(fill:blue)[Na przykład w systemie Windows niektóre zadania _Task Schedulera_ mogą zacząć się wykonywać, gdy komputer jest w stanie bezczynności.] ]
+
+#pagebreak()
 
 == Eksperymenty
 
@@ -2355,6 +2365,8 @@ create index cell_is_solitary_composite_idx on
 ```]
 
 #align(center, include("./test-app/out/e13/table.typ"))
+
+#pagebreak()
 
 *`change3`:*
 #plan(
@@ -3194,6 +3206,8 @@ create index query4_mv_sex_idx on
 
 A także użyliśmy takiego _hinta_ w zapytaniu: `/*+ INDEX(query4_mv query4_mv_block_number_idx) INDEX(query4_mv query4_mv_sex_idx) */`, aby upewnić się, że silnik bazy danych skorzysta z naszych indeksów.
 
+#pagebreak()
+
 Porównanie czasów wykonania zapytań `query4` z widokiem zmaterializowanym i z widokiem zmaterializowanym z indeksami:
 #let r(n) = text(fill: rgb("#880000"), n)
 #let g(n) = text(fill: rgb("#008800"), n)
@@ -3406,6 +3420,8 @@ insert into reprimand_clone
    select *
      from reprimand;
 ```]
+
+#pagebreak()
 
 Poniżej przedstawiono porównanie wariantu 2 względem 1, a następnie 3 względem 1:
 
