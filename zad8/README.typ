@@ -3800,4 +3800,12 @@ Note
 
 ==== Wnioski
 
-TODO
+W obu przypadkach, zastosowanie partycji zwiększyło koszt operacji. W przypadku partycji bez indeksu, średni czas wykonania kwerendy spadł o prawie 2 sekundy, natomiast przy użyciu indeksu wzrósł o ćwierć sekundy.
+
+W wyniku analizy planów można zauważyć, że w obu przypadkach została zastosowana nowa, partycjonowana tablica, a dostępy pełne `TABLE ACCESS FULL` zostały zamienione na dostępy `PARTITION RANGE ALL -> TABLE ACCESS FULL` lub `PARTITION RANGE ITERATOR -> TABLE ACCESS FULL`. To czy przechodziliśmy po wszystkich partycjach, czy tylko ich zakresie zależało od tego, jak tabela `reprimand_clone` była wykorzystywana w kwerendzie. W przypadku `query3`, następuje dwukrotny dostęp do tej tabeli, raz wraz z filtrowaniem po `issue_date` (po którym były tworzone partycje) oraz raz bez filtrowania, przy złączeniu z inną tabelą.
+
+Jednakże niezależnie od tego, czy wykorzystywaliśmy dostęp do części tabeli czy jej całości, koszt operacji wzrósł (i w przypadku `PARTITION RANGE ITERATOR` i `PARTITION RANGE ALL`). Być może tabela, na której wykonywaliśmy eksperyment była za mała, lub nasze partycje zbyt częste, żeby zaobserwować poprawę.
+
+W obu przypadkach widać też zamianę kolejności operacji: w wersji bazowej `reprimand` było łączone z `prisoner`, a dopiero następnie z `sentence` natomaist w obu wersjach z partycjonowaniem najpierw łączymy `prisoner` z `sentence`, a dopiero wynik z tym co uzyskamy z `reprimand_clone`. Nie podejrzewamy jednak, aby miało to wpływ na efektywność kwerendy.
+
+Pomimo minimalnie mniejszego kosztu, czas wykonania wersji z indeksami był znacząco dłuższy niż wersji bez indeksów. Podejrzewamy, że każda z partycji była na tyle mała, że zastosowane na nich indeksy lokalne nie miały jak przyspieszyć wyszukiwania względem pełnego skanu. Niezależnie, w tym przypadku należałoby całkowicie zrezygnować z partycji, które są też dodatkowo problematyczne w utrzymaniu (przykładowo nie byliśmy w stanie dodać partycjonowania do tabeli `reprimand` i dlatego stworzyliśmy pomocniczą `reprimand_clone`).
