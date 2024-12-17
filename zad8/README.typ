@@ -3413,8 +3413,6 @@ Poniżej przedstawiono porównanie wariantu 2 względem 1, a następnie 3 wzglę
 
 #align(center, include("./test-app/out/e31/table.typ"))
 
-TODO: dać dane z planu do tabelki
-
 #plan(
    [```
 Plan hash value: 220023471
@@ -3429,13 +3427,19 @@ Plan hash value: 220023471
 |   4 |     NESTED LOOPS                     |               |     1 |  2170 |       | 11115   (2)| 00:00:01 |
 |*  5 |      HASH JOIN                       |               |     1 |  2159 |       | 11114   (2)| 00:00:01 |
 |*  6 |       HASH JOIN                      |               |     1 |  2133 |       |  9021   (2)| 00:00:01 |
+```
+#highlight[```
 |*  7 |        HASH JOIN                     |               |     1 |   118 |       |  6793   (2)| 00:00:01 |
 |   8 |         JOIN FILTER CREATE           | :BF0000       |   103 | 10815 |       |  1504   (1)| 00:00:01 |
 |   9 |          NESTED LOOPS                |               |   103 | 10815 |       |  1504   (1)| 00:00:01 |
 |  10 |           NESTED LOOPS               |               |   103 | 10815 |       |  1504   (1)| 00:00:01 |
 |* 11 |            TABLE ACCESS FULL         | REPRIMAND     |   103 |  8446 |       |  1401   (2)| 00:00:01 |
 |* 12 |            INDEX UNIQUE SCAN         | SYS_C008848   |     1 |       |       |     0   (0)| 00:00:01 |
+```]
+```
 |  13 |           TABLE ACCESS BY INDEX ROWID| PRISONER      |     1 |    23 |       |     1   (0)| 00:00:01 |
+```
+#highlight[```
 |  14 |         VIEW                         |               |  1063 | 13819 |       |  5288   (2)| 00:00:01 |
 |* 15 |          FILTER                      |               |       |       |       |            |          |
 |  16 |           JOIN FILTER USE            | :BF0000       |  1063 | 28701 |       |  5288   (2)| 00:00:01 |
@@ -3449,6 +3453,8 @@ Plan hash value: 220023471
 |* 24 |        VIEW                          |               |  9870 |    18M|       |  2228   (2)| 00:00:01 |
 |  25 |         SORT GROUP BY                |               |  9870 |   751K|   872K|  2228   (2)| 00:00:01 |
 |* 26 |          FILTER                      |               |       |       |       |            |          |
+```]
+```
 |* 27 |           HASH JOIN                  |               |  9870 |   751K|       |  2046   (2)| 00:00:01 |
 |* 28 |            TABLE ACCESS FULL         | SENTENCE      |  9870 |   587K|       |  1399   (3)| 00:00:01 |
 |  29 |            TABLE ACCESS FULL         | PRISONER      |   299K|  4980K|       |   645   (1)| 00:00:01 |
@@ -3507,6 +3513,8 @@ Plan hash value: 2070514248
 |   4 |     NESTED LOOPS                     |                 |     1 |  3138 |       | 11410   (2)| 00:00:01 |       |       |
 |*  5 |      HASH JOIN                       |                 |     1 |  3127 |       | 11409   (2)| 00:00:01 |       |       |
 |*  6 |       HASH JOIN                      |                 |     1 |  3101 |       |  9316   (2)| 00:00:01 |       |       |
+```
+#highlight[```
 |   7 |        JOIN FILTER CREATE            | :BF0000         |     4 | 12352 |       |  3752   (2)| 00:00:01 |       |       |
 |*  8 |         HASH JOIN                    |                 |     4 | 12352 |       |  3752   (2)| 00:00:01 |       |       |
 |   9 |          NESTED LOOPS                |                 |   108 |   113K|       |  1524   (2)| 00:00:01 |       |       |
@@ -3514,7 +3522,11 @@ Plan hash value: 2070514248
 |  11 |            PARTITION RANGE ITERATOR  |                 |   108 |   110K|       |  1415   (2)| 00:00:01 |   KEY |   KEY |
 |* 12 |             TABLE ACCESS FULL        | REPRIMAND_CLONE |   108 |   110K|       |  1415   (2)| 00:00:01 |   KEY |   KEY |
 |* 13 |            INDEX UNIQUE SCAN         | SYS_C008848     |     1 |       |       |     0   (0)| 00:00:01 |       |       |
+```]
+```
 |  14 |           TABLE ACCESS BY INDEX ROWID| PRISONER        |     1 |    23 |       |     1   (0)| 00:00:01 |       |       |
+```
+#highlight[```
 |* 15 |          VIEW                        |                 |  9870 |    18M|       |  2228   (2)| 00:00:01 |       |       |
 |  16 |           SORT GROUP BY              |                 |  9870 |   751K|   872K|  2228   (2)| 00:00:01 |       |       |
 |* 17 |            HASH JOIN                 |                 |  9870 |   751K|       |  2046   (2)| 00:00:01 |       |       |
@@ -3528,6 +3540,8 @@ Plan hash value: 2070514248
 |* 25 |             HASH JOIN                |                 |   689K|    23M|    10M|  5523   (1)| 00:00:01 |       |       |
 |  26 |              PARTITION RANGE ALL     |                 |   441K|  5608K|       |  1408   (1)| 00:00:01 |     1 |    25 |
 |  27 |               TABLE ACCESS FULL      | REPRIMAND_CLONE |   441K|  5608K|       |  1408   (1)| 00:00:01 |     1 |    25 |
+```]
+```
 |* 28 |              HASH JOIN               |                 |   468K|     9M|  7856K|  2826   (1)| 00:00:01 |       |       |
 |  29 |               TABLE ACCESS FULL      | SENTENCE        |   473K|  2310K|       |  1379   (1)| 00:00:01 |       |       |
 |  30 |               TABLE ACCESS FULL      | PRISONER        |   299K|  4980K|       |   645   (1)| 00:00:01 |       |       |
@@ -3586,8 +3600,6 @@ create index reprimand_clone_issue_date_idx on
 
 #align(center, include("./test-app/out/e32/table.typ"))
 
-TODO: dać dane z planu do tabelki
-
 #plan(
    [```
 Plan hash value: 220023471
@@ -3598,15 +3610,31 @@ Plan hash value: 220023471
 |   0 | SELECT STATEMENT                     |               |     1 |  2200 |       | 11117   (2)| 00:00:01 |
 |   1 |  NESTED LOOPS                        |               |     1 |  2200 |       | 11117   (2)| 00:00:01 |
 |   2 |   NESTED LOOPS                       |               |     1 |  2200 |       | 11117   (2)| 00:00:01 |
+```
+#highlight[```
 |   3 |    NESTED LOOPS                      |               |     1 |  2177 |       | 11116   (2)| 00:00:01 |
+```]
+```
 |   4 |     NESTED LOOPS                     |               |     1 |  2170 |       | 11115   (2)| 00:00:01 |
+```
+#highlight[```
 |*  5 |      HASH JOIN                       |               |     1 |  2159 |       | 11114   (2)| 00:00:01 |
+```]
+```
 |*  6 |       HASH JOIN                      |               |     1 |  2133 |       |  9021   (2)| 00:00:01 |
+```
+#highlight[```
 |*  7 |        HASH JOIN                     |               |     1 |   118 |       |  6793   (2)| 00:00:01 |
 |   8 |         JOIN FILTER CREATE           | :BF0000       |   103 | 10815 |       |  1504   (1)| 00:00:01 |
+```]
+```
 |   9 |          NESTED LOOPS                |               |   103 | 10815 |       |  1504   (1)| 00:00:01 |
 |  10 |           NESTED LOOPS               |               |   103 | 10815 |       |  1504   (1)| 00:00:01 |
+```
+#highlight[```
 |* 11 |            TABLE ACCESS FULL         | REPRIMAND     |   103 |  8446 |       |  1401   (2)| 00:00:01 |
+```]
+```
 |* 12 |            INDEX UNIQUE SCAN         | SYS_C008848   |     1 |       |       |     0   (0)| 00:00:01 |
 |  13 |           TABLE ACCESS BY INDEX ROWID| PRISONER      |     1 |    23 |       |     1   (0)| 00:00:01 |
 |  14 |         VIEW                         |               |  1063 | 13819 |       |  5288   (2)| 00:00:01 |
@@ -3617,7 +3645,11 @@ Plan hash value: 220023471
 |* 19 |              HASH JOIN               |               |   659K|    16M|  7856K|  5249   (1)| 00:00:01 |
 |  20 |               TABLE ACCESS FULL      | SENTENCE      |   473K|  2310K|       |  1379   (1)| 00:00:01 |
 |* 21 |               HASH JOIN              |               |   422K|  9069K|  7016K|  2799   (1)| 00:00:01 |
+```
+#highlight[```
 |  22 |                TABLE ACCESS FULL     | REPRIMAND     |   422K|  2061K|       |  1394   (1)| 00:00:01 |
+```]
+```
 |  23 |                TABLE ACCESS FULL     | PRISONER      |   299K|  4980K|       |   645   (1)| 00:00:01 |
 |* 24 |        VIEW                          |               |  9870 |    18M|       |  2228   (2)| 00:00:01 |
 |  25 |         SORT GROUP BY                |               |  9870 |   751K|   872K|  2228   (2)| 00:00:01 |
@@ -3676,17 +3708,33 @@ Plan hash value: 2539870365
 |   0 | SELECT STATEMENT                                     |                                |     1 |  3168 |       | 11396   (2)| 00:00:01 |       |       |
 |   1 |  NESTED LOOPS                                        |                                |     1 |  3168 |       | 11396   (2)| 00:00:01 |       |       |
 |   2 |   NESTED LOOPS                                       |                                |     1 |  3161 |       | 11395   (2)| 00:00:01 |       |       |
+```
+#highlight[```
 |*  3 |    HASH JOIN                                         |                                |     1 |  3150 |       | 11394   (2)| 00:00:01 |       |       |
+```]
+```
 |   4 |     NESTED LOOPS                                     |                                |     1 |  3124 |       |  9301   (2)| 00:00:01 |       |       |
+```
+#highlight[```
 |   5 |      NESTED LOOPS                                    |                                |     1 |  3124 |       |  9301   (2)| 00:00:01 |       |       |
+```]
+```
 |*  6 |       HASH JOIN                                      |                                |     1 |  3101 |       |  9300   (2)| 00:00:01 |       |       |
+```
+#highlight[```
 |   7 |        JOIN FILTER CREATE                            | :BF0000                        |     4 | 12352 |       |  3736   (1)| 00:00:01 |       |       |
 |*  8 |         HASH JOIN                                    |                                |     4 | 12352 |       |  3736   (1)| 00:00:01 |       |       |
+```]
+```
 |   9 |          NESTED LOOPS                                |                                |   108 |   113K|       |  1508   (1)| 00:00:01 |       |       |
 |  10 |           NESTED LOOPS                               |                                |   108 |   113K|       |  1508   (1)| 00:00:01 |       |       |
+```
+#highlight[```
 |  11 |            PARTITION RANGE ITERATOR                  |                                |   108 |   110K|       |  1400   (1)| 00:00:01 |   KEY |   KEY |
 |* 12 |             TABLE ACCESS BY LOCAL INDEX ROWID BATCHED| REPRIMAND_CLONE                |   108 |   110K|       |  1400   (1)| 00:00:01 |   KEY |   KEY |
 |* 13 |              INDEX RANGE SCAN                        | REPRIMAND_CLONE_ISSUE_DATE_IDX |  1988 |       |       |     6   (0)| 00:00:01 |   KEY |   KEY |
+```]
+```
 |* 14 |            INDEX UNIQUE SCAN                         | SYS_C008848                    |     1 |       |       |     0   (0)| 00:00:01 |       |       |
 |  15 |           TABLE ACCESS BY INDEX ROWID                | PRISONER                       |     1 |    23 |       |     1   (0)| 00:00:01 |       |       |
 |* 16 |          VIEW                                        |                                |  9870 |    18M|       |  2228   (2)| 00:00:01 |       |       |
@@ -3700,8 +3748,12 @@ Plan hash value: 2539870365
 |  24 |           HASH GROUP BY                              |                                |  1063 | 37205 |       |  5564   (2)| 00:00:01 |       |       |
 |* 25 |            FILTER                                    |                                |       |       |       |            |          |       |       |
 |* 26 |             HASH JOIN                                |                                |   689K|    23M|    10M|  5523   (1)| 00:00:01 |       |       |
+```
+#highlight[```
 |  27 |              PARTITION RANGE ALL                     |                                |   441K|  5608K|       |  1408   (1)| 00:00:01 |     1 |    25 |
 |  28 |               TABLE ACCESS FULL                      | REPRIMAND_CLONE                |   441K|  5608K|       |  1408   (1)| 00:00:01 |     1 |    25 |
+```]
+```
 |* 29 |              HASH JOIN                               |                                |   468K|     9M|  7856K|  2826   (1)| 00:00:01 |       |       |
 |  30 |               TABLE ACCESS FULL                      | SENTENCE                       |   473K|  2310K|       |  1379   (1)| 00:00:01 |       |       |
 |  31 |               TABLE ACCESS FULL                      | PRISONER                       |   299K|  4980K|       |   645   (1)| 00:00:01 |       |       |
