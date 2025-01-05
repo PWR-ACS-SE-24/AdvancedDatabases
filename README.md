@@ -47,3 +47,7 @@
 3. [Zadanie 3 - Baza danych](./zad3/)
 4. [Zadanie 4 - Workload](./zad4/)
 5. [Zadanie 5 - Plany zapytań](./zad5/)
+6. [Zadanie 6 - Aplikacja testowa](./zad6/)
+7. [Zadanie 7 - Indeksy](./zad7/)
+8. [Zadanie 8 - Indeksy](./zad8/)
+9. [Zadanie 9 - Składowanie kolumnowe](./zad9/)
