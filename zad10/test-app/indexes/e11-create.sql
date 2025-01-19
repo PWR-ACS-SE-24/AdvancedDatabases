@@ -1,1 +1,1 @@
-alter table prisoner inmemory priority critical nocompress;
+alter table prisoner inmemory priority critical no memcompress;

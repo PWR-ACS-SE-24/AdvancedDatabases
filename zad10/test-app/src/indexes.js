@@ -34,6 +34,7 @@ const indexes = {
   e14: await readIndex("e14"),
   e15: await readIndex("e15"),
   e16: await readIndex("e16"),
+  e2: await readIndex("e2"),
 };
 
 /** @type {Record<string, IndexSet>} */
@@ -43,12 +44,14 @@ export const indexSets = {
   onlyp2group: [indexes.p2group],
   onlyp3rep: [indexes.p3rep],
   onlyp3sen: [indexes.p3sen],
+  p1andp2: [indexes.p1, indexes.p2],
   onlye11: [indexes.e11],
   onlye12: [indexes.e12],
   onlye13: [indexes.e13],
   onlye14: [indexes.e14],
   onlye15: [indexes.e15],
   onlye16: [indexes.e16],
+  onlye2: [indexes.e2],
 };
 
 /** @param {oracledb.Connection} con */

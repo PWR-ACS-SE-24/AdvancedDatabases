@@ -32,10 +32,15 @@
 
 == Propozycja 1
 
+// prisoner
 // 13.89 MB (megabytes) - inmemory (domyślna kompresja)
 // 17.83 MB (megabytes) - na dysku
 
 == Propozycja 2
+
+// guard
+// 1.311 MB (megabytes) - inmemory (domyślna kompresja)
+// 0.7864 MB (megabytes) - na dysku
 
 === Bez złączenia pamięciowego
 
@@ -53,14 +58,49 @@
 
 === `NO MEMCOMPRESS`
 
+// prisoner
+// 15.14 MB (megabytes) - inmemory
+// 17.83 MB (megabytes) - na dysku
+
 === `MEMCOMPRESS FOR DML`
+
+// prisoner
+// 15.14 MB (megabytes) - inmemory
+// 17.83 MB (megabytes) - na dysku
+
+// I think it's also worth mentioning that compression numbers for NO MEMCOMPRESS and MEMCOMPRESS FOR DML are basically the same. That's because MEMCOMPRESS FOR DML is optimized for DML operations and performs little or no data compression. In practice, it will only provide compression if all of the column values are the same.
+// https://blogs.oracle.com/in-memory/post/database-in-memory-compression
 
 === `MEMCOMPRESS FOR QUERY LOW` (domyślne)
 
+// prisoner
+// 13.89 MB (megabytes) - inmemory
+// 17.83 MB (megabytes) - na dysku
+
 === `MEMCOMPRESS FOR QUERY HIGH`
+
+// prisoner
+// 7.602 MB (megabytes) - inmemory
+// 17.83 MB (megabytes) - na dysku
 
 === `MEMCOMPRESS FOR CAPACITY LOW`
 
+// prisoner
+// 6.554 MB (megabytes) - inmemory
+// 17.83 MB (megabytes) - na dysku
+
 === `MEMCOMPRESS FOR CAPACITY HIGH`
 
+// prisoner
+// 5.505 MB (megabytes) - inmemory
+// 17.83 MB (megabytes) - na dysku
+
+=== Podsumowanie
+
 == Eksperyment 2
+
+// query4_mv
+// 5.505 MB (megabytes) - inmemory
+// 9.437 MB (megabytes) - na dysku
+
+// porównanie z indeksami?
