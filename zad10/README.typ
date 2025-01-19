@@ -37,7 +37,17 @@
 
 == Propozycja 2
 
+=== Bez złączenia pamięciowego
+
+=== Ze złączeniem pamięciowym
+
 == Propozycja 3
+
+// CIEKAWY WNIOSEK
+
+=== Ze złączeniem na `reprimand`
+
+=== Ze złączeniem na `prisoner`
 
 == Eksperyment 1
 

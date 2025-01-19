@@ -26,6 +26,8 @@ const indexes = {
   p1: await readIndex("p1"),
   p2: await readIndex("p2"),
   p2group: await readIndex("p2group"),
+  p3rep: await readIndex("p3rep"),
+  p3sen: await readIndex("p3sen"),
 };
 
 /** @type {Record<string, IndexSet>} */
@@ -33,6 +35,8 @@ export const indexSets = {
   onlyp1: [indexes.p1],
   onlyp2: [indexes.p2],
   onlyp2group: [indexes.p2group],
+  onlyp3rep: [indexes.p3rep],
+  onlyp3sen: [indexes.p3sen],
 };
 
 /** @param {oracledb.Connection} con */
