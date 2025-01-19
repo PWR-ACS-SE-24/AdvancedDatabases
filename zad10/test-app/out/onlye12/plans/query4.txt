@@ -3,19 +3,19 @@ Plan hash value: 171928505
 ---------------------------------------------------------------------------------------------------------------
 | Id  | Operation                             | Name          | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
 ---------------------------------------------------------------------------------------------------------------
-|   0 | SELECT STATEMENT                      |               |     5 |    65 |       | 82971   (1)| 00:00:04 |
-|   1 |  HASH UNIQUE                          |               |     5 |    65 |       | 82971   (1)| 00:00:04 |
+|   0 | SELECT STATEMENT                      |               |     5 |    65 |       | 85687   (1)| 00:00:04 |
+|   1 |  HASH UNIQUE                          |               |     5 |    65 |       | 85687   (1)| 00:00:04 |
 |   2 |   UNION-ALL                           |               |       |       |       |            |          |
-|   3 |    SORT AGGREGATE                     |               |     1 |    13 |       | 16594   (1)| 00:00:01 |
-|   4 |     VIEW                              |               |   138K|  1763K|       | 15932   (1)| 00:00:01 |
-|   5 |      HASH GROUP BY                    |               |   138K|  7596K|       | 15932   (1)| 00:00:01 |
-|   6 |       MERGE JOIN OUTER                |               |  2179K|   116M|       | 15932   (1)| 00:00:01 |
-|   7 |        MERGE JOIN OUTER               |               |  1398K|    61M|       | 13056   (1)| 00:00:01 |
-|   8 |         MERGE JOIN OUTER              |               |   284K|  9724K|       |  5568   (1)| 00:00:01 |
+|   3 |    SORT AGGREGATE                     |               |     1 |    13 |       | 17137   (1)| 00:00:01 |
+|   4 |     VIEW                              |               |   138K|  1763K|       | 16475   (1)| 00:00:01 |
+|   5 |      HASH GROUP BY                    |               |   138K|  7596K|       | 16475   (1)| 00:00:01 |
+|   6 |       MERGE JOIN OUTER                |               |  2179K|   116M|       | 16475   (1)| 00:00:01 |
+|   7 |        MERGE JOIN OUTER               |               |  1398K|    61M|       | 13599   (1)| 00:00:01 |
+|   8 |         MERGE JOIN OUTER              |               |   284K|  9724K|       |  6112   (1)| 00:00:01 |
 |*  9 |          FILTER                       |               |       |       |       |            |          |
-|  10 |           MERGE JOIN OUTER            |               |   138K|  3391K|       |  2860   (2)| 00:00:01 |
-|  11 |            SORT JOIN                  |               |   138K|  2170K|  7656K|   767   (2)| 00:00:01 |
-|* 12 |             TABLE ACCESS INMEMORY FULL| PRISONER      |   138K|  2170K|       |    26  (16)| 00:00:01 |
+|  10 |           MERGE JOIN OUTER            |               |   138K|  3391K|       |  3403   (2)| 00:00:01 |
+|  11 |            SORT JOIN                  |               |   138K|  2170K|  7656K|  1311   (1)| 00:00:01 |
+|* 12 |             TABLE ACCESS INMEMORY FULL| PRISONER      |   138K|  2170K|       |   569   (1)| 00:00:01 |
 |* 13 |            SORT JOIN                  |               |  9279 | 83511 |       |  2092   (2)| 00:00:01 |
 |  14 |             VIEW                      |               |  9279 | 83511 |       |  2091   (2)| 00:00:01 |
 |* 15 |              HASH JOIN                |               |  9279 |   371K|       |  2091   (2)| 00:00:01 |
@@ -29,16 +29,16 @@ Plan hash value: 171928505
 |  23 |          TABLE ACCESS FULL            | ACCOMMODATION |  1314K|    13M|       |  1744   (1)| 00:00:01 |
 |* 24 |        SORT JOIN                      |               |   416K|  4070K|    15M|  2874   (1)| 00:00:01 |
 |  25 |         TABLE ACCESS FULL             | SENTENCE      |   416K|  4070K|       |  1209   (1)| 00:00:01 |
-|  26 |    SORT AGGREGATE                     |               |     1 |    13 |       | 16594   (1)| 00:00:01 |
-|  27 |     VIEW                              |               |   138K|  1763K|       | 15932   (1)| 00:00:01 |
-|  28 |      HASH GROUP BY                    |               |   138K|  7596K|       | 15932   (1)| 00:00:01 |
-|  29 |       MERGE JOIN OUTER                |               |  2179K|   116M|       | 15932   (1)| 00:00:01 |
-|  30 |        MERGE JOIN OUTER               |               |  1398K|    61M|       | 13056   (1)| 00:00:01 |
-|  31 |         MERGE JOIN OUTER              |               |   284K|  9724K|       |  5568   (1)| 00:00:01 |
+|  26 |    SORT AGGREGATE                     |               |     1 |    13 |       | 17137   (1)| 00:00:01 |
+|  27 |     VIEW                              |               |   138K|  1763K|       | 16475   (1)| 00:00:01 |
+|  28 |      HASH GROUP BY                    |               |   138K|  7596K|       | 16475   (1)| 00:00:01 |
+|  29 |       MERGE JOIN OUTER                |               |  2179K|   116M|       | 16475   (1)| 00:00:01 |
+|  30 |        MERGE JOIN OUTER               |               |  1398K|    61M|       | 13599   (1)| 00:00:01 |
+|  31 |         MERGE JOIN OUTER              |               |   284K|  9724K|       |  6112   (1)| 00:00:01 |
 |* 32 |          FILTER                       |               |       |       |       |            |          |
-|  33 |           MERGE JOIN OUTER            |               |   138K|  3391K|       |  2860   (2)| 00:00:01 |
-|  34 |            SORT JOIN                  |               |   138K|  2170K|  7656K|   767   (2)| 00:00:01 |
-|* 35 |             TABLE ACCESS INMEMORY FULL| PRISONER      |   138K|  2170K|       |    26  (16)| 00:00:01 |
+|  33 |           MERGE JOIN OUTER            |               |   138K|  3391K|       |  3403   (2)| 00:00:01 |
+|  34 |            SORT JOIN                  |               |   138K|  2170K|  7656K|  1311   (1)| 00:00:01 |
+|* 35 |             TABLE ACCESS INMEMORY FULL| PRISONER      |   138K|  2170K|       |   569   (1)| 00:00:01 |
 |* 36 |            SORT JOIN                  |               |  9279 | 83511 |       |  2092   (2)| 00:00:01 |
 |  37 |             VIEW                      |               |  9279 | 83511 |       |  2091   (2)| 00:00:01 |
 |* 38 |              HASH JOIN                |               |  9279 |   371K|       |  2091   (2)| 00:00:01 |
@@ -52,16 +52,16 @@ Plan hash value: 171928505
 |  46 |          TABLE ACCESS FULL            | ACCOMMODATION |  1314K|    13M|       |  1744   (1)| 00:00:01 |
 |* 47 |        SORT JOIN                      |               |   416K|  4070K|    15M|  2874   (1)| 00:00:01 |
 |  48 |         TABLE ACCESS FULL             | SENTENCE      |   416K|  4070K|       |  1209   (1)| 00:00:01 |
-|  49 |    SORT AGGREGATE                     |               |     1 |    13 |       | 16594   (1)| 00:00:01 |
-|  50 |     VIEW                              |               |   138K|  1763K|       | 15932   (1)| 00:00:01 |
-|  51 |      HASH GROUP BY                    |               |   138K|  7596K|       | 15932   (1)| 00:00:01 |
-|  52 |       MERGE JOIN OUTER                |               |  2179K|   116M|       | 15932   (1)| 00:00:01 |
-|  53 |        MERGE JOIN OUTER               |               |  1398K|    61M|       | 13056   (1)| 00:00:01 |
-|  54 |         MERGE JOIN OUTER              |               |   284K|  9724K|       |  5568   (1)| 00:00:01 |
+|  49 |    SORT AGGREGATE                     |               |     1 |    13 |       | 17137   (1)| 00:00:01 |
+|  50 |     VIEW                              |               |   138K|  1763K|       | 16475   (1)| 00:00:01 |
+|  51 |      HASH GROUP BY                    |               |   138K|  7596K|       | 16475   (1)| 00:00:01 |
+|  52 |       MERGE JOIN OUTER                |               |  2179K|   116M|       | 16475   (1)| 00:00:01 |
+|  53 |        MERGE JOIN OUTER               |               |  1398K|    61M|       | 13599   (1)| 00:00:01 |
+|  54 |         MERGE JOIN OUTER              |               |   284K|  9724K|       |  6112   (1)| 00:00:01 |
 |* 55 |          FILTER                       |               |       |       |       |            |          |
-|  56 |           MERGE JOIN OUTER            |               |   138K|  3391K|       |  2860   (2)| 00:00:01 |
-|  57 |            SORT JOIN                  |               |   138K|  2170K|  7656K|   767   (2)| 00:00:01 |
-|* 58 |             TABLE ACCESS INMEMORY FULL| PRISONER      |   138K|  2170K|       |    26  (16)| 00:00:01 |
+|  56 |           MERGE JOIN OUTER            |               |   138K|  3391K|       |  3403   (2)| 00:00:01 |
+|  57 |            SORT JOIN                  |               |   138K|  2170K|  7656K|  1311   (1)| 00:00:01 |
+|* 58 |             TABLE ACCESS INMEMORY FULL| PRISONER      |   138K|  2170K|       |   569   (1)| 00:00:01 |
 |* 59 |            SORT JOIN                  |               |  9279 | 83511 |       |  2092   (2)| 00:00:01 |
 |  60 |             VIEW                      |               |  9279 | 83511 |       |  2091   (2)| 00:00:01 |
 |* 61 |              HASH JOIN                |               |  9279 |   371K|       |  2091   (2)| 00:00:01 |
@@ -75,16 +75,16 @@ Plan hash value: 171928505
 |  69 |          TABLE ACCESS FULL            | ACCOMMODATION |  1314K|    13M|       |  1744   (1)| 00:00:01 |
 |* 70 |        SORT JOIN                      |               |   416K|  4070K|    15M|  2874   (1)| 00:00:01 |
 |  71 |         TABLE ACCESS FULL             | SENTENCE      |   416K|  4070K|       |  1209   (1)| 00:00:01 |
-|  72 |    SORT AGGREGATE                     |               |     1 |    13 |       | 16594   (1)| 00:00:01 |
-|  73 |     VIEW                              |               |   138K|  1763K|       | 15932   (1)| 00:00:01 |
-|  74 |      HASH GROUP BY                    |               |   138K|  7596K|       | 15932   (1)| 00:00:01 |
-|  75 |       MERGE JOIN OUTER                |               |  2179K|   116M|       | 15932   (1)| 00:00:01 |
-|  76 |        MERGE JOIN OUTER               |               |  1398K|    61M|       | 13056   (1)| 00:00:01 |
-|  77 |         MERGE JOIN OUTER              |               |   284K|  9724K|       |  5568   (1)| 00:00:01 |
+|  72 |    SORT AGGREGATE                     |               |     1 |    13 |       | 17137   (1)| 00:00:01 |
+|  73 |     VIEW                              |               |   138K|  1763K|       | 16475   (1)| 00:00:01 |
+|  74 |      HASH GROUP BY                    |               |   138K|  7596K|       | 16475   (1)| 00:00:01 |
+|  75 |       MERGE JOIN OUTER                |               |  2179K|   116M|       | 16475   (1)| 00:00:01 |
+|  76 |        MERGE JOIN OUTER               |               |  1398K|    61M|       | 13599   (1)| 00:00:01 |
+|  77 |         MERGE JOIN OUTER              |               |   284K|  9724K|       |  6112   (1)| 00:00:01 |
 |* 78 |          FILTER                       |               |       |       |       |            |          |
-|  79 |           MERGE JOIN OUTER            |               |   138K|  3391K|       |  2860   (2)| 00:00:01 |
-|  80 |            SORT JOIN                  |               |   138K|  2170K|  7656K|   767   (2)| 00:00:01 |
-|* 81 |             TABLE ACCESS INMEMORY FULL| PRISONER      |   138K|  2170K|       |    26  (16)| 00:00:01 |
+|  79 |           MERGE JOIN OUTER            |               |   138K|  3391K|       |  3403   (2)| 00:00:01 |
+|  80 |            SORT JOIN                  |               |   138K|  2170K|  7656K|  1311   (1)| 00:00:01 |
+|* 81 |             TABLE ACCESS INMEMORY FULL| PRISONER      |   138K|  2170K|       |   569   (1)| 00:00:01 |
 |* 82 |            SORT JOIN                  |               |  9279 | 83511 |       |  2092   (2)| 00:00:01 |
 |  83 |             VIEW                      |               |  9279 | 83511 |       |  2091   (2)| 00:00:01 |
 |* 84 |              HASH JOIN                |               |  9279 |   371K|       |  2091   (2)| 00:00:01 |
@@ -98,16 +98,16 @@ Plan hash value: 171928505
 |  92 |          TABLE ACCESS FULL            | ACCOMMODATION |  1314K|    13M|       |  1744   (1)| 00:00:01 |
 |* 93 |        SORT JOIN                      |               |   416K|  4070K|    15M|  2874   (1)| 00:00:01 |
 |  94 |         TABLE ACCESS FULL             | SENTENCE      |   416K|  4070K|       |  1209   (1)| 00:00:01 |
-|  95 |    SORT AGGREGATE                     |               |     1 |    13 |       | 16594   (1)| 00:00:01 |
-|  96 |     VIEW                              |               |   138K|  1763K|       | 15932   (1)| 00:00:01 |
-|  97 |      HASH GROUP BY                    |               |   138K|  7596K|       | 15932   (1)| 00:00:01 |
-|  98 |       MERGE JOIN OUTER                |               |  2179K|   116M|       | 15932   (1)| 00:00:01 |
-|  99 |        MERGE JOIN OUTER               |               |  1398K|    61M|       | 13056   (1)| 00:00:01 |
-| 100 |         MERGE JOIN OUTER              |               |   284K|  9724K|       |  5568   (1)| 00:00:01 |
+|  95 |    SORT AGGREGATE                     |               |     1 |    13 |       | 17137   (1)| 00:00:01 |
+|  96 |     VIEW                              |               |   138K|  1763K|       | 16475   (1)| 00:00:01 |
+|  97 |      HASH GROUP BY                    |               |   138K|  7596K|       | 16475   (1)| 00:00:01 |
+|  98 |       MERGE JOIN OUTER                |               |  2179K|   116M|       | 16475   (1)| 00:00:01 |
+|  99 |        MERGE JOIN OUTER               |               |  1398K|    61M|       | 13599   (1)| 00:00:01 |
+| 100 |         MERGE JOIN OUTER              |               |   284K|  9724K|       |  6112   (1)| 00:00:01 |
 |*101 |          FILTER                       |               |       |       |       |            |          |
-| 102 |           MERGE JOIN OUTER            |               |   138K|  3391K|       |  2860   (2)| 00:00:01 |
-| 103 |            SORT JOIN                  |               |   138K|  2170K|  7656K|   767   (2)| 00:00:01 |
-|*104 |             TABLE ACCESS INMEMORY FULL| PRISONER      |   138K|  2170K|       |    26  (16)| 00:00:01 |
+| 102 |           MERGE JOIN OUTER            |               |   138K|  3391K|       |  3403   (2)| 00:00:01 |
+| 103 |            SORT JOIN                  |               |   138K|  2170K|  7656K|  1311   (1)| 00:00:01 |
+|*104 |             TABLE ACCESS INMEMORY FULL| PRISONER      |   138K|  2170K|       |   569   (1)| 00:00:01 |
 |*105 |            SORT JOIN                  |               |  9279 | 83511 |       |  2092   (2)| 00:00:01 |
 | 106 |             VIEW                      |               |  9279 | 83511 |       |  2091   (2)| 00:00:01 |
 |*107 |              HASH JOIN                |               |  9279 |   371K|       |  2091   (2)| 00:00:01 |
