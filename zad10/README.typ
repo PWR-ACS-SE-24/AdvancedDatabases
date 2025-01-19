@@ -32,6 +32,9 @@
 
 == Propozycja 1
 
+// 13.89 MB (megabytes) - inmemory (domyślna kompresja)
+// 17.83 MB (megabytes) - na dysku
+
 == Propozycja 2
 
 == Propozycja 3

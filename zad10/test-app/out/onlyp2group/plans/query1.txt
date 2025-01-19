@@ -1,0 +1,43 @@
+Plan hash value: 708476432
+ 
+------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                                  | Name                      | Rows  | Bytes | Cost (%CPU)| Time     |
+------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                           |                           |    68 |  1836 |  1697   (5)| 00:00:01 |
+|   1 |  SORT GROUP BY                             |                           |     1 |   271 |            |          |
+|   2 |   VIEW                                     |                           |     5 |  1355 |    48   (5)| 00:00:01 |
+|   3 |    SORT ORDER BY                           |                           |     5 |  1485 |    48   (5)| 00:00:01 |
+|*  4 |     VIEW                                   |                           |     5 |  1485 |    47   (3)| 00:00:01 |
+|*  5 |      WINDOW SORT PUSHED RANK               |                           |     5 |   420 |    47   (3)| 00:00:01 |
+|*  6 |       FILTER                               |                           |       |       |            |          |
+|*  7 |        HASH JOIN OUTER                     |                           |     5 |   420 |    46   (0)| 00:00:01 |
+|   8 |         NESTED LOOPS                       |                           |     7 |   476 |    29   (0)| 00:00:01 |
+|   9 |          TABLE ACCESS BY INDEX ROWID       | PATROL_SLOT               |     1 |    27 |     2   (0)| 00:00:01 |
+|* 10 |           INDEX UNIQUE SCAN                | SYS_C008259               |     1 |       |     1   (0)| 00:00:01 |
+|* 11 |          TABLE ACCESS INMEMORY FULL        | GUARD                     |     7 |   287 |    27   (0)| 00:00:01 |
+|  12 |         TABLE ACCESS BY INDEX ROWID BATCHED| PATROL                    |  2368 | 37888 |    17   (0)| 00:00:01 |
+|* 13 |          INDEX RANGE SCAN                  | PATROL_FK_PATROL_SLOT_IDX |  2368 |       |     8   (0)| 00:00:01 |
+|* 14 |  TABLE ACCESS FULL                         | PATROL_SLOT               |    68 |  1836 |    34   (3)| 00:00:01 |
+------------------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   4 - filter("from$_subquery$_008"."rowlimit_$$_rownumber"<=:PROPOSAL_COUNT)
+   5 - filter(ROW_NUMBER() OVER ( ORDER BY "DBMS_RANDOM"."VALUE"())<=:PROPOSAL_COUNT)
+   6 - filter("P"."ID" IS NULL)
+   7 - access("P"."FK_GUARD"(+)="G"."ID" AND "P"."FK_PATROL_SLOT"(+)="PS"."ID")
+  10 - access("PS"."ID"=:B1)
+  11 - inmemory(("G"."HAS_DISABILITY_CLASS"=:HAS_DISABILITY_CLASS OR :HAS_DISABILITY_CLASS IS NULL) AND 
+              "PS"."START_TIME">=INTERNAL_FUNCTION("G"."EMPLOYMENT_DATE") AND ("G"."DISMISSAL_DATE" IS NULL OR 
+              "PS"."END_TIME"<=INTERNAL_FUNCTION("G"."DISMISSAL_DATE")) AND (:EXPERIENCE_MONTHS IS NULL OR 
+              MONTHS_BETWEEN(INTERNAL_FUNCTION("PS"."START_TIME"),INTERNAL_FUNCTION("G"."EMPLOYMENT_DATE"))>=:EXPERIENCE_MONTH
+              S))
+       filter(("G"."HAS_DISABILITY_CLASS"=:HAS_DISABILITY_CLASS OR :HAS_DISABILITY_CLASS IS NULL) AND 
+              "PS"."START_TIME">=INTERNAL_FUNCTION("G"."EMPLOYMENT_DATE") AND ("G"."DISMISSAL_DATE" IS NULL OR 
+              "PS"."END_TIME"<=INTERNAL_FUNCTION("G"."DISMISSAL_DATE")) AND (:EXPERIENCE_MONTHS IS NULL OR 
+              MONTHS_BETWEEN(INTERNAL_FUNCTION("PS"."START_TIME"),INTERNAL_FUNCTION("G"."EMPLOYMENT_DATE"))>=:EXPERIENCE_MONTH
+              S))
+  13 - access("P"."FK_PATROL_SLOT"(+)=:B1)
+  14 - filter("PS"."START_TIME">=TO_TIMESTAMP(:START_TIME,'YYYY-MM-DD HH24:MI:SS') AND 
+              "PS"."END_TIME"<=TO_TIMESTAMP(:END_TIME,'YYYY-MM-DD HH24:MI:SS'))

@@ -24,31 +24,15 @@ const readIndex = async (name, editQuery = {}) => {
 /** @type {Record<string, IndexEntry>} */
 const indexes = {
   p1: await readIndex("p1"),
-  // i2: await readIndex("i2"),
-  // i3: await readIndex("i3"),
-  // i4: await readIndex("i4"),
-  // i5: await readIndex("i5"),
-  // e11: await readIndex("e11"),
-  // e12: await readIndex("e12"),
-  // e13: await readIndex("e13"),
-  // e31: await readIndex("e31", { query3: query3partition }),
-  // e32: await readIndex("e32", { query3: query3partition }),
+  p2: await readIndex("p2"),
+  p2group: await readIndex("p2group"),
 };
 
 /** @type {Record<string, IndexSet>} */
 export const indexSets = {
   onlyp1: [indexes.p1],
-  // only1: [indexes.i1],
-  // only2: [indexes.i2],
-  // only3: [indexes.i3],
-  // only4: [indexes.i4],
-  // only5: [indexes.i5],
-  // all: [indexes.i1, indexes.i2, indexes.i3, indexes.i4, indexes.i5],
-  // e11: [indexes.e11],
-  // e12: [indexes.e12],
-  // e13: [indexes.e13],
-  // e31: [indexes.e31],
-  // e32: [indexes.e32],
+  onlyp2: [indexes.p2],
+  onlyp2group: [indexes.p2group],
 };
 
 /** @param {oracledb.Connection} con */
