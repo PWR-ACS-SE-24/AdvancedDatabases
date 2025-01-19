@@ -73,7 +73,9 @@ export async function createIndexes(con, set) {
     for (const query of index.create) {
       try {
         await con.execute(query);
-      } catch {}
+      } catch (err) {
+        console.log(err);
+      }
     }
   }
 }
