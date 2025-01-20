@@ -1,17 +1,17 @@
-Plan hash value: 244708335
+Plan hash value: 87624460
  
 -------------------------------------------------------------------------------------------------
 | Id  | Operation                       | Name          | Rows  | Bytes | Cost (%CPU)| Time     |
 -------------------------------------------------------------------------------------------------
-|   0 | INSERT STATEMENT                |               |   106 |  4664 |  2101   (2)| 00:00:01 |
+|   0 | INSERT STATEMENT                |               |   121 |  5324 |  2474   (5)| 00:00:01 |
 |   1 |  LOAD TABLE CONVENTIONAL        | REPRIMAND     |       |       |            |          |
-|   2 |   SEQUENCE                      | ISEQ$$_75815  |       |       |            |          |
-|*  3 |    HASH JOIN                    |               |   106 |  4664 |  2101   (2)| 00:00:01 |
-|   4 |     NESTED LOOPS                |               |  2540 | 45720 |   326   (1)| 00:00:01 |
+|   2 |   SEQUENCE                      | ISEQ$$_76236  |       |       |            |          |
+|*  3 |    HASH JOIN                    |               |   121 |  5324 |  2474   (5)| 00:00:01 |
+|   4 |     NESTED LOOPS                |               |  2742 | 49356 |   354   (2)| 00:00:01 |
 |   5 |      TABLE ACCESS BY INDEX ROWID| PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
-|*  6 |       INDEX UNIQUE SCAN         | SYS_C008242   |     1 |       |     0   (0)| 00:00:01 |
-|*  7 |      TABLE ACCESS FULL          | CELL          |  2540 | 27940 |   325   (1)| 00:00:01 |
-|*  8 |     TABLE ACCESS FULL           | ACCOMMODATION |  9577 |   243K|  1775   (3)| 00:00:01 |
+|*  6 |       INDEX UNIQUE SCAN         | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
+|*  7 |      TABLE ACCESS FULL          | CELL          |  2742 | 30162 |   353   (2)| 00:00:01 |
+|*  8 |     TABLE ACCESS FULL           | ACCOMMODATION | 10850 |   275K|  2119   (6)| 00:00:01 |
 -------------------------------------------------------------------------------------------------
  
 Predicate Information (identified by operation id):

@@ -1,71 +1,57 @@
-Plan hash value: 1298516637
+Plan hash value: 848339698
  
-----------------------------------------------------------------------------------------------
-| Id  | Operation                        | Name      | Rows  | Bytes | Cost (%CPU)| Time     |
-----------------------------------------------------------------------------------------------
-|   0 | SELECT STATEMENT                 |           |     5 |   150 |  1570   (1)| 00:00:01 |
-|   1 |  HASH UNIQUE                     |           |     5 |   150 |  1570   (1)| 00:00:01 |
-|   2 |   UNION-ALL                      |           |       |       |            |          |
-|   3 |    SORT AGGREGATE                |           |     1 |    30 |   314   (1)| 00:00:01 |
-|*  4 |     MAT_VIEW ACCESS INMEMORY FULL| QUERY4_MV |   889 | 26670 |   313   (1)| 00:00:01 |
-|   5 |    SORT AGGREGATE                |           |     1 |    30 |   314   (1)| 00:00:01 |
-|*  6 |     MAT_VIEW ACCESS INMEMORY FULL| QUERY4_MV |   889 | 26670 |   313   (1)| 00:00:01 |
-|   7 |    SORT AGGREGATE                |           |     1 |    30 |   314   (1)| 00:00:01 |
-|*  8 |     MAT_VIEW ACCESS INMEMORY FULL| QUERY4_MV |   889 | 26670 |   313   (1)| 00:00:01 |
-|   9 |    SORT AGGREGATE                |           |     1 |    30 |   314   (1)| 00:00:01 |
-|* 10 |     MAT_VIEW ACCESS INMEMORY FULL| QUERY4_MV |   889 | 26670 |   313   (1)| 00:00:01 |
-|  11 |    SORT AGGREGATE                |           |     1 |    30 |   314   (1)| 00:00:01 |
-|* 12 |     MAT_VIEW ACCESS INMEMORY FULL| QUERY4_MV |   889 | 26670 |   313   (1)| 00:00:01 |
-----------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------
+| Id  | Operation                                 | Name              | Rows  | Bytes | Cost (%CPU)| Time     |
+---------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                          |                   |     5 |    47 |  9784   (1)| 00:00:01 |
+|   1 |  HASH UNIQUE                              |                   |     5 |    47 |  9784   (1)| 00:00:01 |
+|   2 |   UNION-ALL                               |                   |       |       |            |          |
+|   3 |    SORT AGGREGATE                         |                   |     1 |    10 |  1956   (1)| 00:00:01 |
+|*  4 |     MAT_VIEW ACCESS BY INDEX ROWID BATCHED| QUERY4_MV         |  8705 | 87050 |  1955   (1)| 00:00:01 |
+|*  5 |      INDEX FULL SCAN                      | QUERY4_MV_SEX_IDX |   157K|       |   594   (2)| 00:00:01 |
+|   6 |    SORT AGGREGATE                         |                   |     1 |    10 |  1957   (1)| 00:00:01 |
+|*  7 |     MAT_VIEW ACCESS BY INDEX ROWID BATCHED| QUERY4_MV         |  8705 | 87050 |  1955   (1)| 00:00:01 |
+|*  8 |      INDEX FULL SCAN                      | QUERY4_MV_SEX_IDX |   157K|       |   594   (2)| 00:00:01 |
+|   9 |    SORT AGGREGATE                         |                   |     1 |     9 |  1957   (1)| 00:00:01 |
+|* 10 |     MAT_VIEW ACCESS BY INDEX ROWID BATCHED| QUERY4_MV         |  8705 | 78345 |  1955   (1)| 00:00:01 |
+|* 11 |      INDEX FULL SCAN                      | QUERY4_MV_SEX_IDX |   157K|       |   594   (2)| 00:00:01 |
+|  12 |    SORT AGGREGATE                         |                   |     1 |     9 |  1957   (1)| 00:00:01 |
+|* 13 |     MAT_VIEW ACCESS BY INDEX ROWID BATCHED| QUERY4_MV         |  8705 | 78345 |  1956   (1)| 00:00:01 |
+|* 14 |      INDEX FULL SCAN                      | QUERY4_MV_SEX_IDX |   157K|       |   594   (2)| 00:00:01 |
+|  15 |    SORT AGGREGATE                         |                   |     1 |     9 |  1957   (1)| 00:00:01 |
+|* 16 |     MAT_VIEW ACCESS BY INDEX ROWID BATCHED| QUERY4_MV         |  8705 | 78345 |  1956   (1)| 00:00:01 |
+|* 17 |      INDEX FULL SCAN                      | QUERY4_MV_SEX_IDX |   157K|       |   594   (2)| 00:00:01 |
+---------------------------------------------------------------------------------------------------------------
  
 Predicate Information (identified by operation id):
 ---------------------------------------------------
  
-   4 - inmemory((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND (:SEX IS 
-              NULL OR "SEX"=TO_NUMBER(:SEX)))
-       filter((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND (:SEX IS 
-              NULL OR "SEX"=TO_NUMBER(:SEX)))
-   6 - inmemory((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND (:SEX IS 
-              NULL OR "SEX"=TO_NUMBER(:SEX)))
-       filter((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND (:SEX IS 
-              NULL OR "SEX"=TO_NUMBER(:SEX)))
-   8 - inmemory((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND (:SEX IS 
-              NULL OR "SEX"=TO_NUMBER(:SEX)))
-       filter((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND (:SEX IS 
-              NULL OR "SEX"=TO_NUMBER(:SEX)))
-  10 - inmemory((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND (:SEX IS 
-              NULL OR "SEX"=TO_NUMBER(:SEX)))
-       filter((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND (:SEX IS 
-              NULL OR "SEX"=TO_NUMBER(:SEX)))
-  12 - inmemory((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND (:SEX IS 
-              NULL OR "SEX"=TO_NUMBER(:SEX)))
-       filter((:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER) AND (:SEX IS 
-              NULL OR "SEX"=TO_NUMBER(:SEX)))
+   4 - filter(:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER)
+   5 - filter("SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
+   7 - filter(:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER)
+   8 - filter("SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
+  10 - filter(:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER)
+  11 - filter("SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
+  13 - filter(:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER)
+  14 - filter("SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
+  16 - filter(:BLOCK_NUMBER IS NULL OR "BLOCK_NUMBER"=:BLOCK_NUMBER)
+  17 - filter("SEX"=TO_NUMBER(:SEX) OR :SEX IS NULL)
  
 Hint Report (identified by operation id / Query Block Name / Object Alias):
-Total hints for statement: 10 (U - Unused (10))
+Total hints for statement: 5 (U - Unused (5))
 ---------------------------------------------------------------------------
  
    4 -  SEL$F5BB74E1 / "QUERY4_MV"@"SEL$2"
          U -  INDEX(query4_mv query4_mv_block_number_idx)
-         U -  INDEX(query4_mv query4_mv_sex_idx)
  
-   6 -  SEL$07BDC5B4 / "QUERY4_MV"@"SEL$4"
+   7 -  SEL$07BDC5B4 / "QUERY4_MV"@"SEL$4"
          U -  INDEX(query4_mv query4_mv_block_number_idx)
-         U -  INDEX(query4_mv query4_mv_sex_idx)
  
-   8 -  SEL$ABDE6DFF / "QUERY4_MV"@"SEL$6"
+  10 -  SEL$ABDE6DFF / "QUERY4_MV"@"SEL$6"
          U -  INDEX(query4_mv query4_mv_block_number_idx)
-         U -  INDEX(query4_mv query4_mv_sex_idx)
  
-  10 -  SEL$8A3193DA / "QUERY4_MV"@"SEL$8"
+  13 -  SEL$8A3193DA / "QUERY4_MV"@"SEL$8"
          U -  INDEX(query4_mv query4_mv_block_number_idx)
-         U -  INDEX(query4_mv query4_mv_sex_idx)
  
-  12 -  SEL$0EE6DB63 / "QUERY4_MV"@"SEL$10"
+  16 -  SEL$0EE6DB63 / "QUERY4_MV"@"SEL$10"
          U -  INDEX(query4_mv query4_mv_block_number_idx)
-         U -  INDEX(query4_mv query4_mv_sex_idx)
- 
-Note
------
-   - dynamic statistics used: dynamic sampling (level=2)
