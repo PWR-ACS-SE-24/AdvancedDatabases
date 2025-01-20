@@ -1,32 +1,30 @@
-Plan hash value: 2939466326
+Plan hash value: 3347754010
  
------------------------------------------------------------------------------------------------------
-| Id  | Operation                           | Name          | Rows  | Bytes | Cost (%CPU)| Time     |
------------------------------------------------------------------------------------------------------
-|   0 | INSERT STATEMENT                    |               |     1 |    52 |  3955   (3)| 00:00:01 |
-|   1 |  LOAD TABLE CONVENTIONAL            | ACCOMMODATION |       |       |            |          |
-|   2 |   SEQUENCE                          | ISEQ$$_76227  |       |       |            |          |
-|*  3 |    HASH JOIN                        |               |     1 |    52 |  3955   (3)| 00:00:01 |
-|   4 |     VIEW                            |               |     1 |    26 |  2449   (4)| 00:00:01 |
-|   5 |      COUNT                          |               |       |       |            |          |
-|*  6 |       HASH JOIN ANTI                |               |     1 |    31 |  2449   (4)| 00:00:01 |
-|   7 |        NESTED LOOPS                 |               |    55 |   990 |   354   (2)| 00:00:01 |
-|   8 |         TABLE ACCESS BY INDEX ROWID | PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
-|*  9 |          INDEX UNIQUE SCAN          | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
-|* 10 |         TABLE ACCESS FULL           | CELL          |    55 |   605 |   353   (2)| 00:00:01 |
-|  11 |        VIEW                         | VW_NSO_1      | 10659 |   135K|  2095   (5)| 00:00:01 |
-|  12 |         SORT GROUP BY               |               | 10659 |   218K|  2095   (5)| 00:00:01 |
-|* 13 |          TABLE ACCESS FULL          | ACCOMMODATION | 10850 |   222K|  2093   (4)| 00:00:01 |
-|  14 |     VIEW                            |               |   103 |  2678 |  1506   (2)| 00:00:01 |
-|  15 |      SORT GROUP BY                  |               |   103 |  9373 |  1506   (2)| 00:00:01 |
-|  16 |       COUNT                         |               |       |       |            |          |
-|* 17 |        FILTER                       |               |       |       |            |          |
-|  18 |         NESTED LOOPS                |               |   103 |  9373 |  1505   (1)| 00:00:01 |
-|  19 |          NESTED LOOPS               |               |   103 |  9373 |  1505   (1)| 00:00:01 |
-|* 20 |           TABLE ACCESS FULL         | REPRIMAND     |   103 |  7622 |  1402   (2)| 00:00:01 |
-|* 21 |           INDEX UNIQUE SCAN         | SYS_C008848   |     1 |       |     0   (0)| 00:00:01 |
-|  22 |          TABLE ACCESS BY INDEX ROWID| PRISONER      |     1 |    17 |     1   (0)| 00:00:01 |
------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+| Id  | Operation                          | Name          | Rows  | Bytes | Cost (%CPU)| Time     |
+----------------------------------------------------------------------------------------------------
+|   0 | INSERT STATEMENT                   |               |     1 |    52 |  3888   (4)| 00:00:01 |
+|   1 |  LOAD TABLE CONVENTIONAL           | ACCOMMODATION |       |       |            |          |
+|   2 |   SEQUENCE                         | ISEQ$$_76227  |       |       |            |          |
+|*  3 |    HASH JOIN                       |               |     1 |    52 |  3888   (4)| 00:00:01 |
+|   4 |     VIEW                           |               |     1 |    26 |  2449   (4)| 00:00:01 |
+|   5 |      COUNT                         |               |       |       |            |          |
+|*  6 |       HASH JOIN ANTI               |               |     1 |    31 |  2449   (4)| 00:00:01 |
+|   7 |        NESTED LOOPS                |               |    55 |   990 |   354   (2)| 00:00:01 |
+|   8 |         TABLE ACCESS BY INDEX ROWID| PRISON_BLOCK  |     1 |     7 |     1   (0)| 00:00:01 |
+|*  9 |          INDEX UNIQUE SCAN         | SYS_C008856   |     1 |       |     0   (0)| 00:00:01 |
+|* 10 |         TABLE ACCESS FULL          | CELL          |    55 |   605 |   353   (2)| 00:00:01 |
+|  11 |        VIEW                        | VW_NSO_1      | 10659 |   135K|  2095   (5)| 00:00:01 |
+|  12 |         SORT GROUP BY              |               | 10659 |   218K|  2095   (5)| 00:00:01 |
+|* 13 |          TABLE ACCESS FULL         | ACCOMMODATION | 10850 |   222K|  2093   (4)| 00:00:01 |
+|  14 |     VIEW                           |               |   103 |  2678 |  1439   (2)| 00:00:01 |
+|  15 |      SORT GROUP BY                 |               |   103 |  9373 |  1439   (2)| 00:00:01 |
+|  16 |       COUNT                        |               |       |       |            |          |
+|* 17 |        FILTER                      |               |       |       |            |          |
+|* 18 |         HASH JOIN                  |               |   103 |  9373 |  1438   (2)| 00:00:01 |
+|* 19 |          TABLE ACCESS FULL         | REPRIMAND     |   103 |  7622 |  1402   (2)| 00:00:01 |
+|  20 |          TABLE ACCESS INMEMORY FULL| PRISONER      |   299K|  4980K|    34  (30)| 00:00:01 |
+----------------------------------------------------------------------------------------------------
  
 Predicate Information (identified by operation id):
 ---------------------------------------------------
@@ -35,11 +33,11 @@ Predicate Information (identified by operation id):
    6 - access("C"."ID"="FK_CELL")
    9 - access("PB"."BLOCK_NUMBER"=:BLOCK_NUMBER)
   10 - filter("PB"."ID"="C"."FK_BLOCK" AND "C"."IS_SOLITARY"=1)
-  13 - filter(TO_CHAR(INTERNAL_FUNCTION("A"."START_DATE"),'YYYY-MM-DD HH24:MI:SS')<=:NOW AND 
-              ("A"."END_DATE" IS NULL OR TO_CHAR(INTERNAL_FUNCTION("A"."END_DATE"),'YYYY-MM-DD 
+  13 - filter(TO_CHAR(INTERNAL_FUNCTION("A"."START_DATE"),'YYYY-MM-DD HH24:MI:SS')<=:NOW 
+              AND ("A"."END_DATE" IS NULL OR TO_CHAR(INTERNAL_FUNCTION("A"."END_DATE"),'YYYY-MM-DD 
               HH24:MI:SS')>=:NOW))
   17 - filter(:END_DATE>=:START_DATE)
-  20 - filter((:EVENT_TYPE IS NULL OR INSTR("R"."REASON",:EVENT_TYPE)>0) AND 
+  18 - access("P"."ID"="R"."FK_PRISONER")
+  19 - filter((:EVENT_TYPE IS NULL OR INSTR("R"."REASON",:EVENT_TYPE)>0) AND 
               TO_CHAR(INTERNAL_FUNCTION("R"."ISSUE_DATE"),'YYYY-MM-DD')>=:START_DATE AND 
               TO_CHAR(INTERNAL_FUNCTION("R"."ISSUE_DATE"),'YYYY-MM-DD')<=:END_DATE)
-  21 - access("P"."ID"="R"."FK_PRISONER")
