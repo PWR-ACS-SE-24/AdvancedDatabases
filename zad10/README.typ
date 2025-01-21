@@ -47,7 +47,7 @@ Następnie, logując się za pomocą SQL\*Plus kontem `sys`, przydzieliliśmy od
 
 ```sql
 alter system set sga_target = 1536M scope = both;
-alter system set inmemory_size = 800M scope = both;
+alter system set inmemory_size = 1G scope = both;
 ```
 
 Końcowe wartości kluczowych parametrów (pokazane komendą `show parameter`) to:
